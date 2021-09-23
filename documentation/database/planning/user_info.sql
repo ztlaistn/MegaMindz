@@ -17,17 +17,21 @@ user_info (
 -- Fields required to create account
 	Email 			VARCHAR(100) NOT NULL DEFAULT "",
 	Username 		VARCHAR(50) NOT NULL DEFAULT "",
-	Password		VARCHAR(50) NOT NULL DEAFULT "",
+	Password		VARCHAR(50) NOT NULL DEFAULT "",
 -- Additional account information (feel free to add more to this, as we add features)
-	FirstName		VARCHAR(30) NOT NULL DEAFULT "",
-	LastName		VARCHAR(30) NOT NULL DEAFULT "",
-	DOB				DATE DEAFULT "0000-00-00",
-	Location		VARCHAR(50) NOT NULL DEAFULT "",
+	FirstName		VARCHAR(30) NOT NULL DEFAULT "",
+	LastName		VARCHAR(30) NOT NULL DEFAULT "",
+	DOB				DATE DEFAULT "0000-00-00",
+	Location		VARCHAR(50) NOT NULL DEFAULT "",
 	Status			VARCHAR(200) NOT NULL DEFAULT "",
 	Skill			VARCHAR(200) NOT NULL DEFAULT "",
 -- Might want to just disable row, rather than delete entry when account is removed
 	Enabled			TINYINT NOT NULL DEFAULT 0,
+	
+	INDEX 	index1 	(Enabled, Username, Password),
+	INDEX 	index2	(Enabled, Lastname, Firstname)
 );
 
 -- Will print table structure when created
 DESCRIBE user_info
+
