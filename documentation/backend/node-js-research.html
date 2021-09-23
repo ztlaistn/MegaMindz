@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <h1>Node.JS Research</h1>
+    <h2>Rationale</h2>
+    <p>It is way more suited for applications that require a persistent connection between the browser and server.</p>
+    <p>Since Node.JS allows for event based (asynchronous calls) using JavaScript, it's very good for when you need to do several different things at the same time (voice chat, games, etc.)</p>
+
+    <p>It does not require the server to open multiple threads (like Django would have to). If we were to do this in Django, each seperate thread (user that's connected to voice call) would require its own server process. That's too much!</p>
+
+    <p>Instead, Node utilizes <a href="https://en.wikipedia.org/wiki/Push_technology#Long_polling">long polling</a>, where updates can be sent directly to the user in real time.</p>
+
+    <p>(
+      <a href="https://stackoverflow.com/questions/5062614/how-to-decide-when-to-use-node-js">Source</a>
+    )</p>
+
+    <p>Finally, there are already a LOT of examples and tutorials out there about making real-time voice chat and text chat apps using node. There's honestly way more than doing it in Django.</p>
+
+    <h2>Examples</h2>
+    <a href="https://tsh.io/blog/how-to-write-video-chat-app-using-webrtc-and-nodejs/">Writing a Video Chat App with WebRTC and Node</a>
+    <br>
+    <br>
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/DvlyzDZDEq4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+  </body>
+</html>
