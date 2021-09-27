@@ -5,26 +5,44 @@
     <title></title>
   </head>
   <body>
-    <h1>Node.JS Research</h1>
+    <h1>Backend Research</h1>
+    <h2>Technology</h2>
+    <ul>
+      <li>Node.JS</li>
+    </ul>
     <h2>Rationale</h2>
-    <p>It is way more suited for applications that require a persistent connection between the browser and server.</p>
-    <p>Since Node.JS allows for event based (asynchronous calls) using JavaScript, it's very good for when you need to do several different things at the same time (voice chat, games, etc.)</p>
+    <p>
+      Node.JS is suited for applications that require a persistent connection between the browser and server.
+      <br><br>
+      It allows for event based (asynchronous calls) using JavaScript, so it's very good for when you need to do several different things at the same time (voice chat, games, etc.)
+      <br><br>
+      Since most of the teammates have React experience and we agreed to use React for the frontend, it is also nice to use a JavaScript based backend. This way, we can also use the same testing library.
+      <br> <br>
+    </p>
+    <h2>What we will use Node for:</h2>
+    <ul>
+      <li>Setting up a web server</li>
+      <li>Create web sockets for users to send data</li>
+      <li>provide API endpoints for frontend to send requests to (GET/POST)</li>
+      <li>Interface with PostGreSQL database</li>
+    </ul>
 
-    <p>It does not require the server to open multiple threads (like Django would have to). If we were to do this in Django, each seperate thread (user that's connected to voice call) would require its own server process. That's too much!</p>
-
-    <p>Instead, Node utilizes <a href="https://en.wikipedia.org/wiki/Push_technology#Long_polling">long polling</a>, where updates can be sent directly to the user in real time.</p>
-
-    <p>(
-      <a href="https://stackoverflow.com/questions/5062614/how-to-decide-when-to-use-node-js">Source</a>
-    )</p>
-
-    <p>Finally, there are already a LOT of examples and tutorials out there about making real-time voice chat and text chat apps using node. There's honestly way more than doing it in Django.</p>
-
+    <h2>Our Needs</h2>
+    <h3>Also: Why Node over Django</h3>
+      <p>
+        Node.JS does not require the server to open multiple threads (like Django would have to). If we were to do this in Django, each seperate thread (user that's connected to voice call) would require its own server process. That's too much!
+        <br><br>
+        Instead, Node utilizes <a href="https://en.wikipedia.org/wiki/Push_technology#Long_polling">long polling</a>, where updates can be sent directly to the user in real time. We are building an application that will need voice chat and real time text chat, so these features of Node will fit our needs the best.Finally, there are already a LOT of examples and tutorials out there about making real-time voice chat and text chat apps using Node.
+        <br><br>
+        <a href="https://stackoverflow.com/questions/5062614/how-to-decide-when-to-use-node-js">Source</a>
+      </p>
+    <h2>Heroku Integration</h2>
+    <p> Will update </p>
+    <h2>Docker Integration</h2>
+    <p> Will update </p>
     <h2>Examples</h2>
     <a href="https://tsh.io/blog/how-to-write-video-chat-app-using-webrtc-and-nodejs/">Writing a Video Chat App with WebRTC and Node</a>
-    <br>
-    <br>
+    <br><br>
     <iframe width="560" height="315" src="https://www.youtube.com/embed/DvlyzDZDEq4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
   </body>
 </html>
