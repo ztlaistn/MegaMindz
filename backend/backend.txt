@@ -1,0 +1,26 @@
+Information about package.json file:
+
+To run the app, you will have to pay attention to the "scripts" section.
+So far, there is a dev script:
+"dev": "nodemon --watch 'backend/**/*.js' -r esm backend/index.js"
+
+To run this script, in the main megamindz directory, run:
+npm run dev
+
+----DEV SCRIPT EXPLAINED---
+
+nodemon is used to monitor changes to the codebase,
+so you don't have to manually restart the server everytime you make a change
+
+It is set to watch any changes made to .js files in the backend folder
+
+-r esm is VERY IMPORTANT
+esm module loader helps us to use the es6 imports in node.js
+By imports I am referring to the statements that look like this:
+
+import { Server } from "./server";
+
+We need the module functionality that ES6 provides to make our code more modular
+AKA organize it into different pages, so it's more organized and prevents bugs!
+
+Otherwise, we are forced to use require() statements rather than import
