@@ -17,11 +17,11 @@ RUN apt-get install -y npm
 COPY . .
 
 # Download dependancies
-RUN npn install
+RUN npm install
 
 # Allow port $PORT to be accessed
 # from outside the container
 EXPOSE $PORT
 
 # Run the app
-CMD node app-www.js $PORT
+CMD node backend/index.js $PORT

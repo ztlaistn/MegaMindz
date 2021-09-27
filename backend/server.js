@@ -7,7 +7,7 @@ class Server {
   app;
   io;
 
-  PORT = 5001;
+  PORT = process.env.PORT || 5001;
   HOST = '0.0.0.0';
 
   constructor() {
