@@ -8,6 +8,7 @@ class Server {
   io;
 
   PORT = 5001;
+  HOST = '0.0.0.0';
 
   constructor() {
    this.initialize();
@@ -41,9 +42,8 @@ class Server {
 
   // pass in a callback function that returns port number
   listen(callbackFunction) {
-    this.httpServer.listen(this.PORT, () =>
-         callbackFunction(this.PORT)
-       );
+    this.httpServer.listen(this.PORT,this.HOST);
+    callbackFunction(this.PORT);
   }
 }
 export {Server};
