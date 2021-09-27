@@ -14,16 +14,24 @@ We will likely cater this to a conference or education based setting.
 - stuff
 
 ## Deployment
-- Our app is not yet live on Heroku [here](google.com)
+- Our app is not yet live on Heroku [here](https://google.com)
 
 ## Built With
 - NodeJS
 - Spite
 - Python
+- JavaScript
+- Docker
 
 ## Authors
-- Kevin Huang
+- Kevin Huang (jhuang88)
+- Malika Kodial (malikako)
+- Manaswini Burugupalli (manaswin)
+- Zack Laistner (ztlaistn)
+- David Palumbo (djpalumb)
 
 ## License
+- ??
 
 ## Acknowledgments
+- ??
