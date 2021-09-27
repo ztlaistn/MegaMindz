@@ -16,7 +16,9 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --watch 'backend/**/*.js' -r esm backend/index.js"
+    "dev": "nodemon --watch 'backend/**/*.js' -r esm backend/index.js",
+    "start": "nodemon --watch 'backend/**/*.js' -r esm backend/index.js"
+
   },
   "repository": {
     "type": "git",
