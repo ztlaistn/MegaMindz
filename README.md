@@ -11,14 +11,17 @@ We will likely cater this to a conference or education based setting.
 - docker-compose up
 
 ## Features
-- stuff
+- Log In with email and password
+- Password reset email
+- Movement with keyboard or touchpad if mobile
+- Voice proximity
 
 ## Deployment
 - Our app is not yet live on Heroku [here](https://google.com)
+- Our wireframes are live on Figma [here](https://www.figma.com/file/ZiVKfdxSwSmI6LpcNDQrye/Conference-App-Style-Guide)
 
 ## Built With
 - NodeJS
-- Spite
 - Python
 - JavaScript
 - Docker
