@@ -13,7 +13,7 @@ We will likely cater this to a conference or education based setting.
 ## Features
 - Log In with email and password
 - Password reset email
-- Movement with keyboard or touchpad if mobile
+- Movement with mouse, or touchpad if mobile
 - Voice proximity
 
 ## Deployment
