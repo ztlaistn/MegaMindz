@@ -34,7 +34,7 @@ We will likely cater this to a conference or education based setting.
 - David Palumbo (djpalumb)
 
 ## License
-- ??
+- N/a
 
 ## Acknowledgments
-- ??
+- N/a
