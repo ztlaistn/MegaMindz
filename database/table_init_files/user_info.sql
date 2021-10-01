@@ -26,9 +26,7 @@ user_info (
 );
 
 CREATE INDEX index1 ON user_info(Enabled, Username, Pass);
-
 CREATE INDEX index2 ON user_info(Enabled, Lastname, Firstname);
-
 CREATE INDEX index3 ON user_info(Enabled, CurrRoom, UserID);
 	
 -- Will print table structure when created
