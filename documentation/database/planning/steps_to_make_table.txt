@@ -1,0 +1,7 @@
+Get into database with heidiSQL
+Paste the 'CREATE TABLE' and 'CREATE INDEX' sections into the query box.
+
+This can also be done by running the command in the heroku-cli, but I personally like to be able to visualize what I am doing.
+
+You can check that the table is working by inserting some test users.  For example:
+INSERT INTO user_info(Username, Pass, FirstName) VALUES ('test_user', 'fake_pass', 'RealPerson');

@@ -1,12 +1,7 @@
 /*
-* Create database table for user info
-* TODO: Fill in the actual database name, once it is made
 * TODO: Don't let users input fields that are longer than can be stored in this table
 */
 
-USE d8k5sebftf48b1;
-
--- table_name = user_info
 -- Next line will delete table if already exists (so that you can debug without having to delete it every time)
 DROP TABLE IF EXISTS user_info;
 
@@ -31,9 +26,7 @@ user_info (
 );
 
 CREATE INDEX index1 ON user_info(Enabled, Username, Pass);
-
 CREATE INDEX index2 ON user_info(Enabled, Lastname, Firstname);
-
 CREATE INDEX index3 ON user_info(Enabled, CurrRoom, UserID);
 	
 -- Will print table structure when created
