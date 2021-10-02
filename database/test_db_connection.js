@@ -3,17 +3,17 @@ const { Pool, Client } = require('pg');
 
 console.log(typeof process.env.DB_PORT);
 
-// const client = new Client({
-//     host: process.env.DB_HOST,
-//     user: process.env.DB_USER,
-//     port: Number(process.env.DB_PORT),
-//     password: process.env.DB_PASSWORD,
-//     database: process.env.DB_DATABASE,
-// });
-
 const client = new Client({
-    connectionString: process.env.DATABASE_URL,
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    port: Number(process.env.DB_PORT),
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
 });
+
+// const client = new Client({
+//     connectionString: process.env.DATABASE_URL,
+// });
 
 console.log(client.host);
 
