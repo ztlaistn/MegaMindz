@@ -1,9 +1,5 @@
 import React from "react";
 import "./styles/CardTemplate.css";
-import LoginForm from "./Login.jsx";
-import {
-   Link
-} from 'react-router-dom';
 import gray_logo from "../assets/logo_gray.png";
 
 export default class CardTemplate extends React.Component {
@@ -19,7 +15,7 @@ export default class CardTemplate extends React.Component {
                     <br/>
                     <header className="card-title">{this.props.page_title}</header>
                     <br/>
-                    <LoginForm/>
+                    {this.props.children}
                 </div>
             </div>
         );
