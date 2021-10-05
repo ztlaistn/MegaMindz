@@ -21,7 +21,7 @@ async function connect_client(){
 	});
 	
 	// I want to use the callback so I can print the err message, but then the function returns before the connect has finished.
-	
+	temp = 0;
 	await client.connect(err =>{
 		if(err){
 			console.log(err)
@@ -31,6 +31,12 @@ async function connect_client(){
 			return client;
 		}
 	});
+
+	if(temp === 0){
+		console.log("what are we doing here");
+		await new Promise((resolve => {setTimeout(resolve, 1000)}))
+		console.log("still here?");
+	}
 
 	//client.connect();
 
@@ -57,7 +63,7 @@ async function new_user(client, user, pass, email, first, last){
 		values: [user, email]
 	};
 	
-	await client.query(select_query, (err, res) => {
+	await client.query(select_query, async (err, res) => {
 		console.log("we are not done adding the user");
 		if (res.rows[0].count > 0){
 			return -1;
