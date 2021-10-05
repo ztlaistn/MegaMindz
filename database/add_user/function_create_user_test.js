@@ -3,7 +3,7 @@
 **/
 
 const {Pool, Client} = require('pg');
-const add_funs = require("./function_create_user.js")
+const add_funs = require("./user_database_utils.js")
 
 /**
 * Runs the tests.
