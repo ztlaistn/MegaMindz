@@ -13,6 +13,7 @@ user_info (
 	Email 			VARCHAR(100) NOT NULL DEFAULT '',
 	Username 		VARCHAR(50) NOT NULL DEFAULT '',
 	Pass			VARCHAR(50) NOT NULL DEFAULT '',
+-- Logged			BOOLEAN NOT NULL DEFAULT 'f',
 -- Additional account information (feel free to add more to this, as we add features)
 	FirstName		VARCHAR(30) NOT NULL DEFAULT '',
 	LastName		VARCHAR(30) NOT NULL DEFAULT '',
@@ -22,10 +23,10 @@ user_info (
 	Skills			VARCHAR(200) NOT NULL DEFAULT '',
 	CurrRoom		INT DEFAULT NULL,
 -- Might want to just disable row, rather than delete entry when account is removed
-	Enabled			SMALLINT NOT NULL DEFAULT 0
+	Enabled			SMALLINT NOT NULL DEFAULT 1
 );
 
-CREATE INDEX index1 ON user_info(Enabled, Username, Pass);
+CREATE INDEX index1 ON user_info(Enabled, Username, Pass, Logged);
 CREATE INDEX index2 ON user_info(Enabled, Lastname, Firstname);
 CREATE INDEX index3 ON user_info(Enabled, CurrRoom, UserID);
 	

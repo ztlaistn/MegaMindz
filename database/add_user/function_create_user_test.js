@@ -26,6 +26,8 @@ async function main(){
 		client.end(()=>console.log("exited"))
 	});
 	
+	//TODO: add a second test were we try to add another user with the same info, should reject the request.
+	
 }
 
 if (require.main === module) {

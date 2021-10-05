@@ -2,7 +2,6 @@
 const {Pool, Client} = require('pg');
 
 /* TODO: At the moment, these functions return specific values on failure.  It might be better to have them throw an error and call them with try/catches.
-   TODO: Functions in this file are no longer contained to just creating user.  It might make more sense to name the file something to do with login_utils or even user_utiils.*/
 
 /**
 * Async Function makes a client to our database with our given enviroment variables.  
@@ -128,10 +127,10 @@ async function dump_user_info(client, field = "", value = ""){
 * Returns: 
 * 	- res.rows[0] that corresponds to UserId passed
 *   - null if it didn't find exactly 1 user.
-*/
+**/
 async function select_user_with_id(client, id){
 	const select_query = {
-		text: 'SELECT * FROM user_info WHERE UserID = $1',
+		text: 'SELECT 1 FROM user_info WHERE UserID = $1',
 		values: [id]
 	};
 	
@@ -151,9 +150,10 @@ async function select_user_with_id(client, id){
 	});
 }
 
+
 module.exports = {
 	connect_client,
 	new_user,
 	dump_user_info,
-	select_user_with_id
+	select_user_with_id,
 };
