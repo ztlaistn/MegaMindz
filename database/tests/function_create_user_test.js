@@ -2,6 +2,7 @@
 * Tests create user functions on local PostgreSQL database
 **/
 
+const { resolveInclude } = require('ejs');
 const {Pool, Client} = require('pg');
 const add_funs = require("../utils/user_database_utils.js")
 
@@ -9,55 +10,70 @@ const add_funs = require("../utils/user_database_utils.js")
 * Runs the tests.
 **/ 
 async function main(){
-	console.log("Starting inside main.")
-
 	//Connect a client to local
-	//Assumes you have set the enviroment variables
-	const client = await add_funs.connect_client();
+	//Assumes you have already set the enviroment variables
+	client = []
+	try{
+		client = await add_funs.connect_client();
+
+		//console.log(client);
+		console.log("We have connected.");
+
+	} catch (err){
+		console.log("Failed test, threw the following error trying to connect client: " + err);
+		process.exit();
+	}
+
+	//clear out test user from possible previous run.
+	try{
+		await add_funs.delete_user(client, 'test_add_user', 'test_add_pass', 'test_add_email@fake.com', 'test_add_first', 'test_add_last');
+		console.log("Any previous test user from previous runs have been cleared out of the user_info table.")
+	} catch (err){
+		console.log("Failed test, when trying to remove previous test user, threw the following error: " + err);
+		process.exit();
+	}
+
+	//Add test user row to the table.
+	try{
+		const ret_id = await add_funs.new_user(client, 'test_add_user', 'test_add_pass', 'test_add_email@fake.com', 'test_add_first', 'test_add_last');
+		
+		console.log("We added the user with id: " + ret_id);
+
+	} catch (err){
+		console.log("Failed test, when trying to add first client, we threw the following error: " + err +
+		".\n  Note, if you didn't clear out the dataset since the last test, it will still be there and fail this.");
+		process.exit();
+	}
 	
-	if (client === null){
-		console.log("FAILED: Didn't make connection");
-		return 0;
-	}else{
-		console.log("Client connected");
-		console.log(client);
-	}
-
-	//Add a user to the database
-	const ret_id = await add_funs.new_user(client, 'test_add_user', 'test_add_pass', 'test_add_email@fake.com', 'test_add_first', 'test_add_last');
-
-	if (ret_id === -1){
-		console.log("FAILED FIRST ADD: Didn't insert user into table.  Make sure the test user was not already in the table.");
-
-		//Close the client connection
-		await client.end(()=>console.log("exited"));
-
-		return 0;
-	}else{
-		console.log("PASSED FIRST ADD: Added user to table with ID: " + ret_id)
-	}
-
 	console.log("We are done with adding user, now we will see if the user is in the table.");
 
 	//Dump table to make sure that the user was added
-	await add_funs.dump_user_info(client);
-	
-	//TODO: add a second test were we try to add another user with the same info, should reject the request.
-	console.log("Now we will test adding the same user, should not work.");
+	try{
+		const success = await add_funs.dump_user_info(client);
 
-	const ret_id_2 = await add_funs.new_user(client, 'test_add_user', 'test_add_pass', 'test_add_email@fake.com', 'test_add_first', 'test_add_last');
-
-	if (ret_id === -1){
-		console.log("PASSED SECOND ADD: Didn't add duplicate user.");
-	}else{
-		console.log("FAILEd SECOND ADD: Added user to table with duplicate ID: " + ret_id_2);
-
-		//Close the client connection
-		await client.end(()=>console.log("exited"));
-
-		return 0;
-	}
+		console.log("Able to dump user_info table")
 		
+	} catch (err){
+		console.log("Failed test, when trying to dump table, threw the following error: " + err);
+		process.exit();
+	}
+	
+	// Try to add another user with the same info, should reject the request.
+	console.log("Now we will test adding the same user, should not work.");
+	try{
+		const ret_id_2 = await add_funs.new_user(client, 'test_add_user', 'test_add_pass', 'test_add_email@fake.com', 'test_add_first', 'test_add_last');
+
+		console.log("Failed test, when adding a duplicate, didn't throw error but instead resolved with id " + ret_id_2);
+		process.exit();
+
+	} catch (err){
+		console.log("Correctly rejcted the insertion of a duplicate line with the following error message: " + err);
+	}
+
+	console.log("---------------All tests passed!-----------------");
+	
+	//If this is replaced with a return statement, it seems to hang on it and the program never ends.
+	process.exit()
 }
 
 if (require.main === module) {
