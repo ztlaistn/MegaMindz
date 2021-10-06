@@ -104,31 +104,43 @@ function insert_new_user_row(client, user, pass, email, first, last){
 async function new_user(client, user, pass, email, first, last){
 	// Should first see if that username and/or email area already in user_info table
 	
-	// This doesn't seem like the correct way to do this with Promises
-	// Seems like it might break any kind of concurrency, but its the only way I can 
-	// think to nest two function calls into a promise return.
-	try{
-		const count = await user_or_email_unique(client, user, email);
-	} catch (err) {
-		// returns a promise that instantly rejects
-		return new Promise((resolve, reject) => {
-			reject(err);
-		});
-	}
-
-	try{
-		const uid = await insert_new_user_row(client, user, pass, email, first, last);
-
-		// returns a promise that instantly resolves
-		return new Promise((resolve, reject) => {
+	// This seems to work, and fixes the problems with the commented out version
+	// below, that doesn't return the promise right away.
+	return new Promise(async (resolve, reject) => {
+		try{
+			const count = await user_or_email_unique(client, user, email);
+			const uid = await insert_new_user_row(client, user, pass, email, first, last);
 			resolve(uid);
-		});
-	} catch (err){
-		// returns a promise that instantly rejects
-		return new Promise((resolve, reject) => {
+		} catch (err){
 			reject(err);
-		});
-	}
+		}
+	});
+
+	// This doesn't seem like the correct way to do this with Promises
+	// Seems like it might break any kind of concurrency since rather than immediatly
+	// returning the promise, we have to first wait on the other promise functions.
+	// try{
+	// 	const count = await user_or_email_unique(client, user, email);
+	// } catch (err) {
+	// 	// returns a promise that instantly rejects
+	// 	return new Promise((resolve, reject) => {
+	// 		reject(err);
+	// 	});
+	// }
+
+	// try{
+	// 	const uid = await insert_new_user_row(client, user, pass, email, first, last);
+
+	// 	// returns a promise that instantly resolves
+	// 	return new Promise((resolve, reject) => {
+	// 		resolve(uid);
+	// 	});
+	// } catch (err){
+	// 	// returns a promise that instantly rejects
+	// 	return new Promise((resolve, reject) => {
+	// 		reject(err);
+	// 	});
+	// }
 }
 
 
