@@ -1,6 +1,9 @@
-import express from "express";
+import express, { Router } from "express";
 import socketIO from "socket.io";
 import { createServer } from "http";
+
+import authRouter from "./routes/auth";
+import usersRouter from "./routes/users"
 
 class Server {
   httpServer;
@@ -32,6 +35,9 @@ class Server {
        data: "Hello World! -This is Malika"
        });
    });
+
+    authRouter(this.app);
+    usersRouter(this.app);
   }
 
   handleSocketConnection() {
