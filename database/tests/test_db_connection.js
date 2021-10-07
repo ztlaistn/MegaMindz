@@ -9,6 +9,8 @@ const client = new Client({
     port: Number(process.env.DB_PORT),
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
+    sslmode: true,
+	ssl: {rejectUnauthorized: false}
 });
 
 // const client = new Client({
@@ -24,7 +26,7 @@ client.connect(err => {
     }else{
         console.log('Connected');
         const insert_query = {
-            text: 'INSERT INTO user_info (Username, Pass, FirstName) VALUES ($1, $2, $3)',
+            text: 'INSERT INTO user_info (username, pass, first_name) VALUES ($1, $2, $3)',
             values: ['test_user', 'test_pass', 'test_name'],
         }
         
@@ -40,7 +42,7 @@ client.connect(err => {
                         console.log("select error: ", err);
                         client.end(()=>console.log("exited"));
                     }else{
-                        console.log(res);
+                        console.log(res.rows);
                         client.end(()=>console.log("exited"))
                     }
                 });

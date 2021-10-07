@@ -18,6 +18,8 @@ function connect_client(){
 		port: Number(process.env.DB_PORT),
 		password: process.env.DB_PASSWORD,
 		database: process.env.DB_DATABASE,
+		sslmode: true,
+		ssl: {rejectUnauthorized: false}
 	});
 	
 	return new Promise((resolve, reject) => client.connect(err =>{
