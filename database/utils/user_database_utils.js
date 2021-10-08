@@ -193,37 +193,6 @@ function dump_user_info(client, field = "", value = ""){
 
 
 /**
-* Async function that uses the user_id field in the user_info table to return the user with that given ID.
-* Parameters: 
-* 	- client:   client object that is connected to the database and user_info table (will not be closed in this function) 
-* 	- id: 		user_id value for the user we are trying to lookup
-* Returns: 
-* 	- res.rows[0] that corresponds to user_id passed
-*   - null if it didn't find exactly 1 user.
-**/
-async function select_user_with_id(client, id){
-	const select_query = {
-		text: 'SELECT 1 FROM user_info WHERE user_id = $1',
-		values: [id]
-	};
-	
-	await client.query(select_query, (err, res) => {
-		if(err){
-			console.log("err in select with id", err);
-			return null;
-		}else{
-			//Need to figure out how many rows we returned, not sure if this is the correct way
-			if (res.length === 1){
-				return res.rows[0];
-			}else{
-				console.log("Found exactly " + res.length + " users with that ID in the user_info table.")
-				return null;
-			}
-		}
-	});
-}
-
-/**
 * Function that will delete a user that matches all of the passed fields.
 * It is a dangerous function.
 * Called mainly by test code, to ensure that we remove the test users from previous runs before the next run.
@@ -251,7 +220,73 @@ function delete_user(client, user, pass, email, first, last){
 			resolve(true);
 		}
 	}));
+}
 
+/**
+* Function that uses the user_id field in the user_info table to return the user with that given ID.
+* Parameters: 
+* 	- client:   client object that is connected to the database and user_info table (will not be closed in this function) 
+* 	- id: 		user_id value for the user we are trying to lookup
+*
+* Returns: 	A Promise which, when select query throws error, will reject with error.
+*			When finds one row that matches, will resolve with that row object.
+*			When finds an number of rows that is not 1 (0 or greater than 1), rejects with an error message.
+*
+**/
+function select_user_with_id(client, id){
+	const select_query = {
+		text: 'SELECT 1 FROM user_info WHERE user_id = $1',
+		values: [id]
+	};
+	
+	return new Promise((resolve, reject) => client.query(select_query, (err, res) =>{
+		if(err){
+			reject("err in select with id: " + err);
+		}else{
+			//Need to figure out how many rows we returned, not sure if this is the correct way
+			if (res.length === 1){
+				resolve(res.rows[0]);
+			}else {
+				reject("Found exactly " + res.length + " users with that ID in the user_info table.");
+			}
+		}
+	}));
+}
+
+
+/**
+* Function that will take the email and pass (encrypted) and compare them to see if anything matches in the database.
+* Parameters:
+* 	- client: 	client object that is connected to the database and user_info table (will not be closed in this function)
+* 	- email:	user's email address entered into the login page
+* 	- pass: 	user's pass already encrypted by backend	
+* 
+* Returns: 	A Promise which, when select query throws error, will reject with error.
+*			When finds one row that matches, will resolve with that user_id.
+*			When finds an number of rows that is not 1 (0 or greater than 1), rejects with an error message.
+*
+ **/
+function login_validation(client, email, pass){
+	//There should only be one user in the table with the given email, due to the check in add.
+	select_query = {
+		text: 'SELECT 1 FROM user_info WHERE Email = $1 and Pass = $2 RETURNING user_id',
+		values: [email, pass]
+	};
+	
+	return new Promise((resolve, reject) => client.query(select_query, (err, res) =>{
+		if(err){
+			reject("err in login varification with select " + err);
+			return -1;
+		}else{
+			//Need to figure out how many rows we returned, not sure if this is the correct way
+			if (res.length === 1){
+				uid = res.rows[0].user_id;			
+				resolve(uid);
+			}else{
+				reject("Found exactly " + res.length + " users with that matched those login fields user_info table.");
+			}
+		}
+	})); 
 }
 
 module.exports = {
@@ -259,6 +294,7 @@ module.exports = {
 	user_or_email_unique,
 	new_user,
 	dump_user_info,
+	delete_user,
 	select_user_with_id,
-	delete_user
+	login_validation
 };
