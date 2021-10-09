@@ -1,9 +1,5 @@
 /* service will handle business logic */
-class AuthService {
-  constructor() {
-    //dependencies are added here for dependency injection
-
-  }
+export default {
 
   /*Input: Object with username, password1, password2, and email
     Output: Object with successValue [bool], uid [int], and errorMsg [string]
@@ -29,7 +25,7 @@ class AuthService {
 
     let tempUid = 29;
     return {isSuccess: true, uid: tempUid};
-  }
+  },
 
   /*Input:
     Output:
@@ -40,7 +36,7 @@ class AuthService {
     // check if email is valid
     // check that encrypted password matches
     // create token, update db with token, return
-  }
+  },
 
   /*Input:
     Output:
@@ -49,20 +45,19 @@ class AuthService {
   logOut() {
     // might need AUTH header - check this
     // delete user token from db
-  }
+  },
 
   // create JSON Web Token
+  // MOVE THESE TO MIDDLEWARE FOLDER
   createToken() {
 
-  }
+  },
 
   validateToken() {
 
-  }
+  },
 
   destroyToken() {
 
-  }
+  },
 }
-
-export default { AuthService };

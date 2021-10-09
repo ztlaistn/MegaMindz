@@ -10,9 +10,8 @@ export default (app) => {
 
   // register a new user
   router.post('/register', function (req, res) {
-    res.status(200).send(req.body);
     // ensure all required data is present
-    /*const { username, email, password1, password2 } = req.body;
+    const { username, email, password1, password2 } = req.body;
     if (!(email && username && password1 && password2)) {
       res.status(400).send("All input is required");
     }
@@ -23,7 +22,7 @@ export default (app) => {
       res.status(201).send("Account successfully created");
     } else {
       res.status(409).send(response.errorMsg);
-    }*/
+    }
   });
 
   // define the login route
