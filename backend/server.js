@@ -1,6 +1,7 @@
 import express, { Router } from "express";
 import socketIO from "socket.io";
 import { createServer } from "http";
+import bodyParser from "body-parser";
 
 import authRouter from "./routes/auth";
 import usersRouter from "./routes/users"
@@ -21,6 +22,12 @@ class Server {
 
   initialize() {
     this.app = express();
+
+    // parse application/x-www-form-urlencoded
+    this.app.use(bodyParser.urlencoded({ extended: true }))
+    // parse application/json
+    this.app.use(bodyParser.json())
+
     // initialize the web (http) server
     this.httpServer = createServer(this.app);
     // initialize the Socket.IO server and attach it to the web server
