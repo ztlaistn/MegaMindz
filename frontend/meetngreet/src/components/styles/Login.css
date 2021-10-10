@@ -1,0 +1,25 @@
+.logincredentials {
+    display: block;
+    float: right;
+    margin-left: auto;
+    margin-right: 0px;
+    width: 40%;
+}
+
+.login-icon {
+    display: block;
+    float: left;
+    margin-top: 5vh;
+    margin-left: 0px;
+    margin-right: auto;
+    max-width: 40%;
+}
+
+.register-prompt {
+    font-family: Work Sans;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 21px;
+    line-height: 25px;
+    color: black;
+}
