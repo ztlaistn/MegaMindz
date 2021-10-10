@@ -2,8 +2,6 @@
 * Tests create user functions on local PostgreSQL database
 **/
 
-const { resolveInclude } = require('ejs');
-const {Pool, Client} = require('pg');
 const add_funs = require("../utils/user_database_utils.js")
 
 /**

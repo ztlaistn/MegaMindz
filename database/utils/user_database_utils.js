@@ -235,7 +235,7 @@ function delete_user(client, user, pass, email, first, last){
 **/
 function select_user_with_id(client, id){
 	const select_query = {
-		text: 'SELECT 1 FROM user_info WHERE user_id = $1',
+		text: 'SELECT * FROM user_info WHERE user_id = $1',
 		values: [id]
 	};
 	
@@ -244,10 +244,10 @@ function select_user_with_id(client, id){
 			reject("err in select with id: " + err);
 		}else{
 			//Need to figure out how many rows we returned, not sure if this is the correct way
-			if (res.length === 1){
+			if (res.rows.length === 1){
 				resolve(res.rows[0]);
 			}else {
-				reject("Found exactly " + res.length + " users with that ID in the user_info table.");
+				reject("Found exactly " + res.rows.length + " users with that ID in the user_info table.");
 			}
 		}
 	}));
@@ -269,7 +269,7 @@ function select_user_with_id(client, id){
 function login_validation(client, email, pass){
 	//There should only be one user in the table with the given email, due to the check in add.
 	select_query = {
-		text: 'SELECT 1 FROM user_info WHERE Email = $1 and Pass = $2 RETURNING user_id',
+		text: 'SELECT user_id FROM user_info WHERE Email = $1 and Pass = $2',
 		values: [email, pass]
 	};
 	
@@ -279,11 +279,11 @@ function login_validation(client, email, pass){
 			return -1;
 		}else{
 			//Need to figure out how many rows we returned, not sure if this is the correct way
-			if (res.length === 1){
+			if (res.rows.length === 1){
 				uid = res.rows[0].user_id;			
 				resolve(uid);
 			}else{
-				reject("Found exactly " + res.length + " users with that matched those login fields user_info table.");
+				reject("Found exactly " + res.rows.length + " users with that matched those login fields user_info table.");
 			}
 		}
 	})); 
