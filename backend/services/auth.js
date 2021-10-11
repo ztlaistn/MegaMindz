@@ -37,6 +37,11 @@ export default {
     // check if email is valid
     // check that encrypted password matches
     // create token, update db with token, return
+
+
+    return ""
+
+
   },
 
   /*Input:
