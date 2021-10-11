@@ -4,6 +4,7 @@
   "description": "The backend for the MeetNGreet Voice Chat Application.",
   "main": "index.js",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "docker": "^1.0.0",
     "ejs": "^3.1.6",
     "esm": "^3.2.25",
@@ -14,7 +15,9 @@
     "socket.io": "^4.2.0",
     "uuid": "^8.3.2"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "jsonwebtoken": "^8.5.1"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon --watch 'backend/**/*.js' -r esm backend/index.js",
