@@ -1,6 +1,8 @@
 import React from "react";
 import "./styles/Login.css";
 import "./styles/Input.css";
+import "./styles/userAccount.css";
+
 import sample_profile from "../assets/sample-profile.png";
 import login_icon from "../assets/login_icon.png";
 
@@ -18,7 +20,7 @@ export default class UserAccount extends React.Component {
     render() {
         return (
             <div id="loginform">
-                <img src={sample_profile} className="login-icon" alt=""/>
+                <img src={sample_profile} className="profile-picture" alt=""/>
                 <div className="useraccount">
                     <form>
                         <label for="name">Name</label>
