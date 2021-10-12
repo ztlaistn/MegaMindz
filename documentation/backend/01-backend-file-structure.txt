@@ -1,0 +1,18 @@
+Seperation of Concerns:
+
+1. Routes
+  Responsible for which endpoints that certain tasks occur
+  They should have no business logic and instead utilize the service layer
+  Ex) /auth/login is an endpoint but it will have no logic that verifies password matches - it will utilize the AuthService
+
+2. Services
+  Responsible for business logic
+  For testing, we need to ensure we are careful with dependecies.
+  Look into: Dependency Injection and how it helps with testing
+  Ex) AuthService.logIn will handle password match check
+
+3. Models
+  Responsible for interfacing with database
+  Each function will connect to the database and make a query
+  Can update, remove, or add database rows/cells
+  Ex) TBD
