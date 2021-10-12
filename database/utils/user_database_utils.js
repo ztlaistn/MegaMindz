@@ -64,18 +64,19 @@ function user_or_email_unique(client, user, email){
  * Parameter:
 * 	client: client that has made a connection with the database and user_info table (this will not be closed in this function)
 * 	user: new username
-* 	pass: new Password
+* 	hash: new hashed password
 * 	email: new email
 * 	first: new first name
 * 	last: new last name
+* 	salt: new salt
 *
 * Return: 	A promise where, when query has an error, will reject with that error.
 *			When it inserts correctly (and there is no error), will resolve with user_id
  */
-function insert_new_user_row(client, user, pass, email, first, last){
+function insert_new_user_row(client, user, hash, email, first, last, salt){
 	const insert_query = {
-		text: 'INSERT INTO user_info (username, pass, email, first_name, last_name) VALUES ($1, $2, $3, $4, $5) RETURNING user_id',
-		values: [user, pass, email, first, last],
+		text: 'INSERT INTO user_info (username, hash, email, first_name, last_name, salt) VALUES ($1, $2, $3, $4, $5, $6) RETURNING user_id',
+		values: [user, hash, email, first, last, salt],
 	};
 	
 	return new Promise((resolve, reject) => client.query(insert_query, (err, res) =>{
@@ -94,16 +95,17 @@ function insert_new_user_row(client, user, pass, email, first, last){
 * Parameters:
 * 	client: client that has made a connection with the database and user_info table (this will not be closed in this function)
 * 	user: new username
-* 	pass: new Password
+* 	hash: new hashed password
 * 	email: new email
 * 	first: new first name
 * 	last: new last name
+* 	salt: new salt
 * 
 * Return: 	A promise where, when a successfull insert has happened it will resolve, passing the user_id of the new user.
 			When the user_or_email_unique check fails, it will reject with the error message.
 			When the insert fails, it will reject with the error message.
 **/
-async function new_user(client, user, pass, email, first, last){
+async function new_user(client, user, hash, email, first, last, salt){
 	// Should first see if that username and/or email area already in user_info table
 	
 	// This seems to work, and fixes the problems with the commented out version
@@ -111,38 +113,12 @@ async function new_user(client, user, pass, email, first, last){
 	return new Promise(async (resolve, reject) => {
 		try{
 			const count = await user_or_email_unique(client, user, email);
-			const uid = await insert_new_user_row(client, user, pass, email, first, last);
+			const uid = await insert_new_user_row(client, user, hash, email, first, last, salt);
 			resolve(uid);
 		} catch (err){
 			reject(err);
 		}
 	});
-
-	// This doesn't seem like the correct way to do this with Promises
-	// Seems like it might break any kind of concurrency since rather than immediatly
-	// returning the promise, we have to first wait on the other promise functions.
-	// try{
-	// 	const count = await user_or_email_unique(client, user, email);
-	// } catch (err) {
-	// 	// returns a promise that instantly rejects
-	// 	return new Promise((resolve, reject) => {
-	// 		reject(err);
-	// 	});
-	// }
-
-	// try{
-	// 	const uid = await insert_new_user_row(client, user, pass, email, first, last);
-
-	// 	// returns a promise that instantly resolves
-	// 	return new Promise((resolve, reject) => {
-	// 		resolve(uid);
-	// 	});
-	// } catch (err){
-	// 	// returns a promise that instantly rejects
-	// 	return new Promise((resolve, reject) => {
-	// 		reject(err);
-	// 	});
-	// }
 }
 
 
@@ -198,19 +174,20 @@ function dump_user_info(client, field = "", value = ""){
 * Called mainly by test code, to ensure that we remove the test users from previous runs before the next run.
 * Parameters:
 *	client: client that has made a connection with the database and user_info table (this will not be closed in this function)
-* 	user: new username
-* 	pass: new Password
-* 	email: new email
-* 	first: new first name
-* 	last: new last name
+* 	user: user's username
+* 	pass: user's Password
+* 	email: user's email
+* 	first: user's first name
+* 	last: user's last name
+* 	salt: user's salt
 * 
 * Return:	A promise where, when the query has an error, will reject with that error.
 *			When the delete is done (or there is nothing to delete), it will resolve with true.
 */
-function delete_user(client, user, pass, email, first, last){
+function delete_user(client, user, hash, email, first, last, salt){
 	delete_query = {
-		text: 'DELETE FROM user_info WHERE username = $1 AND pass = $2 AND email = $3 AND first_name = $4 AND last_name = $5',
-		values: [user, pass, email, first, last]
+		text: 'DELETE FROM user_info WHERE username = $1 AND hash = $2 AND email = $3 AND first_name = $4 AND last_name = $5 AND salt = $6',
+		values: [user, hash, email, first, last, salt]
 	};
 
 	return new Promise((resolve, reject) => client.query(delete_query, (err) =>{
@@ -259,18 +236,18 @@ function select_user_with_id(client, id){
 * Parameters:
 * 	- client: 	client object that is connected to the database and user_info table (will not be closed in this function)
 * 	- email:	user's email address entered into the login page
-* 	- pass: 	user's pass already encrypted by backend	
+* 	- hash: 	user's hash pass already 'encrypted' by backend	
 * 
 * Returns: 	A Promise which, when select query throws error, will reject with error.
 *			When finds one row that matches, will resolve with that user_id.
 *			When finds an number of rows that is not 1 (0 or greater than 1), rejects with an error message.
 *
  **/
-function login_validation(client, email, pass){
+function login_validation(client, email, hash){
 	//There should only be one user in the table with the given email, due to the check in add.
 	select_query = {
-		text: 'SELECT user_id FROM user_info WHERE Email = $1 and Pass = $2',
-		values: [email, pass]
+		text: 'SELECT user_id FROM user_info WHERE email = $1 and hash = $2',
+		values: [email, hash]
 	};
 	
 	return new Promise((resolve, reject) => client.query(select_query, (err, res) =>{

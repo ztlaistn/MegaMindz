@@ -19,7 +19,7 @@ async function main() {
 
     // Delete our test user from any previous test runs
     try{
-        await database_funs.delete_user(client, 'test_login_valid_user', 'test_login_valid_pass', 'test_login_valid@fake.com', 'test_login_valid_first', 'test_login_valid_last');
+        await database_funs.delete_user(client, 'test_login_valid_user', 'test_login_valid_hash', 'test_login_valid@fake.com', 'test_login_valid_first', 'test_login_valid_last', 'test_login_valid_salt');
         console.log("Any previous test user from previous runs have been cleared out of the user_info table.")
     } catch (err){
         fail("Failed test, when trying to remove previous test user, threw the following error: " + err)
@@ -27,7 +27,7 @@ async function main() {
 
     // Try to vailidate a login with a user that doesn't exist, should reject
     try{
-        await database_funs.login_validation(client, "test_login_valid@fake.com", "test_login_valid_pass");
+        await database_funs.login_validation(client, "test_login_valid@fake.com", "test_login_valid_hash");
         fail("Failed test: approved an invalid login.")
     } catch (err){
         console.log("Correctly rejcted invalid login with the following error message: " + err);
@@ -36,7 +36,7 @@ async function main() {
     // Add user back in
     ret_id = -1;
 	try{
-		ret_id = await database_funs.new_user(client, 'test_login_valid_user', 'test_login_valid_pass', 'test_login_valid@fake.com', 'test_login_valid_first', 'test_login_valid_last');
+		ret_id = await database_funs.new_user(client, 'test_login_valid_user', 'test_login_valid_hash', 'test_login_valid@fake.com', 'test_login_valid_first', 'test_login_valid_last', 'test_login_valid_salt');
 		console.log("We added the user with id: " + ret_id);
 	} catch (err){
         fail("Failed test: when trying to add first client, we threw the following error: " + err +
@@ -53,7 +53,7 @@ async function main() {
 
     // Try to validate again, should pass
     try{
-        await database_funs.login_validation(client, "test_login_valid@fake.com", "test_login_valid_pass");
+        await database_funs.login_validation(client, "test_login_valid@fake.com", "test_login_valid_hash");
         console.log("Correctly validated login");
     } catch (err){
         fail("Failed test: didn't approve valid login validation.  Error: " + err);
