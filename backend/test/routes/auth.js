@@ -7,7 +7,7 @@ import chaiHttp from 'chai-http';
 describe("Authentication Routes", () => {
     describe("POST /auth/register", () => {
 
-        it("It should give 400 if not all required data is provided", (done) => {
+        it("should return 400 if not all required data is provided", (done) => {
               chai.request(testServer)
                   .post('/auth/register')
                   .send({ // missing the email
@@ -22,7 +22,7 @@ describe("Authentication Routes", () => {
                   });
           });
 
-          it("It should give 201 if correct data is provided", (done) => {
+          it("should return 201 if correct data is provided", (done) => {
                 chai.request(testServer)
                     .post('/auth/register')
                     .send({ // has email, password1, password2, and username
@@ -37,7 +37,7 @@ describe("Authentication Routes", () => {
                         done();
                     });
           });
-          it("It should give 409 if creating account fails (passwords don't match)", (done) => {
+          it("should return 409 if creating account fails (passwords don't match)", (done) => {
                 chai.request(testServer)
                     .post('/auth/register')
                     .send({ // has email, password1, password2, and username
