@@ -4,8 +4,7 @@ export default {
   /*Input: Object with username, password1, password2, and email
     Output: Object with successValue [bool], uid [int], and errorMsg [string]
       SUCCESS: isSuccess=true with valid auth token and uid
-      ERROR: isSuccess=false with error message
-  */
+      ERROR: isSuccess=false with error message*/
   register(data) {
     const { username, email, password1, password2 } = data;
     // check that password 1 and password 2 match
@@ -16,7 +15,8 @@ export default {
     // INSERT database method here [from user model]
 
     // generate salt
-    /*bcrypt.genSalt(saltRounds, function(err, salt) {
+    /*const saltRounds = 10;
+    bcrypt.genSalt(saltRounds, function(err, salt) {
         bcrypt.hash(myPlaintextPassword, salt, function(err, hash) {
             // store user, store username, email, hash, and salt in db
             // return uid
