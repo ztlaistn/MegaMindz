@@ -266,6 +266,99 @@ function login_validation(client, email, hash){
 	})); 
 }
 
+/* 
+* Takes a parameter and a corresponding field, returns the user IDs that match that field/value combo.
+* If two different field/value combos have been given, it will return user IDs that satisfy the AND of those two combos.
+* Parameters:
+* 	- client: 		client object that is connected to the database and user_info table (will not be closed in this function)
+* 	- field1 = "": 	If there is a specific field you want to filter for.
+* 	- value1 = "":	The value you are looking for in the given field.
+*		- These two will be manditory for this function to work.
+* 	- field2 = "": 	If there is a specific field you want to filter for.
+* 	- value2 = "":	The value you are looking for in the given field.
+*		- Second field, for if you want to look for a specific field.
+*
+*	Returns: 	A promise that, when client is found, returns a list of user Id's that matched the field/value combo
+*				When something unexpected happens, it will reject with an error message
+*/
+function get_user_ids_from_fields(client, field1 = "", value1 = "", field2 = "", value2 = ""){
+	if(field1 === "" || value1 === ""){
+		return new Promise((resolve, reject) => {
+			reject("No primary field supplied to get user ids");
+		});
+	}
+
+	if(field2 === "" || value2 === ""){
+		// only one field has been given 
+		const select_query = {
+			text: 'SELECT user_id FROM user_info WHERE ' + field1 + ' = $1',
+			values: [value1]
+		};
+
+		return new Promise((resolve, reject) => client.query(select_query, (err, res) => {
+			if(err){
+				reject("Error in get_user_ids_from_fields with one field/value combo: " + err);
+			}else{
+				//TODO: return a list of the user ids that have been returned
+			}
+		}));
+
+	}else{
+		// We have been given two values
+		const select_query = {
+			text: 'SELECT user_id FROM user_info WHERE ' + field1 + ' = $1 AND ' + field2 + ' = $2',
+			values: [value1, value2]
+		};
+
+		return new Promise((resolve, reject) => client.query(select_query, (err, res) => {
+			if(err){
+				reject("Error in get_user_ids_from_fields with two field/value combos: " + err);
+			}else{
+				//TODO: return a list of the user ids that have been returned
+			}
+		}));
+	}
+}
+
+
+/*
+* Function that will change the value of one of the user's fields to the given value.
+* If the user with that given ID is not in the table, will also throw an error.
+* Cannot use this function to change the user's ID
+* Parameters:
+*	- client: client that has made a connection to the user_info table
+*	- uid: user id of the user we want to change
+*	- field: field we want to chage
+*	- value: value we wanted to change
+* 
+* Returns: 	A promise that, when passes, will resolve and return the changed user_id (should be the same as the one passed)
+*			When fails, will reject with an error message
+*/
+function set_field_for_user_id(client, uid, field = "", value = ""){
+	if(field.toLowerCase() === "user_id"){
+		return new Promise((resolve, reject) => {
+			reject("Cannot change user id with set_field_for_user_id function");
+		});
+	}
+
+	update_query = {
+		text: 'UPDATE user_info SET ' + field + ' = $1 WHERE user_id = $2 RETURNING user_id',
+		values: [value, uid]
+	};
+
+	console.log(update_query)
+
+	return new Promise((resolve, reject) => client.query(update_query, (err, res) =>{
+		if(err){
+			reject("Error in set_field_for_user_id: " + err);
+		}else if(res.rows.length === 1){
+			resolve(res.rows[0].user_id);			
+		}else{
+			reject("Error in set_field_for_user_id: number of rows that matched uid was: " + res.rows.length + ", but expected 1.");
+		}
+	}));
+}
+
 module.exports = {
 	connect_client,
 	user_or_email_unique,
@@ -273,5 +366,7 @@ module.exports = {
 	dump_user_info,
 	delete_user,
 	select_user_with_id,
-	login_validation
+	login_validation,
+	get_user_ids_from_fields,
+	set_field_for_user_id
 };
