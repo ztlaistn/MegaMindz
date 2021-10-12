@@ -13,15 +13,15 @@ export default (app) => {
     // ensure all required data is present
     const { username, email, password1, password2 } = req.body;
     if (!(email && username && password1 && password2)) {
-      res.status(400).send("All input is required");
+      return res.status(400).json("All input is required");
     }
 
     const response = AuthService.register(req.body);
 
     if (response.isSuccess) {
-      res.status(201).send("Account successfully created");
+      return res.status(201).json("Account successfully created");
     } else {
-      res.status(409).send(response.errorMsg);
+      return res.status(409).json(response.errorMsg);
     }
   });
 
