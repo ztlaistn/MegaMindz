@@ -12,7 +12,8 @@ user_info (
 -- Fields required to create account
 	email 			VARCHAR(100) NOT NULL DEFAULT '',
 	username 		VARCHAR(50) NOT NULL DEFAULT '',
-	pass			VARCHAR(50) NOT NULL DEFAULT '',
+	hash			VARCHAR(50) NOT NULL DEFAULT '',
+	salt			VARCHAR(50) NOT NULL DEFAULT '',
 -- Additional account information (feel free to add more to this, as we add features)
 	first_name		VARCHAR(30) NOT NULL DEFAULT '',
 	last_name		VARCHAR(30) NOT NULL DEFAULT '',
@@ -25,9 +26,10 @@ user_info (
 	enabled			SMALLINT NOT NULL DEFAULT 1
 );
 
-CREATE INDEX index1 ON user_info(enabled, username, pass);
+CREATE INDEX index1 ON user_info(enabled, username, hash);
 CREATE INDEX index2 ON user_info(enabled, last_name, first_name);
 CREATE INDEX index3 ON user_info(enabled, curr_room, user_id);
+CREATE INDEX index4 ON user_info(enabled, username, salt);
 	
 -- Will print table structure when created
 -- DESCRIBE user_info;
