@@ -1,0 +1,1 @@
+/* model will be used for interfacing with database*/

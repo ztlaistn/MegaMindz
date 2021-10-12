@@ -1,27 +1,22 @@
-FROM ubuntu:20.04
+FROM node:12.18.4
+ENV NODE_ENV=production
 
-RUN apt-get update
+WORKDIR /app
 
-# Set the home directory to /root
-ENV HOME /root
+RUN cd /app
 
-# cd into the home directory
-WORKDIR /root
+# copy over package-lock and package files
+COPY package*.json .
 
-# Install Node
-RUN apt-get update --fix-missing
-RUN apt-get install -y node.js
-RUN apt-get install -y npm
+# Download dependancies
+RUN npm install --production
 
 # Copy all app files into the image
 COPY . .
-
-# Download dependancies
-RUN npm install
 
 # Allow port $PORT to be accessed
 # from outside the container
 EXPOSE $PORT
 
 # Run the app
-CMD node backend/index.js $PORT
+CMD node -r esm backend/index.js $PORT

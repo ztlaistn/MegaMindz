@@ -1,0 +1,7 @@
+Get into database with heidiSQL
+Paste the 'CREATE TABLE' and 'CREATE INDEX' sections into the query box.
+
+This can also be done by writing a quick script to connect to the DB in code and then runt the insert query.
+
+You can check that the table is working by inserting some test users.  For example:
+INSERT INTO user_info(Username, Pass, FirstName) VALUES ('test_user', 'fake_pass', 'RealPerson');
