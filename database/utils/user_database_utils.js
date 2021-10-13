@@ -66,17 +66,16 @@ function user_or_email_unique(client, user, email){
 * 	user: new username
 * 	hash: new hashed password
 * 	email: new email
-* 	first: new first name
-* 	last: new last name
+* 	full_name: new name
 * 	salt: new salt
 *
 * Return: 	A promise where, when query has an error, will reject with that error.
 *			When it inserts correctly (and there is no error), will resolve with user_id
  */
-function insert_new_user_row(client, user, hash, email, first, last, salt){
+function insert_new_user_row(client, user, hash, email, salt){
 	const insert_query = {
-		text: 'INSERT INTO user_info (username, hash, email, first_name, last_name, salt) VALUES ($1, $2, $3, $4, $5, $6) RETURNING user_id',
-		values: [user, hash, email, first, last, salt],
+		text: 'INSERT INTO user_info (username, hash, email, salt) VALUES ($1, $2, $3, $4) RETURNING user_id',
+		values: [user, hash, email, salt],
 	};
 	
 	return new Promise((resolve, reject) => client.query(insert_query, (err, res) =>{
@@ -97,7 +96,6 @@ function insert_new_user_row(client, user, hash, email, first, last, salt){
 * 	user: new username
 * 	hash: new hashed password
 * 	email: new email
-* 	first: new first name
 * 	last: new last name
 * 	salt: new salt
 * 
@@ -105,15 +103,14 @@ function insert_new_user_row(client, user, hash, email, first, last, salt){
 			When the user_or_email_unique check fails, it will reject with the error message.
 			When the insert fails, it will reject with the error message.
 **/
-async function new_user(client, user, hash, email, first, last, salt){
-	// Should first see if that username and/or email area already in user_info table
-	
+async function new_user(client, user, hash, email, salt){	
 	// This seems to work, and fixes the problems with the commented out version
 	// below, that doesn't return the promise right away.
 	return new Promise(async (resolve, reject) => {
 		try{
+			//First makes sure the user and 
 			const count = await user_or_email_unique(client, user, email);
-			const uid = await insert_new_user_row(client, user, hash, email, first, last, salt);
+			const uid = await insert_new_user_row(client, user, hash, email, salt);
 			resolve(uid);
 		} catch (err){
 			reject(err);
@@ -177,17 +174,15 @@ function dump_user_info(client, field = "", value = ""){
 * 	user: user's username
 * 	pass: user's Password
 * 	email: user's email
-* 	first: user's first name
-* 	last: user's last name
 * 	salt: user's salt
 * 
 * Return:	A promise where, when the query has an error, will reject with that error.
 *			When the delete is done (or there is nothing to delete), it will resolve with true.
 */
-function delete_user(client, user, hash, email, first, last, salt){
+function delete_user(client, user, hash, email, salt){
 	delete_query = {
-		text: 'DELETE FROM user_info WHERE username = $1 AND hash = $2 AND email = $3 AND first_name = $4 AND last_name = $5 AND salt = $6',
-		values: [user, hash, email, first, last, salt]
+		text: 'DELETE FROM user_info WHERE username = $1 AND hash = $2 AND email = $3 AND salt = $4',
+		values: [user, hash, email, salt]
 	};
 
 	return new Promise((resolve, reject) => client.query(delete_query, (err) =>{
@@ -334,7 +329,7 @@ function get_user_ids_from_fields(client, field1 = "", value1 = "", field2 = "",
 * Returns: 	A promise that, when passes, will resolve and return the changed user_id (should be the same as the one passed)
 *			When fails, will reject with an error message
 */
-function set_field_for_user_id(client, uid, field = "", value = ""){
+function set_field_for_user_id(client, uid, field, value){
 	if(field.toLowerCase() === "user_id"){
 		return new Promise((resolve, reject) => {
 			reject("Cannot change user id with set_field_for_user_id function");
@@ -345,8 +340,6 @@ function set_field_for_user_id(client, uid, field = "", value = ""){
 		text: 'UPDATE user_info SET ' + field + ' = $1 WHERE user_id = $2 RETURNING user_id',
 		values: [value, uid]
 	};
-
-	console.log(update_query)
 
 	return new Promise((resolve, reject) => client.query(update_query, (err, res) =>{
 		if(err){
