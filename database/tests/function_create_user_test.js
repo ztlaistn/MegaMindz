@@ -38,7 +38,7 @@ async function main(){
 		console.log("We added the user with id: " + ret_id);
 
 	} catch (err){
-		console.log("Failed test, when trying to add first client, we threw the following error: " + err +
+		console.log("Failed test, when trying to add first user, we threw the following error: " + err +
 		".\n  Note, if you didn't clear out the dataset since the last test, it will still be there and fail this.");
 		process.exit();
 	}

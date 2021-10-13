@@ -47,7 +47,7 @@ async function main() {
 		ret_id = await database_funs.new_user(client, 'test_login_valid_user', 'test_login_valid_hash', 'test_login_valid@fake.com', 'test_login_valid_salt');
 		console.log("We added the user with id: " + ret_id);
 	} catch (err){
-        console.log("Failed test: when trying to add first client, we threw the following error: " + err +
+        console.log("Failed test: when trying to add first user, we threw the following error: " + err +
 	    ".\n  Note, if you didn't clear out the dataset since the last test, it will still be there and fail this.")
         client.end();
         console.log("Exiting.")

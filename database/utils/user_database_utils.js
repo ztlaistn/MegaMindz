@@ -264,19 +264,22 @@ function login_validation(client, email, hash){
 /* 
 * Takes a parameter and a corresponding field, returns the user IDs that match that field/value combo.
 * If two different field/value combos have been given, it will return user IDs that satisfy the AND of those two combos.
+*
+* NOTE: This function can, and will return an empty array if nothing matched the fields/value combos in the table.	
+*
 * Parameters:
 * 	- client: 		client object that is connected to the database and user_info table (will not be closed in this function)
-* 	- field1 = "": 	If there is a specific field you want to filter for.
+* 	- field1:       The specific field you want to filter for.
 * 	- value1 = "":	The value you are looking for in the given field.
 *		- These two will be manditory for this function to work.
 * 	- field2 = "": 	If there is a specific field you want to filter for.
 * 	- value2 = "":	The value you are looking for in the given field.
 *		- Second field, for if you want to look for a specific field.
 *
-*	Returns: 	A promise that, when client is found, returns a list of user Id's that matched the field/value combo
+*	Returns: 	A promise that, when client is found, returns an array of user Id's that matched the field/value combo
 *				When something unexpected happens, it will reject with an error message
 */
-function get_user_ids_from_fields(client, field1 = "", value1 = "", field2 = "", value2 = ""){
+function get_user_ids_from_fields(client, field1, value1, field2 = "", value2 = ""){
 	if(field1 === "" || value1 === ""){
 		return new Promise((resolve, reject) => {
 			reject("No primary field supplied to get user ids");
@@ -294,7 +297,11 @@ function get_user_ids_from_fields(client, field1 = "", value1 = "", field2 = "",
 			if(err){
 				reject("Error in get_user_ids_from_fields with one field/value combo: " + err);
 			}else{
-				//TODO: return a list of the user ids that have been returned
+				ret_arr = []
+				res.rows.forEach(x=>{
+					ret_arr.push(x.user_id);
+				});
+				resolve(ret_arr);
 			}
 		}));
 
@@ -309,7 +316,11 @@ function get_user_ids_from_fields(client, field1 = "", value1 = "", field2 = "",
 			if(err){
 				reject("Error in get_user_ids_from_fields with two field/value combos: " + err);
 			}else{
-				//TODO: return a list of the user ids that have been returned
+				ret_arr = []
+				res.rows.forEach(x=>{
+					ret_arr.push(x.user_id);
+				});
+				resolve(ret_arr);
 			}
 		}));
 	}
