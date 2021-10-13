@@ -1,6 +1,7 @@
 import express, { Router } from "express";
 import socketIO from "socket.io";
 import { createServer } from "http";
+import path from "path";
 import bodyParser from "body-parser";
 
 import authRouter from "./routes/auth";
@@ -22,11 +23,14 @@ class Server {
 
   initialize() {
     this.app = express();
-
+    this.app.use(express.static("public"));
     // parse application/x-www-form-urlencoded
     this.app.use(bodyParser.urlencoded({ extended: true }))
     // parse application/json
     this.app.use(bodyParser.json())
+
+    this.app.use(express.static(path.resolve(__dirname, '../frontend/build')));
+
 
     // initialize the web (http) server
     this.httpServer = createServer(this.app);
@@ -45,6 +49,10 @@ class Server {
 
     authRouter(this.app);
     usersRouter(this.app);
+
+    this.app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
+});
   }
 
   handleSocketConnection() {
