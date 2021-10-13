@@ -15,8 +15,9 @@ user_info (
 	hash			VARCHAR(50) NOT NULL DEFAULT '',
 	salt			VARCHAR(50) NOT NULL DEFAULT '',
 -- Additional account information (feel free to add more to this, as we add features)
-	first_name		VARCHAR(30) NOT NULL DEFAULT '',
-	last_name		VARCHAR(30) NOT NULL DEFAULT '',
+--first_name		VARCHAR(30) NOT NULL DEFAULT '',
+--last_name			VARCHAR(30) NOT NULL DEFAULT '',
+	full_name		VARCHAR(80) NOT NULL DEFAULT '',
 	dob				DATE DEFAULT '1900-01-01',
 	location		VARCHAR(50) NOT NULL DEFAULT '',
 	status			VARCHAR(200) NOT NULL DEFAULT '',
@@ -27,9 +28,8 @@ user_info (
 );
 
 CREATE INDEX index1 ON user_info(enabled, username, hash);
-CREATE INDEX index2 ON user_info(enabled, last_name, first_name);
-CREATE INDEX index3 ON user_info(enabled, curr_room, user_id);
-CREATE INDEX index4 ON user_info(enabled, username, salt);
+CREATE INDEX index2 ON user_info(enabled, curr_room, user_id);
+CREATE INDEX index3 ON user_info(enabled, username, salt);
 	
 -- Will print table structure when created
 -- DESCRIBE user_info;

@@ -1,4 +1,3 @@
-const e = require('cors');
 const { Pool, Client } = require('pg');
 
 console.log(typeof process.env.DB_PORT);
@@ -26,8 +25,8 @@ client.connect(err => {
     }else{
         console.log('Connected');
         const insert_query = {
-            text: 'INSERT INTO user_info (username, pass, first_name) VALUES ($1, $2, $3)',
-            values: ['test_user', 'test_pass', 'test_name'],
+            text: 'INSERT INTO user_info (username, hash) VALUES ($1, $2)',
+            values: ['test_user', 'test_hash'],
         }
         
         client.query(insert_query, (err) =>{
@@ -40,10 +39,10 @@ client.connect(err => {
                 client.query('SELECT * FROM user_info', (err, res) =>{
                     if(err){
                         console.log("select error: ", err);
-                        client.end(()=>console.log("exited"));
+                        client.end(()=>console.log("Failed and exited"));
                     }else{
                         console.log(res.rows);
-                        client.end(()=>console.log("exited"))
+                        client.end(()=>console.log("Passed test and exited"))
                     }
                 });
             }

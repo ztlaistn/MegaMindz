@@ -66,17 +66,16 @@ function user_or_email_unique(client, user, email){
 * 	user: new username
 * 	hash: new hashed password
 * 	email: new email
-* 	first: new first name
-* 	last: new last name
+* 	full_name: new name
 * 	salt: new salt
 *
 * Return: 	A promise where, when query has an error, will reject with that error.
 *			When it inserts correctly (and there is no error), will resolve with user_id
  */
-function insert_new_user_row(client, user, hash, email, first, last, salt){
+function insert_new_user_row(client, user, hash, email, salt){
 	const insert_query = {
-		text: 'INSERT INTO user_info (username, hash, email, first_name, last_name, salt) VALUES ($1, $2, $3, $4, $5, $6) RETURNING user_id',
-		values: [user, hash, email, first, last, salt],
+		text: 'INSERT INTO user_info (username, hash, email, salt) VALUES ($1, $2, $3, $4) RETURNING user_id',
+		values: [user, hash, email, salt],
 	};
 	
 	return new Promise((resolve, reject) => client.query(insert_query, (err, res) =>{
@@ -97,7 +96,6 @@ function insert_new_user_row(client, user, hash, email, first, last, salt){
 * 	user: new username
 * 	hash: new hashed password
 * 	email: new email
-* 	first: new first name
 * 	last: new last name
 * 	salt: new salt
 * 
@@ -105,15 +103,14 @@ function insert_new_user_row(client, user, hash, email, first, last, salt){
 			When the user_or_email_unique check fails, it will reject with the error message.
 			When the insert fails, it will reject with the error message.
 **/
-async function new_user(client, user, hash, email, first, last, salt){
-	// Should first see if that username and/or email area already in user_info table
-	
+async function new_user(client, user, hash, email, salt){	
 	// This seems to work, and fixes the problems with the commented out version
 	// below, that doesn't return the promise right away.
 	return new Promise(async (resolve, reject) => {
 		try{
+			//First makes sure the user and 
 			const count = await user_or_email_unique(client, user, email);
-			const uid = await insert_new_user_row(client, user, hash, email, first, last, salt);
+			const uid = await insert_new_user_row(client, user, hash, email, salt);
 			resolve(uid);
 		} catch (err){
 			reject(err);
@@ -177,17 +174,15 @@ function dump_user_info(client, field = "", value = ""){
 * 	user: user's username
 * 	pass: user's Password
 * 	email: user's email
-* 	first: user's first name
-* 	last: user's last name
 * 	salt: user's salt
 * 
 * Return:	A promise where, when the query has an error, will reject with that error.
 *			When the delete is done (or there is nothing to delete), it will resolve with true.
 */
-function delete_user(client, user, hash, email, first, last, salt){
+function delete_user(client, user, hash, email, salt){
 	delete_query = {
-		text: 'DELETE FROM user_info WHERE username = $1 AND hash = $2 AND email = $3 AND first_name = $4 AND last_name = $5 AND salt = $6',
-		values: [user, hash, email, first, last, salt]
+		text: 'DELETE FROM user_info WHERE username = $1 AND hash = $2 AND email = $3 AND salt = $4',
+		values: [user, hash, email, salt]
 	};
 
 	return new Promise((resolve, reject) => client.query(delete_query, (err) =>{
@@ -266,6 +261,108 @@ function login_validation(client, email, hash){
 	})); 
 }
 
+/* 
+* Takes a parameter and a corresponding field, returns the user IDs that match that field/value combo.
+* If two different field/value combos have been given, it will return user IDs that satisfy the AND of those two combos.
+*
+* NOTE: This function can, and will return an empty array if nothing matched the fields/value combos in the table.	
+*
+* Parameters:
+* 	- client: 		client object that is connected to the database and user_info table (will not be closed in this function)
+* 	- field1:       The specific field you want to filter for.
+* 	- value1 = "":	The value you are looking for in the given field.
+*		- These two will be manditory for this function to work.
+* 	- field2 = "": 	If there is a specific field you want to filter for.
+* 	- value2 = "":	The value you are looking for in the given field.
+*		- Second field, for if you want to look for a specific field.
+*
+*	Returns: 	A promise that, when client is found, returns an array of user Id's that matched the field/value combo
+*				When something unexpected happens, it will reject with an error message
+*/
+function get_user_ids_from_fields(client, field1, value1, field2 = "", value2 = ""){
+	if(field1 === "" || value1 === ""){
+		return new Promise((resolve, reject) => {
+			reject("No primary field supplied to get user ids");
+		});
+	}
+
+	if(field2 === "" || value2 === ""){
+		// only one field has been given 
+		const select_query = {
+			text: 'SELECT user_id FROM user_info WHERE ' + field1 + ' = $1',
+			values: [value1]
+		};
+
+		return new Promise((resolve, reject) => client.query(select_query, (err, res) => {
+			if(err){
+				reject("Error in get_user_ids_from_fields with one field/value combo: " + err);
+			}else{
+				ret_arr = []
+				res.rows.forEach(x=>{
+					ret_arr.push(x.user_id);
+				});
+				resolve(ret_arr);
+			}
+		}));
+
+	}else{
+		// We have been given two values
+		const select_query = {
+			text: 'SELECT user_id FROM user_info WHERE ' + field1 + ' = $1 AND ' + field2 + ' = $2',
+			values: [value1, value2]
+		};
+
+		return new Promise((resolve, reject) => client.query(select_query, (err, res) => {
+			if(err){
+				reject("Error in get_user_ids_from_fields with two field/value combos: " + err);
+			}else{
+				ret_arr = []
+				res.rows.forEach(x=>{
+					ret_arr.push(x.user_id);
+				});
+				resolve(ret_arr);
+			}
+		}));
+	}
+}
+
+
+/*
+* Function that will change the value of one of the user's fields to the given value.
+* If the user with that given ID is not in the table, will also throw an error.
+* Cannot use this function to change the user's ID
+* Parameters:
+*	- client: client that has made a connection to the user_info table
+*	- uid: user id of the user we want to change
+*	- field: field we want to chage
+*	- value: value we wanted to change
+* 
+* Returns: 	A promise that, when passes, will resolve and return the changed user_id (should be the same as the one passed)
+*			When fails, will reject with an error message
+*/
+function set_field_for_user_id(client, uid, field, value){
+	if(field.toLowerCase() === "user_id"){
+		return new Promise((resolve, reject) => {
+			reject("Cannot change user id with set_field_for_user_id function");
+		});
+	}
+
+	update_query = {
+		text: 'UPDATE user_info SET ' + field + ' = $1 WHERE user_id = $2 RETURNING user_id',
+		values: [value, uid]
+	};
+
+	return new Promise((resolve, reject) => client.query(update_query, (err, res) =>{
+		if(err){
+			reject("Error in set_field_for_user_id: " + err);
+		}else if(res.rows.length === 1){
+			resolve(res.rows[0].user_id);			
+		}else{
+			reject("Error in set_field_for_user_id: number of rows that matched uid was: " + res.rows.length + ", but expected 1.");
+		}
+	}));
+}
+
 module.exports = {
 	connect_client,
 	user_or_email_unique,
@@ -273,5 +370,7 @@ module.exports = {
 	dump_user_info,
 	delete_user,
 	select_user_with_id,
-	login_validation
+	login_validation,
+	get_user_ids_from_fields,
+	set_field_for_user_id
 };
