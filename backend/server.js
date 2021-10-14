@@ -50,8 +50,8 @@ class Server {
     authRouter(this.app);
     usersRouter(this.app);
 
-    this.app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
+    this.app.get('/', (req, res) => {
+      res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
 });
   }
 

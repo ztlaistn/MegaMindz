@@ -1,4 +1,5 @@
 import express, { Router } from "express";
+import path from "path";
 import AuthService from "../services/auth";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -8,6 +9,9 @@ const router = express.Router();
 export default (app) => {
   app.use("/auth", router);
 
+  router.get('/register', function (req, res) {
+    res.sendFile(path.resolve(__dirname, '../../client/build', 'index.html'));
+    })
   // register a new user
   router.post('/register', function (req, res) {
     // ensure all required data is present
