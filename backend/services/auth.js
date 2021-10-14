@@ -1,4 +1,8 @@
 /* service will handle business logic */
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import {login_validation} from "../../database/utils/user_database_utils";
+import {connect_client} from "../../database/utils/user_database_utils";
 export default {
 
   /*Input: Object with username, password1, password2, and email
@@ -31,11 +35,25 @@ export default {
     Output:
     Behavior:
   */
-  logIn() {
-    // check if token already exists
+  logIn(data) {
+
     // check if email is valid
-    // check that encrypted password matches
-    // create token, update db with token, return
+    login_validation(connect_client(),data["email"])
+      // check that encrypted password matches
+      // var correct_password = CALL THE DATABASE AND GET THE FUNCTION
+      var hash = ""
+      bcrypt.compare(data["password"], hash, function (err, result) {
+        if (result) {
+          //create token
+          var token = jwt.sign(data["password"], process.env);
+          // update db with token, return
+          return {logged_in: true, body: token}
+        } else {
+          return {logged_in: false, body: "Email or Password Incorrect"}
+        }
+      });
+
+
   },
 
   /*Input:

@@ -280,6 +280,7 @@ function login_validation(client, email, hash){
 *				When something unexpected happens, it will reject with an error message
 */
 function get_user_ids_from_fields(client, field1, value1, field2 = "", value2 = ""){
+
 	if(field1 === "" || value1 === ""){
 		return new Promise((resolve, reject) => {
 			reject("No primary field supplied to get user ids");
