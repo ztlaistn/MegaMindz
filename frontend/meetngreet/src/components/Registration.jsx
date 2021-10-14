@@ -1,6 +1,7 @@
 import React from "react";
 import "./styles/Registration.css";
 import "./styles/Input.css";
+import { Link } from "react-router-dom";
 import registration_icon from "../assets/registration_icon.png";
 
 export default class Registration extends React.Component {
@@ -39,7 +40,7 @@ export default class Registration extends React.Component {
                         <input type="password" required id="password" name="password" placeholder="Password" onChange={this.check_credentials}/>
                         <label for="password-confirmation">Confirm Password</label>
                         <input type="password" required id="password-confirmation" name="password-confirmation" placeholder="Password" onChange={this.check_credentials}/>
-                        <input type="button" id="registration_button" value="Register" className="button-primary" onClick={this.process_registration}/>
+                        <Link to='/registration'> Register </Link>
                     </form>
                     <br/>
                 </div>

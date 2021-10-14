@@ -1,4 +1,5 @@
 import express, { Router } from "express";
+import path from "path";
 import AuthService from "../services/auth";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -19,7 +20,7 @@ export default (app) => {
     const response = AuthService.register(req.body);
 
     if (response.isSuccess) {
-      return res.status(201).json("Account successfully created");
+      return res.redirect("/login");
     } else {
       return res.status(409).json(response.errorMsg);
     }
