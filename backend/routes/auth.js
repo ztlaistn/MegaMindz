@@ -35,7 +35,7 @@ export default (app) => {
     // AuthService.logIn(req.body) will check if the provided credentials are valid or invalid and accordingly provide a response.
     // If they are valid a token will be issued to the user and that will be stored in the database.
     // If not error message will be sent.
-    const response = AuthService.logIn(reqs.body);
+    const response = AuthService.logIn(req.body);
     // A server response wll be sent accordingly
     if (response.isSuccess) {
       res.status(201).send("Log In Successful");

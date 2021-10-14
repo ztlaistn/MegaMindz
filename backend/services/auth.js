@@ -1,7 +1,11 @@
 /* service will handle business logic */
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import {login_validation} from "../../database/utils/user_database_utils";
+import {
+  get_user_ids_from_fields,
+  login_validation,
+  select_user_with_id, set_field_for_user_id
+} from "../../database/utils/user_database_utils";
 import {connect_client} from "../../database/utils/user_database_utils";
 export default {
 
@@ -35,24 +39,27 @@ export default {
     Output:
     Behavior:
   */
-  logIn(data) {
+  async logIn(data) {
 
+    var client = connect_client()
+    var ids = await get_user_ids_from_fields(client,"email",data["email"])
+    var row = await select_user_with_id(client,ids[0])
     // check if email is valid
-    login_validation(connect_client(),data["email"])
+
       // check that encrypted password matches
       // var correct_password = CALL THE DATABASE AND GET THE FUNCTION
-      var hash = ""
-      bcrypt.compare(data["password"], hash, function (err, result) {
+      var hash_ = row.hash
+      bcrypt.compare(data["password"], hash_, function (err, result) {
         if (result) {
           //create token
           var token = jwt.sign(data["password"], process.env);
           // update db with token, return
+
+          set_field_for_user_id(client,ids[0],"token", token)
           return {logged_in: true, body: token}
-        } else {
-          return {logged_in: false, body: "Email or Password Incorrect"}
         }
       });
-
+    return {logged_in: false, body: "Email or Password Incorrect"}
 
   },
 
