@@ -23,14 +23,15 @@ class Server {
 
   initialize() {
     this.app = express();
-    this.app.use(express.static("public"));
+
+    // hook app up with ejs views
+    this.app.set("view engine", "ejs");
+    this.app.use(express.static(path.resolve(__dirname, 'public')));// path.resolve(__dirname, 'public')
+
     // parse application/x-www-form-urlencoded
     this.app.use(bodyParser.urlencoded({ extended: true }))
     // parse application/json
     this.app.use(bodyParser.json())
-
-    this.app.use(express.static(path.resolve(__dirname, '../frontend/build')));
-
 
     // initialize the web (http) server
     this.httpServer = createServer(this.app);
@@ -51,8 +52,17 @@ class Server {
     usersRouter(this.app);
 
     this.app.get('/', (req, res) => {
-      res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
-});
+      res.redirect('login');
+    })
+
+    this.app.get('/login', (req, res) => {
+      //res.sendFile(path.resolve(__dirname, 'public', 'index.ejs'));
+      res.render('login');
+    });
+
+    this.app.get('/register', (req, res) => {
+      res.render('register');
+    });
   }
 
   handleSocketConnection() {

@@ -9,9 +9,6 @@ const router = express.Router();
 export default (app) => {
   app.use("/auth", router);
 
-  router.get('/register', function (req, res) {
-    res.sendFile(path.resolve(__dirname, '../../client/build', 'index.html'));
-    })
   // register a new user
   router.post('/register', function (req, res) {
     // ensure all required data is present
@@ -23,7 +20,7 @@ export default (app) => {
     const response = AuthService.register(req.body);
 
     if (response.isSuccess) {
-      return res.status(201).json("Account successfully created");
+      return res.redirect("/login");
     } else {
       return res.status(409).json(response.errorMsg);
     }
