@@ -51,9 +51,9 @@ class Server {
     authRouter(this.app);
     usersRouter(this.app);
 
-    this.app.get('/', (req, res) => {
+    /*this.app.get('/', (req, res) => {
       res.redirect('login');
-    })
+    })*/
 
     this.app.get('/login', (req, res) => {
       //res.sendFile(path.resolve(__dirname, 'public', 'index.ejs'));
@@ -63,11 +63,36 @@ class Server {
     this.app.get('/register', (req, res) => {
       res.render('register');
     });
+
+    /*this.app.get("/chat/:room", (req, res) => {
+      res.render("chatroom" , {roomId: req.param.room});
+    });*/
+
+    this.app.get("/chatroom", (req,res) => {
+        res.render("chatroom");
+    });
   }
 
   handleSocketConnection() {
     this.io.on("connection", socket => {
      console.log("Socket connected.");
+
+      socket.emit('news', 'This is the news');
+
+     /*socket.on("join-room", (roomId, userId) => {
+       socket.join(roomId);
+       socket.emit("")
+      });*/
+
+      socket.on('response', function (data) {
+        console.log(data);
+        });
+
+      socket.on('disconnect',function(){
+        console.log('Server has disconnected');
+      });
+
+
    });
   }
 
