@@ -52,7 +52,7 @@ export default {
       bcrypt.compare(data["password"], hash_, function (err, result) {
         if (result) {
           //create token
-          var token = jwt.sign(data["password"], process.env);
+          var token = jwt.sign(data["password"], process.env.TOKEN);
           // update db with token, return
 
           set_field_for_user_id(client,ids[0],"token", token)

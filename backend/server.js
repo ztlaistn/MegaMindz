@@ -6,6 +6,7 @@ import bodyParser from "body-parser";
 
 import authRouter from "./routes/auth";
 import usersRouter from "./routes/users"
+import io from "ejs/ejs";
 
 class Server {
   httpServer;
@@ -63,12 +64,41 @@ class Server {
     this.app.get('/register', (req, res) => {
       res.render('register');
     });
+      this.app.get("/chat/:room", (req, res) => {
+          console.log(req)
+          // this.handleSocketConnection();
+
+          res.render("chatroom" , {roomId: req.param.room});
+        // this.handleSocketConnection();
+
+      });
+
   }
 
+
+
   handleSocketConnection() {
-    this.io.on("connection", socket => {
-     console.log("Socket connected.");
-   });
+  //     console.log("it was here")
+  //   this.io.on("connection", socket => {
+  //       console.log("Socket connected.");
+  //       socket.on("join-room", (roomId, userId) => {
+  //
+  //           socket.join(roomId);
+  //           socket.to(roomId).broadcast.emit("user-connected", userId);
+  //
+  //       });
+
+      io.on('connection', (socket)=>{
+          console.log('New user connected');
+          //emit message from server to user
+          // socket.emit('newMessage', {
+
+              // from:'jen@mds',
+              // text:'hepppp',
+              // createdAt:123
+          // });
+    });
+
   }
 
   // pass in a callback function that returns port number
