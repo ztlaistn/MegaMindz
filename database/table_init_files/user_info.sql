@@ -28,9 +28,10 @@ user_info (
 	enabled			SMALLINT NOT NULL DEFAULT 1
 );
 
-CREATE INDEX index1 ON user_info(enabled, username, hash);
+CREATE INDEX index1 ON user_info(enabled, user_id, hash);
 CREATE INDEX index2 ON user_info(enabled, curr_room, user_id);
-CREATE INDEX index3 ON user_info(enabled, username, token);
+CREATE INDEX index3 ON user_info(enabled, user_id, token);
+CREATE INDEX index4 On user_info(enabled, email, user_id)
 	
 -- Will print table structure when created
 -- DESCRIBE user_info;
