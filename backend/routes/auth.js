@@ -3,6 +3,7 @@ import path from "path";
 import AuthService from "../services/auth";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import DbUtil from "../../database/utils/user_database_utils";
 
 const router = express.Router();
 
@@ -10,20 +11,38 @@ export default (app) => {
   app.use("/auth", router);
 
   // register a new user
-  router.post('/register', function (req, res) {
+  router.post('/register', async function (req, res) {
     // ensure all required data is present
     const { username, email, password1, password2 } = req.body;
     if (!(email && username && password1 && password2)) {
       return res.status(400).json("All input is required");
     }
 
-    const response = AuthService.register(req.body);
-
-    if (response.isSuccess) {
-      return res.redirect("/login");
-    } else {
-      return res.status(409).json(response.errorMsg);
+    if (password1 != password2) {
+      return res.status(400).json("Passwords must match");
     }
+
+    try {
+      const salt = await bcrypt.genSalt(10);
+      const hash = await bcrypt.hash(password1, salt);
+      console.log(salt, hash);
+      // connect client
+      const client = await DbUtil.connect_client();
+    } catch (err) {
+      console.log(err);
+      return res.status(400).json("An error occured on our backend");
+    }
+    // create user in database using new_user(client, username, hash, email)
+    try {
+      const id = await DbUtil.new_user(client, username, hash, email);
+      console.log("Created account: " + id);
+      return res.status(201).json("Account successfully created")
+    } catch (err) {
+      client.end();
+      return res.status(400).json("An error occured on our backend");
+      console.log(err);
+    }
+    client.end();
   });
 
   // define the login route
