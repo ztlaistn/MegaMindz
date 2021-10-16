@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Meet N Greet</title>
+    <link rel="stylesheet" href="styles/index.css" />
+    <link rel="stylesheet" href="styles/login.css" />
+    <link rel="stylesheet" href="styles/cardtemplate.css" />
+    <link rel="stylesheet" href="styles/input.css" />
+  </head>
+  <body>
+    <div>
+      <div class="App">
+        <div class="App-header">
+          <div class="card-template">
+            <div class="card-frame">
+              <img src="imgs/logo_gray.png" class="alt-logo" alt=""/>
+              <br/>
+              <div class="card-title">Log In</div>
+              <div id="login-form">
+                  <img src="imgs/login_icon.png" class="login-icon" alt="Meet N Greet Logo"/>
+                  <div class="login-credentials">
+                      <form>
+                          <label for="email" class="text-input-label">Email Address</label>
+                          <input type="email" required id="email" name="email" placeholder="Email" onchange=""/>
+                          <label for="password" class="text-input-label">Password</label>
+                          <input type="password" required id="password" name="password" placeholder="Password" onchange=""/>
+                          <input type="button" id="login_button" value="Log In" class="button-primary" onclick=""/>
+                      </form>
+                      <br/>
+                      <br/>
+                      <header class="register-prompt">Don't have an account?</header>
+                      <input type="button" value="Register" class="button-secondary" onClick=""/>
+                  </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

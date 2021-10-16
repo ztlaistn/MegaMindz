@@ -1,6 +1,8 @@
 import express, { Router } from "express";
 import socketIO from "socket.io";
 import { createServer } from "http";
+import path from "path";
+import bodyParser from "body-parser";
 
 import authRouter from "./routes/auth";
 import usersRouter from "./routes/users"
@@ -21,6 +23,16 @@ class Server {
 
   initialize() {
     this.app = express();
+
+    // hook app up with ejs views
+    this.app.set("view engine", "ejs");
+    this.app.use(express.static(path.resolve(__dirname, 'public')));// path.resolve(__dirname, 'public')
+
+    // parse application/x-www-form-urlencoded
+    this.app.use(bodyParser.urlencoded({ extended: true }))
+    // parse application/json
+    this.app.use(bodyParser.json())
+
     // initialize the web (http) server
     this.httpServer = createServer(this.app);
     // initialize the Socket.IO server and attach it to the web server
@@ -38,6 +50,19 @@ class Server {
 
     authRouter(this.app);
     usersRouter(this.app);
+
+    this.app.get('/', (req, res) => {
+      res.redirect('login');
+    })
+
+    this.app.get('/login', (req, res) => {
+      //res.sendFile(path.resolve(__dirname, 'public', 'index.ejs'));
+      res.render('login');
+    });
+
+    this.app.get('/register', (req, res) => {
+      res.render('register');
+    });
   }
 
   handleSocketConnection() {
