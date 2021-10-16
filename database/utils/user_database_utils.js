@@ -66,16 +66,14 @@ function user_or_email_unique(client, user, email){
 * 	user: new username
 * 	hash: new hashed password
 * 	email: new email
-* 	full_name: new name
-* 	salt: new salt
 *
 * Return: 	A promise where, when query has an error, will reject with that error.
 *			When it inserts correctly (and there is no error), will resolve with user_id
  */
-function insert_new_user_row(client, user, hash, email, salt){
+function insert_new_user_row(client, user, hash, email){
 	const insert_query = {
-		text: 'INSERT INTO user_info (username, hash, email, salt) VALUES ($1, $2, $3, $4) RETURNING user_id',
-		values: [user, hash, email, salt],
+		text: 'INSERT INTO user_info (username, hash, email) VALUES ($1, $2, $3) RETURNING user_id',
+		values: [user, hash, email],
 	};
 	
 	return new Promise((resolve, reject) => client.query(insert_query, (err, res) =>{
@@ -97,20 +95,19 @@ function insert_new_user_row(client, user, hash, email, salt){
 * 	hash: new hashed password
 * 	email: new email
 * 	last: new last name
-* 	salt: new salt
 * 
 * Return: 	A promise where, when a successfull insert has happened it will resolve, passing the user_id of the new user.
 			When the user_or_email_unique check fails, it will reject with the error message.
 			When the insert fails, it will reject with the error message.
 **/
-async function new_user(client, user, hash, email, salt){	
+async function new_user(client, user, hash, email){	
 	// This seems to work, and fixes the problems with the commented out version
 	// below, that doesn't return the promise right away.
 	return new Promise(async (resolve, reject) => {
 		try{
 			//First makes sure the user and 
 			const count = await user_or_email_unique(client, user, email);
-			const uid = await insert_new_user_row(client, user, hash, email, salt);
+			const uid = await insert_new_user_row(client, user, hash, email);
 			resolve(uid);
 		} catch (err){
 			reject(err);
@@ -174,15 +171,14 @@ function dump_user_info(client, field = "", value = ""){
 * 	user: user's username
 * 	pass: user's Password
 * 	email: user's email
-* 	salt: user's salt
 * 
 * Return:	A promise where, when the query has an error, will reject with that error.
 *			When the delete is done (or there is nothing to delete), it will resolve with true.
 */
-function delete_user(client, user, hash, email, salt){
+function delete_user(client, user, hash, email){
 	delete_query = {
-		text: 'DELETE FROM user_info WHERE username = $1 AND hash = $2 AND email = $3 AND salt = $4',
-		values: [user, hash, email, salt]
+		text: 'DELETE FROM user_info WHERE username = $1 AND hash = $2 AND email = $3',
+		values: [user, hash, email]
 	};
 
 	return new Promise((resolve, reject) => client.query(delete_query, (err) =>{
@@ -334,7 +330,7 @@ function get_user_ids_from_fields(client, field1, value1, field2 = "", value2 = 
 * Parameters:
 *	- client: client that has made a connection to the user_info table
 *	- uid: user id of the user we want to change
-*	- field: field we want to chage
+*	- field (string): field we want to chage
 *	- value: value we wanted to change
 * 
 * Returns: 	A promise that, when passes, will resolve and return the changed user_id (should be the same as the one passed)

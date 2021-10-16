@@ -24,7 +24,7 @@ async function main(){
 
 	//clear out test user from possible previous run.
 	try{
-		await add_funs.delete_user(client, 'test_add_user', 'test_add_hash', 'test_add_email@fake.com', 'test_add_salt');
+		await add_funs.delete_user(client, 'test_add_user', 'test_add_hash', 'test_add_email@fake.com');
 		console.log("Any previous test user from previous runs have been cleared out of the user_info table.")
 	} catch (err){
 		console.log("Failed test, when trying to remove previous test user, threw the following error: " + err);
@@ -33,7 +33,7 @@ async function main(){
 
 	//Add test user row to the table.
 	try{
-		const ret_id = await add_funs.new_user(client, 'test_add_user', 'test_add_hash', 'test_add_email@fake.com', 'test_add_salt');
+		const ret_id = await add_funs.new_user(client, 'test_add_user', 'test_add_hash', 'test_add_email@fake.com');
 		
 		console.log("We added the user with id: " + ret_id);
 
@@ -59,7 +59,7 @@ async function main(){
 	// Try to add another user with the same info, should reject the request.
 	console.log("Now we will test adding the same user, should not work.");
 	try{
-		const ret_id_2 = await add_funs.new_user(client, 'test_add_user', 'test_add_hash', 'test_add_email@fake.com', 'test_add_salt');
+		const ret_id_2 = await add_funs.new_user(client, 'test_add_user', 'test_add_hash', 'test_add_email@fake.com');
 
 		console.log("Failed test, when adding a duplicate, didn't throw error but instead resolved with id " + ret_id_2);
 		process.exit();

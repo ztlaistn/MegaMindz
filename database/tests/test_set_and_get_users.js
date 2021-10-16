@@ -24,7 +24,7 @@ async function main() {
 
     // Delete our test user from any previous test runs
     try{
-        await database_funs.delete_user(client, 'test_get_valid_user', 'test_get_valid_hash', 'test_get_valid@fake.com', 'test_get_valid_salt');
+        await database_funs.delete_user(client, 'test_get_valid_user', 'test_get_valid_hash', 'test_get_valid@fake.com');
         console.log("First previous test user from previous runs have been cleared out of the user_info table.");
     } catch (err){
         console.log("Failed test, when trying to remove previous test user, threw the following error: " + err);
@@ -36,7 +36,7 @@ async function main() {
 
     // Delete second user as well
     try{
-        await database_funs.delete_user(client, 'test_get_valid_user2', 'test_get_valid_hash2', 'test_get_valid2@fake.com', 'test_get_valid_salt2');
+        await database_funs.delete_user(client, 'test_get_valid_user2', 'test_get_valid_hash2', 'test_get_valid2@fake.com');
         console.log("Second previous test user from previous runs have been cleared out of the user_info table.");
     } catch (err){
         console.log("Failed test, when trying to remove previous test user, threw the following error: " + err);
@@ -49,7 +49,7 @@ async function main() {
     // Add first user back in
     ret_id = -1;
 	try{
-		ret_id = await database_funs.new_user(client, 'test_get_valid_user', 'test_get_valid_hash', 'test_get_valid@fake.com', 'test_get_valid_salt');
+		ret_id = await database_funs.new_user(client, 'test_get_valid_user', 'test_get_valid_hash', 'test_get_valid@fake.com');
 		console.log("We added the user with id: " + ret_id);
 	} catch (err){
         console.log("Failed test: when trying to add first client, we threw the following error: " + err +
@@ -228,7 +228,7 @@ async function main() {
     //Add another user
     second_ret_id = -1;
 	try{
-		second_ret_id = await database_funs.new_user(client, 'test_get_valid_user2', 'test_get_valid_hash2', 'test_get_valid2@fake.com', 'test_get_valid_salt2');
+		second_ret_id = await database_funs.new_user(client, 'test_get_valid_user2', 'test_get_valid_hash2', 'test_get_valid2@fake.com');
 		console.log("We added the second user, with id: " + second_ret_id);
 	} catch (err){
         console.log("Failed test: when trying to add second user, we threw the following error: " + err +
