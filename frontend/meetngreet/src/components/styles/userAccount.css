@@ -1,0 +1,9 @@
+.profile-picture{
+    display: block;
+    float: left;
+    margin-top: 5vh;
+    margin-left: 50px;
+    margin-right: auto;
+    max-width: 40%;
+    border-radius: 1000px;
+}
