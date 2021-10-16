@@ -30,19 +30,20 @@ export default (app) => {
       const client = await DbUtil.connect_client();
     } catch (err) {
       console.log(err);
-      return res.status(400).json("An error occured on our backend");
+      return res.status(400).json("CLIENT ERROR #1:" + err);
     }
     // create user in database using new_user(client, username, hash, email)
     try {
       const id = await DbUtil.new_user(client, username, hash, email);
       console.log("Created account: " + id);
+      client.end();
       return res.status(201).json("Account successfully created")
     } catch (err) {
       client.end();
-      return res.status(400).json("An error occured on our backend");
+      return res.status(400).json("DB ERROR: " + err);
       console.log(err);
     }
-    client.end();
+
   });
 
   // define the login route
