@@ -1,5 +1,4 @@
 .App {
-  text-align: center;
 }
 
 .App-logo {
@@ -14,6 +13,7 @@
 }
 
 .App-container {
+  text-align: center;
   background-color: #F3F7F9;
   min-height: 100vh;
   display: flex;

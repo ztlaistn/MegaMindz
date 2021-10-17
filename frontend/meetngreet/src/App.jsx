@@ -5,6 +5,7 @@ import LoginForm from "./components/Login.jsx";
 import RegistrationForm from "./components/Registration.jsx";
 import UserAccount from "./components/UserAccount.jsx";
 import React from "react";
+import Navigation_Registration, {Navigation_Login, Navigation_UserAccount} from './navbar.jsx';
 import {Link} from 'react-router-dom';
 import {
   BrowserRouter as Router, Route, Switch
@@ -18,16 +19,19 @@ class App extends React.Component {
                     <header className="App-header">
                         <Switch>
                             <Route path="/registration">
+                                <Navigation_Registration/>
                                 <CardTemplate page_title={"User Registration"}>
                                     <RegistrationForm/>
                                 </CardTemplate>
                             </Route>
                             <Route path="/user-account">
-                                <CardTemplate page_title={"User Registration"}>
+                                <Navigation_UserAccount/>
+                                <CardTemplate page_title={"User Account"}>
                                     <UserAccount/>
                                 </CardTemplate>
                             </Route>
                             <Route path="/">
+                                <Navigation_Login/>
                                 <CardTemplate page_title={"User Login"}>
                                     <LoginForm/>
                                 </CardTemplate>
