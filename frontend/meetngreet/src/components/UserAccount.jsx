@@ -16,7 +16,7 @@ export default class UserAccount extends React.Component {
             skills: "",
             employment_status : "",
             dob : "",
-            url : "http://localhost:5001"
+            url : process.env.SITE_URL
         };
         this.change_Handler.bind(this);
         this.handle_submit.bind(this);
@@ -34,7 +34,7 @@ export default class UserAccount extends React.Component {
         event.preventDefault();
 
         //make the api call to the user controller
-        fetch("", {
+        fetch(this.url+"/auth/setUserAccount", {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
@@ -130,7 +130,6 @@ export default class UserAccount extends React.Component {
                                 value={this.state.employment_status}
                             />
                         </label>
-
                         <label className="Skills">
                             Skills
                             <input
