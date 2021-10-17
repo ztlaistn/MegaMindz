@@ -139,6 +139,106 @@ export default (app) => {
     }
   });
 
+
+
+  router.post('/fetchUserAccount', async function (req, res) {
+    // making sure all login credentials provided
+    const {email} = req.body;
+    let client;
+    let id_array;
+    let row;
+    try {
+      // connect client
+      client = await DbUtil.connect_client();
+    }
+    catch (err) {
+      const errString = "USER ACCOUNT ERROR #1:" + err
+      console.log(errString);
+      return res.status(400).json(errString);
+    }
+    try{
+      id_array = await DbUtil.get_user_ids_from_fields(client, "email",email)
+
+      if (id_array.length !== 1){
+        client.end()
+        return res.status(400).json("Email does not exist");
+      }
+    }
+    catch (err) {
+      const errString = "USER ACCOUNT ERROR #2:" + err
+      client.end()
+      console.log(errString);
+      return res.status(400).json(errString);
+    }
+    try{
+      row = await DbUtil.select_user_with_id(client, id_array[0])
+    }
+    catch (err) {
+      const errString = "USER ACCOUNT ERROR #3:" + err
+      client.end()
+      console.log(errString);
+      return res.status(400).json(errString);
+    }
+    client.end()
+    return res.status(200).json({name:row.name,username:row.username,location:row.location, dob:row.dob,employment:row.employment,skills:row.skills});
+
+
+  });
+
+  router.post('/setUserAccount', async function (req, res) {
+    // making sure all login credentials provided
+    //email
+    //fields_to_change : array of all the fields that need to be changed
+    // new_values: new values of the fields.
+    const {email,fields_to_change,new_values} = req.body;
+
+    let client;
+    let id_array;
+    let row;
+    try {
+      // connect client
+      client = await DbUtil.connect_client();
+    }
+    catch (err) {
+      const errString = "SET USER ACCOUNT ERROR #1:" + err
+      console.log(errString);
+      return res.status(400).json(errString);
+    }
+    try{
+      id_array = await DbUtil.get_user_ids_from_fields(client, "email",email)
+
+      if (id_array.length !== 1){
+        return res.status(400).json("Email does not exist");
+      }
+    }
+    catch (err) {
+      const errString = "SET USER ACCOUNT ERROR #2:" + err
+      client.end()
+      console.log(errString);
+      return res.status(400).json(errString);
+    }
+    try{
+      row = await DbUtil.set_field_for_user_id(client, id_array[0],"location",new_values["location"])
+      row = await DbUtil.set_field_for_user_id(client, id_array[0],"dob",new_values["dob"])
+      row = await DbUtil.set_field_for_user_id(client, id_array[0],"skills",new_values["skills"])
+      row = await DbUtil.set_field_for_user_id(client, id_array[0],"status",new_values["status"])
+      row = await DbUtil.set_field_for_user_id(client, id_array[0],"full_name",new_values["full_name"])
+
+
+    }
+    catch (err) {
+      const errString = "SET USER ACCOUNT ERROR #3:" + err
+      client.end()
+      console.log(errString);
+      return res.status(400).json(errString);
+    }
+    client.end()
+    return res.status(200).json("successfully changed fields");
+
+
+  });
+
+
   // define the join_room route
   router.post('/joinRoom', tokenAuthorization ,async function (req, res) {
     const { room_id, userId } = req.body;

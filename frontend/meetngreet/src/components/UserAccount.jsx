@@ -38,7 +38,7 @@ export default class UserAccount extends React.Component {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer '+sessionStorage.getItem("token")
+                'Authorization': 'Bearer '+ sessionStorage.getItem("token")
             },
             body: JSON.stringify({
 
@@ -47,6 +47,7 @@ export default class UserAccount extends React.Component {
                 location: this.state.location|| "",
                 skills: this.state.skills|| "",
                 employment_status: this.state.employment || ""
+
             })
         })
             .then(res => res.json())
