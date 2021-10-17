@@ -90,3 +90,13 @@ This can be done with a call to set_field_for_user_id.  Which will take the clie
 
 There are multiple other more specific functions in the user_database_utils.js file.  All functions have detailed header comments explaining their purpose and how to use them.
 
+**Misc**
+
+Strings returned from SELECT queries will be in single quotes, if that matters.
+
+Due to indexs made in the user_info table, it will be quicker to query a user based on their email, than based on their username.
+
+If there is a variable field being used in a query, it is injected directly with string concat.  This is NOT open our database to injection attacks.
+The reason for this is that we assume that the user should never have the power to set a query field.  The only one calling these functions are backend functions.
+The backend functions will always be looking for a specific function, and so they will simply pass a string constant that the user never had a chance to modify (unlike the values, that ARE dangerous, thus is run through the built in sanitation).
+If the user already has acces to the backend, its probably too late.
