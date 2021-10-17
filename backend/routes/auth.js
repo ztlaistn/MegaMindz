@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import DbUtil, {connect_client} from "../../database/utils/user_database_utils";
 import bycrpt from "bcrypt";
+import tokenAuthorization from "../middleware/tokenAuth";
 
 const router = express.Router();
 
@@ -16,11 +17,11 @@ export default (app) => {
     // ensure all required data is present
     const { username, email, password1, password2 } = req.body;
     if (!(email && username && password1 && password2)) {
-      return res.status(400).json("All input is required");
+      return res.status(400).json({message: "All input is required"});
     }
 
     if (password1 != password2) {
-      return res.status(400).json("Passwords must match");
+      return res.status(400).json({message: "Passwords must match"});
     }
     let client;
     let hash;
@@ -31,7 +32,7 @@ export default (app) => {
     } catch(err) {
       const errString = "BCRYPT ERROR #1:" + err;
       console.log(errString);
-      return res.status(400).json(errString);
+      return res.status(400).json({message: "An error occured behind the scenes"});
     }
     try {
       // connect client
@@ -39,7 +40,7 @@ export default (app) => {
     } catch (err) {
       const errString = "CLIENT ERROR #2:" + err
       console.log(errString);
-      return res.status(400).json(errString);
+      return res.status(400).json({message: "An error occured behind the scenes"});
     }
     // create user in database using new_user(client, username, hash, email)
     try {
@@ -47,7 +48,7 @@ export default (app) => {
       console.log("Created account: " + id);
       client.end();
       //console.log("here")
-      return res.status(201).json("Account successfully created")
+      return res.status(201).json({message: "Account successfully created"})
     } catch (err) {
         let errString;
       if(err === "Account info already exists"){
@@ -57,7 +58,7 @@ export default (app) => {
       }
       client.end();
       console.log(errString);
-      return res.status(400).json(errString);
+      return res.status(400).json({message: "An error occured behind the scenes"});
     }
   });
 
@@ -76,21 +77,21 @@ export default (app) => {
     catch (err) {
       const errString = "LOGIN CLIENT ERROR #2:" + err
       console.log(errString);
-      return res.status(400).json(errString);
+      return res.status(400).json({message: "An error occured behind the scenes"});
     }
 
     try{
       id_array = await DbUtil.get_user_ids_from_fields(client, "email",email)
 
       if (id_array.length !== 1){
-        return res.status(400).json("Email does not exist");
+        return res.status(400).json({message: "Account does not exist"});
       }
     }
     catch (err) {
       const errString = "LOGIN CLIENT ERROR #3:" + err
       client.end();
       console.log(errString);
-      return res.status(400).json(errString);
+      return res.status(400).json({message: "An error occured behind the scenes"});
     }
 
     try{
@@ -100,7 +101,7 @@ export default (app) => {
       const errString = "LOGIN CLIENT ERROR #4:" + err
       client.end()
       console.log(errString);
-      return res.status(400).json(errString);
+      return res.status(400).json({message: "An error occured behind the scenes"});
     }
 
     try{
@@ -109,31 +110,42 @@ export default (app) => {
       console.log(hash)
       console.log(password_match)
       if (password_match){
-        let token = jwt.sign(password_match,process.env.TOKEN_SECRET)
+        let token = jwt.sign(
+            {
+                userId: row.user_id
+            },
+            process.env.TOKEN_SECRET,
+            { expiresIn: '2h' });
         console.log("Logged in user " + row.user_id)
         client.end();
-        return res.status(200).json({token: token, message:"Login Successful",username:row.username});
+        return res
+            .status(200)
+            .json({
+                token: token,
+                message: "Login Successful",
+                username: row.username
+                });
       }else{
         client.end();
         console.log("Could not log in user " + row.user_id)
-        return res.status(400).json("Username or password Incorrect");
+        return res.status(400).json({message: "Username or password Incorrect"});
       }
     }
     catch (err) {
       const errString = "LOGIN CLIENT ERROR #5:" + err
       client.end()
       console.log(errString);
-      return res.status(400).json("email does not exist");
+      return res.status(400).json({message: "email does not exist"});
     }
-
-
   });
 
   // define the logout route
   router.get('/logout', function (req, res) {
-
-    // delete this later when funct is implemented
-    res.status(200).send({data: "logging out"});
+    res.status(200).json({message: "logging out"});
   });
 
+  /*router.post("/joinroom", tokenAuthorization, function (req, res) {
+    const {userId} = req.body;
+    res.status(200).json({message: "Successful authorization", userId });
+  });*/
 }
