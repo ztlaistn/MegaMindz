@@ -140,13 +140,10 @@ export default (app) => {
   });
 
   // define the join_room route
-  router.post('/joinRoom', async function (req, res) {
-    const { email, room_id } = req.body;
+  router.post('/joinRoom', tokenAuthorization ,async function (req, res) {
+    const { room_id, userId } = req.body;
     let client;
-    let id_array;
     //let row;
-
-    //TODO: validate user's token
 
     try {
       // connect client
@@ -157,20 +154,21 @@ export default (app) => {
       return res.status(400).json(errString);
     }
 
-    try{
-      // get user_id
-      id_array = await DbUtil.get_user_ids_from_fields(client, "email", email)
+    // UserID obtained by token authentication
+    // try{
+    //   // get user_id
+    //   id_array = await DbUtil.get_user_ids_from_fields(client, "email", email)
 
-      if (id_array.length !== 1){
-        client.end();
-        return res.status(400).json("User trying to enter room doesn't exist.");
-      }
-    } catch (err) {
-      const errString = "ENTER ROOM ERROR #2:" + err
-      client.end();
-      console.log(errString);
-      return res.status(400).json(errString);
-    }
+    //   if (id_array.length !== 1){
+    //     client.end();
+    //     return res.status(400).json("User trying to enter room doesn't exist.");
+    //   }
+    // } catch (err) {
+    //   const errString = "ENTER ROOM ERROR #2:" + err
+    //   client.end();
+    //   console.log(errString);
+    //   return res.status(400).json(errString);
+    // }
 
     // check if they are currently in a room (this part is not neccesary)
     // try{
@@ -188,9 +186,11 @@ export default (app) => {
     //   return res.status(400).json(errString);
     // }
 
+    //TODO: Once we have the roles setup, check if this room exists first (if there are any people with a role for that room)
+
     // add them to the room
     try{
-      await DbUtil.set_field_for_user_id(client, id_array[0], "curr_room", room_id);
+      await DbUtil.set_field_for_user_id(client, userId, "curr_room", room_id);
 
     } catch (err){
       const errString = "ENTER ROOM CLIENT ERROR #4:" + err
@@ -208,13 +208,10 @@ export default (app) => {
   });
 
   // handle leaveRoom request
-  router.post('/leaveRoom', async function (req, res) {
-    const { email } = req.body;
+  router.post('/leaveRoom', tokenAuthorization, async function (req, res) {
+    const { userId } = req.body;
     let client;
-    let id_array;
     //let row;
-
-    //TODO: verify session token
 
     try {
       // connect client
@@ -225,20 +222,22 @@ export default (app) => {
       return res.status(400).json(errString);
     }
 
-    try{
-      // get user_id
-      id_array = await DbUtil.get_user_ids_from_fields(client, "email", email)
+    // token will get the userId (next part is not needed)
 
-      if (id_array.length !== 1){
-        client.end();
-        return res.status(400).json("User trying to leave room doesn't exist.");
-      }
-    } catch (err) {
-      const errString = "LEAVE ROOM ERROR #2:" + err
-      client.end();
-      console.log(errString);
-      return res.status(400).json(errString);
-    }
+    // try{
+    //   // get user_id
+    //   id_array = await DbUtil.get_user_ids_from_fields(client, "email", email)
+
+    //   if (id_array.length !== 1){
+    //     client.end();
+    //     return res.status(400).json("User trying to leave room doesn't exist.");
+    //   }
+    // } catch (err) {
+    //   const errString = "LEAVE ROOM ERROR #2:" + err
+    //   client.end();
+    //   console.log(errString);
+    //   return res.status(400).json(errString);
+    // }
 
     // check if they are currently in a room (this part is not neccesary)
     // actually, we might want to remove this part since, if they disconnect, they might get stuck in a room but not in a room
@@ -259,7 +258,7 @@ export default (app) => {
 
     // remove them from the room
     try{
-      await DbUtil.set_field_for_user_id(client, id_array[0], "curr_room", null);
+      await DbUtil.set_field_for_user_id(client, userId, "curr_room", null);
 
     } catch (err){
       const errString = "ENTER ROOM CLIENT ERROR #4:" + err
