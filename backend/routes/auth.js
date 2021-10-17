@@ -83,6 +83,7 @@ export default (app) => {
       id_array = await DbUtil.get_user_ids_from_fields(client, "email",email)
 
       if (id_array.length !== 1){
+        client.end()
         return res.status(400).json("Email does not exist");
       }
     }
@@ -147,6 +148,7 @@ export default (app) => {
       id_array = await DbUtil.get_user_ids_from_fields(client, "email",email)
 
       if (id_array.length !== 1){
+        client.end()
         return res.status(400).json("Email does not exist");
       }
     }
@@ -165,7 +167,7 @@ export default (app) => {
       console.log(errString);
       return res.status(400).json(errString);
     }
-
+    client.end()
     return res.status(200).json({name:row.name,username:row.username,location:row.location, dob:row.dob,employment:row.employment,skills:row.skills});
 
 
@@ -173,7 +175,11 @@ export default (app) => {
 
   router.post('/setuseraccount', async function (req, res) {
     // making sure all login credentials provided
+    //email
+    //fields_to_change : array of all the fields that need to be changed
+    // new_values: new values of the fields.
     const {email,fields_to_change,new_values} = req.body;
+
     let client;
     let id_array;
     let row;
@@ -212,7 +218,7 @@ export default (app) => {
       console.log(errString);
       return res.status(400).json(errString);
     }
-
+    client.end()
     return res.status(200).json("successfully changed fields");
 
 
