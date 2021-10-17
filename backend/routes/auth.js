@@ -3,7 +3,7 @@ import path from "path";
 import AuthService from "../services/auth";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import DbUtil, {connect_client} from "../../database/utils/user_database_utils";
+import DbUtil, {connect_client, new_user} from "../../database/utils/user_database_utils";
 import bycrpt from "bcrypt";
 
 const router = express.Router();
@@ -128,6 +128,96 @@ export default (app) => {
 
 
   });
+  router.post('/fetchuseraccount', async function (req, res) {
+    // making sure all login credentials provided
+    const {email} = req.body;
+    let client;
+    let id_array;
+    let row;
+    try {
+      // connect client
+      client = await DbUtil.connect_client();
+    }
+    catch (err) {
+      const errString = "USER ACCOUNT ERROR #1:" + err
+      console.log(errString);
+      return res.status(400).json(errString);
+    }
+    try{
+      id_array = await DbUtil.get_user_ids_from_fields(client, "email",email)
+
+      if (id_array.length !== 1){
+        return res.status(400).json("Email does not exist");
+      }
+    }
+    catch (err) {
+      const errString = "USER ACCOUNT ERROR #2:" + err
+      client.end()
+      console.log(errString);
+      return res.status(400).json(errString);
+    }
+    try{
+      row = await DbUtil.select_user_with_id(client, id_array[0])
+    }
+    catch (err) {
+      const errString = "USER ACCOUNT ERROR #3:" + err
+      client.end()
+      console.log(errString);
+      return res.status(400).json(errString);
+    }
+
+    return res.status(200).json({name:row.name,username:row.username,location:row.location, dob:row.dob,employment:row.employment,skills:row.skills});
+
+
+  });
+
+  router.post('/setuseraccount', async function (req, res) {
+    // making sure all login credentials provided
+    const {email,fields_to_change,new_values} = req.body;
+    let client;
+    let id_array;
+    let row;
+    try {
+      // connect client
+      client = await DbUtil.connect_client();
+    }
+    catch (err) {
+      const errString = "SET USER ACCOUNT ERROR #1:" + err
+      console.log(errString);
+      return res.status(400).json(errString);
+    }
+    try{
+      id_array = await DbUtil.get_user_ids_from_fields(client, "email",email)
+
+      if (id_array.length !== 1){
+        return res.status(400).json("Email does not exist");
+      }
+    }
+    catch (err) {
+      const errString = "SET USER ACCOUNT ERROR #2:" + err
+      client.end()
+      console.log(errString);
+      return res.status(400).json(errString);
+    }
+    try{
+      for (let i = 0; i < fields_to_change.length; i++) {
+        row = await DbUtil.set_field_for_user_id(client, id_array[0],fields_to_change[i],new_values[i])
+
+      }
+
+    }
+    catch (err) {
+      const errString = "SET USER ACCOUNT ERROR #3:" + err
+      client.end()
+      console.log(errString);
+      return res.status(400).json(errString);
+    }
+
+    return res.status(200).json("successfully changed fields");
+
+
+  });
+
 
   // define the logout route
   router.get('/logout', function (req, res) {
