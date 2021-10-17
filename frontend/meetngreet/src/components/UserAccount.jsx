@@ -4,7 +4,6 @@ import "./styles/Input.css";
 import "./styles/UserAccount.css";
 
 import sample_profile from "../assets/sample-profile.png";
-import login_icon from "../assets/login_icon.png";
 
 export default class UserAccount extends React.Component {
     constructor(props) {
@@ -13,6 +12,12 @@ export default class UserAccount extends React.Component {
             empty_email: false,
             empty_password: false
         };
+    }
+
+    componentDidMount = () => {
+        if(sessionStorage.getItem("token") == null){
+            window.location.href = "login";
+        }
     }
 
     render() {
