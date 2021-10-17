@@ -42,31 +42,32 @@ class Server {
     /* backend routes exist here
     NOTE: will likely need to organize into seperate files as we add more routes*/
     backendRoutes() {
-        this.app.get("/express", (req, res) => {
-            res.status(200).send({
-                data: "Hello World! -This is Malika"
-            });
-        });
+        const rootdir = __dirname.substring(0, __dirname.length-7);
+        const root = require('path').join(rootdir, 'frontend', 'meetngreet', 'build')
+            this.app.use(express.static(root));
+            this.app.get("*", (req, res) => {
+                res.sendFile('index.html', { root });
+            })
 
         authRouter(this.app);
         usersRouter(this.app);
 
-        this.app.get('/', (req, res) => {
-            res.redirect('login');
-        })
-        this.app.get('/useraccount', (req, res) => {
-            //res.sendFile(path.resolve(__dirname, 'public', 'index.ejs'));
-            res.render('userAccount');
-        });
+        //this.app.get('/', (req, res) => {
+        //    res.redirect('login');
+        //})
+        //this.app.get('/useraccount', (req, res) => {
+        //    res.sendFile(path.resolve(__dirname, 'public', 'index.ejs'));
+        //    res.render('userAccount');
+        //});
 
-        this.app.get('/login', (req, res) => {
-            //res.sendFile(path.resolve(__dirname, 'public', 'index.ejs'));
-            res.render('login');
-        });
+        //this.app.get('/login', (req, res) => {
+        //      res.sendFile(path.resolve(__dirname, 'public', 'index.ejs'));
+        //    res.render('login');
+        //});
 
-        this.app.get('/register', (req, res) => {
-            res.render('register');
-        });
+        //this.app.get('/register', (req, res) => {
+        //    res.render('register');
+        //});
     }
 
     handleSocketConnection() {
