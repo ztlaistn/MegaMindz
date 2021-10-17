@@ -21,16 +21,24 @@ export default (app) => {
     if (password1 != password2) {
       return res.status(400).json("Passwords must match");
     }
-
+    let client;
+    let hash;
     try {
       const salt = await bcrypt.genSalt(10);
       const hash = await bcrypt.hash(password1, salt);
       console.log(salt, hash);
+    } catch(err) {
+      const errString = "BCRYPT ERROR #1:" + err;
+      console.log(errString);
+      return res.status(400).json(errString);
+    }
+    try {
       // connect client
       const client = await DbUtil.connect_client();
     } catch (err) {
-      console.log(err);
-      return res.status(400).json("CLIENT ERROR #1:" + err);
+      const errString = "CLIENT ERROR #2:" + err
+      console.log(errString);
+      return res.status(400).json(errString);
     }
     // create user in database using new_user(client, username, hash, email)
     try {
@@ -39,11 +47,11 @@ export default (app) => {
       client.end();
       return res.status(201).json("Account successfully created")
     } catch (err) {
+      const errString = "DB ERROR #3: " + err;
       client.end();
-      return res.status(400).json("DB ERROR: " + err);
-      console.log(err);
+      console.log(errString);
+      return res.status(400).json(errString);
     }
-
   });
 
   // define the login route
