@@ -3,7 +3,8 @@ import path from "path";
 import AuthService from "../services/auth";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import DbUtil from "../../database/utils/user_database_utils";
+import DbUtil, {connect_client} from "../../database/utils/user_database_utils";
+import bycrpt from "bcrypt";
 
 const router = express.Router();
 
@@ -61,22 +62,63 @@ export default (app) => {
   });
 
   // define the login route
-  router.post('/login', function (req, res) {
+  router.post('/login', async function (req, res) {
           // making sure all login credentials provided
           const {email,password} = req.body;
-    if (!(email || password)) {
-      res.status(400).send("All input is required");
+    let client;
+    let id_array;
+    let hash;
+    let row;
+    try {
+      // connect client
+      client = await DbUtil.connect_client();
     }
-      // AuthService.logIn(req.body) will check if the provided credentials are valid or invalid and accordingly provide a response.
-      // If they are valid a token will be issued to the user and that will be stored in the database.
-      // If not error message will be sent.
-      const response = AuthService.logIn(req.body);
-      // A server response wll be sent accordingly
-      if (response.isSuccess) {
-        res.status(201).send("Log In Successful");
-      } else {
-        res.status(409).send(response.errorMsg);
+    catch (err) {
+      const errString = "LOGIN CLIENT ERROR #2:" + err
+      console.log(errString);
+      return res.status(400).json(errString);
+    }
+
+    try{
+      id_array = await DbUtil.get_user_ids_from_fields(client, "email",email)
+
+      if (id_array.length !== 1){
+        return res.status(400).json("email does not exist");
       }
+
+    }
+    catch (err) {
+      const errString = "LOGIN CLIENT ERROR #3:" + err
+      console.log(errString);
+
+      return res.status(400).json(errString);
+    }
+
+    try{
+     row = await DbUtil.select_user_with_id(client, id_array[0])
+
+    }
+    catch (err) {
+      const errString = "LOGIN CLIENT ERROR #4:" + err
+      console.log(errString);
+      return res.status(400).json("email does not exist");
+    }
+    try{
+      hash = row.hash
+      const password_match = (await bycrpt.compare(hash,password))
+      if (password_match){
+        let token = jwt.sign(password_match,process.env.TOKEN_SECRET)
+        return res.status(200).json({"token": token, "message":"Login Successful","username":row.username});
+      }else{
+        return res.status(400).json("Username or password Incorrect");
+      }
+    }
+    catch (err) {
+      const errString = "LOGIN CLIENT ERROR #5:" + err
+      console.log(errString);
+      return res.status(400).json("email does not exist");
+    }
+
 
   });
 
