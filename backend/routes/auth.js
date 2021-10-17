@@ -25,7 +25,7 @@ export default (app) => {
     let hash;
     try {
       const salt = await bcrypt.genSalt(10);
-      const hash = await bcrypt.hash(password1, salt);
+      hash = await bcrypt.hash(password1, salt);
       console.log(salt, hash);
     } catch(err) {
       const errString = "BCRYPT ERROR #1:" + err;
@@ -34,7 +34,7 @@ export default (app) => {
     }
     try {
       // connect client
-      const client = await DbUtil.connect_client();
+      client = await DbUtil.connect_client();
     } catch (err) {
       const errString = "CLIENT ERROR #2:" + err
       console.log(errString);
