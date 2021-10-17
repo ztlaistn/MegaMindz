@@ -51,7 +51,8 @@ function user_or_email_unique(client, user, email){
 		if (err){
 			reject("Error in user_or_email_unique: " + err)
 		}else if(res.rows[0].count > 0){
-			reject("Number of rows already containing this data: " + res.rows[0].count)
+			//reject("Number of rows already containing this data: " + res.rows[0].count)
+			reject("Account info already exists")
 		}else{
 			resolve(res.rows[0].count);
 		}
