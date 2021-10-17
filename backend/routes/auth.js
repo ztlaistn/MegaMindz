@@ -189,11 +189,11 @@ export default (app) => {
       return res.status(400).json("Unable to add user to this room");
     }
 
-    //TODO: in the future, we will want to check their roll in this room and return that in the status as well
-    // atm it just returns roll 0 (guest)
+    //TODO: in the future, we will want to check their role in this room and return that in the status as well
+    // atm it just returns role 0 (guest)
 
     client.end();
-    return res.status(200).json({roll: 0, message:"User added to room " + room_id});
+    return res.status(200).json({role: 0, message:"User added to room " + room_id});
 
   });
 
