@@ -129,7 +129,7 @@ export default (app) => {
 
 
   });
-  router.post('/fetchuseraccount', async function (req, res) {
+  router.post('/fetchUserAccount', async function (req, res) {
     // making sure all login credentials provided
     const {email} = req.body;
     let client;
@@ -173,7 +173,7 @@ export default (app) => {
 
   });
 
-  router.post('/setuseraccount', async function (req, res) {
+  router.post('/setUserAccount', async function (req, res) {
     // making sure all login credentials provided
     //email
     //fields_to_change : array of all the fields that need to be changed
@@ -206,10 +206,12 @@ export default (app) => {
       return res.status(400).json(errString);
     }
     try{
-      for (let i = 0; i < fields_to_change.length; i++) {
-        row = await DbUtil.set_field_for_user_id(client, id_array[0],fields_to_change[i],new_values[i])
+        row = await DbUtil.set_field_for_user_id(client, id_array[0],"location",new_values["location"])
+      row = await DbUtil.set_field_for_user_id(client, id_array[0],"dob",new_values["dob"])
+      row = await DbUtil.set_field_for_user_id(client, id_array[0],"skills",new_values["skills"])
+      row = await DbUtil.set_field_for_user_id(client, id_array[0],"status",new_values["status"])
+      row = await DbUtil.set_field_for_user_id(client, id_array[0],"full_name",new_values["full_name"])
 
-      }
 
     }
     catch (err) {
