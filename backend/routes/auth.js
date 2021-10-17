@@ -190,7 +190,7 @@ export default (app) => {
     //email
     //fields_to_change : array of all the fields that need to be changed
     // new_values: new values of the fields.
-    const {email,fields_to_change,new_values} = req.body;
+    const {email,new_values} = req.body;
 
     let client;
     let id_array;
