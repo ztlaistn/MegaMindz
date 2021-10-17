@@ -26,7 +26,7 @@ export default (app) => {
     try {
       const salt = await bcrypt.genSalt(10);
       hash = await bcrypt.hash(password1, salt);
-      console.log(salt, hash);
+      //console.log(salt, hash);
     } catch(err) {
       const errString = "BCRYPT ERROR #1:" + err;
       console.log(errString);
@@ -45,9 +45,15 @@ export default (app) => {
       const id = await DbUtil.new_user(client, username, hash, email);
       console.log("Created account: " + id);
       client.end();
+      //console.log("here")
       return res.status(201).json("Account successfully created")
     } catch (err) {
-      const errString = "DB ERROR #3: " + err;
+        let errString;
+      if(err === "Account info already exists"){
+        errString = "Account info already exists";
+      }else{
+        errString = "DB ERROR #3: " + err;
+      }
       client.end();
       console.log(errString);
       return res.status(400).json(errString);
