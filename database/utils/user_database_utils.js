@@ -359,6 +359,58 @@ function set_field_for_user_id(client, uid, field, value){
 	}));
 }
 
+/*
+* Function that will return an array of rows that correlates to all the users in a given room.
+* If you only want one field from the users, you can pass that field as an optional paramter.
+	- If this is the case, it will just return an array of those field values
+* Parameters:
+*	- client: client that has made a connection to the user_info table
+*	- room_num: room_code/number for the room we are trying to lookup
+*	- field="": optional paramter, if a field is given, will only return the values for that field rather than the whole rows
+* 
+* Returns: 	A promise that, when passes, will resolve and return the array of rows (or just a array of values if a field was given)
+*			When fails, will reject with an error message
+*
+* NOTE: this function can return an empty array if no one is in the room.
+* Also Note: if list has strings, they will be in single quotes.
+*/
+function get_rows_in_room(client, room_num, field=""){
+	if (field === ""){
+		// no field was given, return whole row
+		select_query = {
+			text: 'SELECT * FROM user_info WHERE curr_room = $1',
+			values: [room_num]
+		};
+
+		return new Promise((resolve, reject) => client.query(select_query, (err, res) => {
+			if(err){
+				rejcect("Error in get_rows_in_room: "+ err);
+			}else{
+				resolve(res.rows)
+			}
+		}));
+	}else{
+		// we were given a specific field
+		select_query = {
+			text: 'SELECT ' + field + ' FROM user_info WHERE curr_room = $1',
+			values: [room_num]
+		};
+	
+		return new Promise((resolve, reject) => client.query(select_query, (err, res) => {
+			if(err){
+				rejcect("Error in get_rows_in_room: "+ err);
+			}else{
+				ret_arr = []
+				res.rows.forEach(x=>{
+					ret_arr.push(x[field]);
+				});
+				resolve(ret_arr)
+			}
+		}));
+	}
+}
+
+
 module.exports = {
 	connect_client,
 	user_or_email_unique,
@@ -368,5 +420,6 @@ module.exports = {
 	select_user_with_id,
 	login_validation,
 	get_user_ids_from_fields,
-	set_field_for_user_id
+	set_field_for_user_id,
+	get_rows_in_room
 };
