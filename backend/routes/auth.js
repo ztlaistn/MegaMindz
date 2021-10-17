@@ -156,7 +156,7 @@ export default (app) => {
       console.log(errString);
       return res.status(400).json(errString);
     }
-  
+
     try{
       // get user_id
       id_array = await DbUtil.get_user_ids_from_fields(client, "email", email)
@@ -171,7 +171,7 @@ export default (app) => {
       console.log(errString);
       return res.status(400).json(errString);
     }
-    
+
     // check if they are currently in a room (this part is not neccesary)
     // try{
     //   row = await DbUtil.select_user_with_id(client, id_array[0]);
@@ -187,7 +187,7 @@ export default (app) => {
     //   console.log(errString);
     //   return res.status(400).json(errString);
     // }
-    
+
     // add them to the room
     try{
       await DbUtil.set_field_for_user_id(client, id_array[0], "curr_room", room_id);
@@ -213,7 +213,7 @@ export default (app) => {
     let client;
     let id_array;
     //let row;
-    
+
     //TODO: verify session token
 
     try {
@@ -224,7 +224,7 @@ export default (app) => {
       console.log(errString);
       return res.status(400).json(errString);
     }
-    
+
     try{
       // get user_id
       id_array = await DbUtil.get_user_ids_from_fields(client, "email", email)
@@ -239,7 +239,7 @@ export default (app) => {
       console.log(errString);
       return res.status(400).json(errString);
     }
-    
+
     // check if they are currently in a room (this part is not neccesary)
     // actually, we might want to remove this part since, if they disconnect, they might get stuck in a room but not in a room
     // try{
@@ -260,7 +260,7 @@ export default (app) => {
     // remove them from the room
     try{
       await DbUtil.set_field_for_user_id(client, id_array[0], "curr_room", null);
-      
+
     } catch (err){
       const errString = "ENTER ROOM CLIENT ERROR #4:" + err
         client.end()
@@ -286,7 +286,7 @@ export default (app) => {
       console.log(errString);
       return res.status(400).json(errString);
     }
-	
+
     try{
 	  const user_list = await DbUtil.get_rows_in_room(client, room_id, "username");
       //Note: this user_list could be empty
@@ -297,7 +297,7 @@ export default (app) => {
       console.log("Failed test: Error when trying to retrieve usernames in room" + room_id + ": " + err);
       client.end();
       console.log("Exiting.")
-      process.exit(); 
+      process.exit();
     }
   });
 
@@ -305,9 +305,4 @@ export default (app) => {
   router.get('/logout', function (req, res) {
     res.status(200).json({message: "logging out"});
   });
-
-  /*router.post("/joinroom", tokenAuthorization, function (req, res) {
-    const {userId} = req.body;
-    res.status(200).json({message: "Successful authorization", userId });
-  });*/
 }
