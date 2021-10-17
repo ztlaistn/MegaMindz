@@ -6,6 +6,7 @@ import chaiHttp from 'chai-http';
 
 describe("Authentication Routes", () => {
     describe("POST /auth/register", () => {
+
         it("should return 400 if not all required data is provided", (done) => {
               chai.request(testServer)
                   .post('/auth/register')
