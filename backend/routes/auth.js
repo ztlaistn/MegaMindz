@@ -139,14 +139,111 @@ export default (app) => {
     }
   });
 
-  // define the join_room route
-  router.post('/joinRoom', async function (req, res) {
-    const { email, room_id } = req.body;
+
+
+  router.post('/fetchUserAccount', async function (req, res) {
+    // making sure all login credentials provided
+    const {email} = req.body;
     let client;
     let id_array;
-    //let row;
+    let row;
+    try {
+      // connect client
+      client = await DbUtil.connect_client();
+    }
+    catch (err) {
+      const errString = "USER ACCOUNT ERROR #1:" + err
+      console.log(errString);
+      return res.status(400).json(errString);
+    }
+    try{
+      id_array = await DbUtil.get_user_ids_from_fields(client, "email",email)
 
-    //TODO: validate user's token
+      if (id_array.length !== 1){
+        client.end()
+        return res.status(400).json("Email does not exist");
+      }
+    }
+    catch (err) {
+      const errString = "USER ACCOUNT ERROR #2:" + err
+      client.end()
+      console.log(errString);
+      return res.status(400).json(errString);
+    }
+    try{
+      row = await DbUtil.select_user_with_id(client, id_array[0])
+    }
+    catch (err) {
+      const errString = "USER ACCOUNT ERROR #3:" + err
+      client.end()
+      console.log(errString);
+      return res.status(400).json(errString);
+    }
+    client.end()
+    return res.status(200).json({name:row.name,username:row.username,location:row.location, dob:row.dob,employment:row.employment,skills:row.skills});
+
+
+  });
+
+  router.post('/setUserAccount', async function (req, res) {
+    // making sure all login credentials provided
+    //email
+    //fields_to_change : array of all the fields that need to be changed
+    // new_values: new values of the fields.
+    const {email,new_values} = req.body;
+
+    let client;
+    let id_array;
+    let row;
+    try {
+      // connect client
+      client = await DbUtil.connect_client();
+    }
+    catch (err) {
+      const errString = "SET USER ACCOUNT ERROR #1:" + err
+      console.log(errString);
+      return res.status(400).json(errString);
+    }
+    try{
+      id_array = await DbUtil.get_user_ids_from_fields(client, "email",email)
+
+      if (id_array.length !== 1){
+        return res.status(400).json("Email does not exist");
+      }
+    }
+    catch (err) {
+      const errString = "SET USER ACCOUNT ERROR #2:" + err
+      client.end()
+      console.log(errString);
+      return res.status(400).json(errString);
+    }
+    try{
+      row = await DbUtil.set_field_for_user_id(client, id_array[0],"location",new_values["location"])
+      row = await DbUtil.set_field_for_user_id(client, id_array[0],"dob",new_values["dob"])
+      row = await DbUtil.set_field_for_user_id(client, id_array[0],"skills",new_values["skills"])
+      row = await DbUtil.set_field_for_user_id(client, id_array[0],"status",new_values["status"])
+      row = await DbUtil.set_field_for_user_id(client, id_array[0],"full_name",new_values["full_name"])
+
+
+    }
+    catch (err) {
+      const errString = "SET USER ACCOUNT ERROR #3:" + err
+      client.end()
+      console.log(errString);
+      return res.status(400).json(errString);
+    }
+    client.end()
+    return res.status(200).json("successfully changed fields");
+
+
+  });
+
+
+  // define the join_room route
+  router.post('/joinRoom', tokenAuthorization ,async function (req, res) {
+    const { room_id, userId } = req.body;
+    let client;
+    //let row;
 
     try {
       // connect client
@@ -157,20 +254,21 @@ export default (app) => {
       return res.status(400).json(errString);
     }
 
-    try{
-      // get user_id
-      id_array = await DbUtil.get_user_ids_from_fields(client, "email", email)
+    // UserID obtained by token authentication
+    // try{
+    //   // get user_id
+    //   id_array = await DbUtil.get_user_ids_from_fields(client, "email", email)
 
-      if (id_array.length !== 1){
-        client.end();
-        return res.status(400).json("User trying to enter room doesn't exist.");
-      }
-    } catch (err) {
-      const errString = "ENTER ROOM ERROR #2:" + err
-      client.end();
-      console.log(errString);
-      return res.status(400).json(errString);
-    }
+    //   if (id_array.length !== 1){
+    //     client.end();
+    //     return res.status(400).json("User trying to enter room doesn't exist.");
+    //   }
+    // } catch (err) {
+    //   const errString = "ENTER ROOM ERROR #2:" + err
+    //   client.end();
+    //   console.log(errString);
+    //   return res.status(400).json(errString);
+    // }
 
     // check if they are currently in a room (this part is not neccesary)
     // try{
@@ -188,9 +286,11 @@ export default (app) => {
     //   return res.status(400).json(errString);
     // }
 
+    //TODO: Once we have the roles setup, check if this room exists first (if there are any people with a role for that room)
+
     // add them to the room
     try{
-      await DbUtil.set_field_for_user_id(client, id_array[0], "curr_room", room_id);
+      await DbUtil.set_field_for_user_id(client, userId, "curr_room", room_id);
 
     } catch (err){
       const errString = "ENTER ROOM CLIENT ERROR #4:" + err
@@ -208,13 +308,10 @@ export default (app) => {
   });
 
   // handle leaveRoom request
-  router.post('/leaveRoom', async function (req, res) {
-    const { email } = req.body;
+  router.post('/leaveRoom', tokenAuthorization, async function (req, res) {
+    const { userId } = req.body;
     let client;
-    let id_array;
     //let row;
-
-    //TODO: verify session token
 
     try {
       // connect client
@@ -225,20 +322,22 @@ export default (app) => {
       return res.status(400).json(errString);
     }
 
-    try{
-      // get user_id
-      id_array = await DbUtil.get_user_ids_from_fields(client, "email", email)
+    // token will get the userId (next part is not needed)
 
-      if (id_array.length !== 1){
-        client.end();
-        return res.status(400).json("User trying to leave room doesn't exist.");
-      }
-    } catch (err) {
-      const errString = "LEAVE ROOM ERROR #2:" + err
-      client.end();
-      console.log(errString);
-      return res.status(400).json(errString);
-    }
+    // try{
+    //   // get user_id
+    //   id_array = await DbUtil.get_user_ids_from_fields(client, "email", email)
+
+    //   if (id_array.length !== 1){
+    //     client.end();
+    //     return res.status(400).json("User trying to leave room doesn't exist.");
+    //   }
+    // } catch (err) {
+    //   const errString = "LEAVE ROOM ERROR #2:" + err
+    //   client.end();
+    //   console.log(errString);
+    //   return res.status(400).json(errString);
+    // }
 
     // check if they are currently in a room (this part is not neccesary)
     // actually, we might want to remove this part since, if they disconnect, they might get stuck in a room but not in a room
@@ -259,7 +358,7 @@ export default (app) => {
 
     // remove them from the room
     try{
-      await DbUtil.set_field_for_user_id(client, id_array[0], "curr_room", null);
+      await DbUtil.set_field_for_user_id(client, userId, "curr_room", null);
 
     } catch (err){
       const errString = "ENTER ROOM CLIENT ERROR #4:" + err
