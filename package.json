@@ -25,7 +25,8 @@
   "scripts": {
     "test": "mocha backend/test/**/*.js -r esm",
     "dev": "nodemon --watch 'backend/**/*.js' -r esm backend/index.js",
-    "start": "nodemon --watch 'backend/**/*.js' -r esm backend/index.js"
+    "start": "nodemon --watch 'backend/**/*.js' -r esm backend/index.js",
+    "heroku-postbuild": "cd frontend/meetngreet && npm install && npm run build"
   },
   "repository": {
     "type": "git",
@@ -36,5 +37,5 @@
   "bugs": {
     "url": "https://github.com/ztlaistn/MegaMindz/issues"
   },
-  "homepage": "https://github.com/ztlaistn/MegaMindz#readme"
+  "homepage": "https://meet--n--greet.herokuapp.com/"
 }

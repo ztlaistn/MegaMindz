@@ -32,6 +32,8 @@ export default {
     Behavior:
   */
   logIn() {
+
+
     // check if token already exists
     // check if email is valid
     // check that encrypted password matches
