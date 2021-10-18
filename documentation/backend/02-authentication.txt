@@ -1,0 +1,51 @@
+- Authentication: Determining the user is who they say they are
+- Authorization: Providing the user the correct actions/access based on their privileges
+----------------------------------------
+For the log in and log out system, we will be using these 2 libraries:
+- jsonwebtoken (jwt) - managing user login session
+- bcrypt - used for generating password hash and verifying if they provided the correct password
+
+
+------------CREATING AN ACCOUNT:------------
+The password will be hashed on the backend using a secure hashing algorithm provided by bcrypt.
+Please note that there is a difference between encryption and hashing:
+- Encryption: 2 way, a password that is ENcrypted can be DEcrypted
+- Hashing: 1 way, a password that is HASHED can never be converted back into plaintext.
+
+We will be using hashing. When an account is created, a random salt will be generated and used to hash the password. Note: Hashing should be done asynchronously (async/await) to avoid holding up other processes because it requires a lot of computing power.
+-bcrypt.genSalt
+-bcrypt.hash
+The salt and the hash will be saved in the database. When the user tries to login in the future, this salt and hash will be accessed.
+
+Note: Attackers take a large amount of common passwords, hash them, and check if the user's hash matches any of the common hashes to figure out what the password is (See: Dictionary or Rainbow Tables Attack). The salt is an additional security measure that will ensure no two users can have the same hash - even if they use the same password.
+
+------------LOG IN:------------
+Once the user submits their credentials, the backend will retrieve the stored salt and hash. It will use the salt to hash the user's input and check if it matches the stored hash.
+-bcrypt.compare
+
+If the user is authenticated, then a (jsonwebtoken) token will be generated using a secret key. This key can be saved in an environment variable. It is important to keep this key a secret! Also, setting an expiration time for each jwt will make them even more unique.
+Example:
+jwt.sign({
+  data: 'foobar'
+}, 'secretkey', { expiresIn: '1h' });
+
+------------WHILE LOGGED IN:------------
+
+The token will be sent to back to the frontend to save for future use (can choose to do so using localStorage). For any future API calls that the user makes, if they are accessing restricted pages, they will be required to provide their token in the request header using `Authorization bearer: {token}`. The secret key associated with that user should be retrieved from the backend and used to decrypt the token.
+
+var decoded = jwt.verify(token, 'secretkey');
+Note: when decoding, jwt provides a few errors:
+- TokenExpiredError
+- JsonWebTokenError
+Refer to jwt docs for explanations of errors.
+
+------------LOG OUT:------------
+This will be done on the frontend. The token should be removed from local storage.
+
+----------------------------------------
+Some resources if you'd like to learn more:
+
+https://www.npmjs.com/package/jsonwebtoken
+https://www.npmjs.com/package/bcrypt
+https://medium.com/@maison.moa/using-jwt-json-web-tokens-to-authorize-users-and-protect-api-routes-3e04a1453c3e
+https://dev.to/mhmdlotfy96/authentication-and-authorization-using-jwt-in-node-js-with-express-5bo6
