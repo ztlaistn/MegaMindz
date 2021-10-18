@@ -34,19 +34,21 @@ export default class UserAccount extends React.Component {
         event.preventDefault();
 
         //make the api call to the user controller
-        fetch(this.url+"/auth/setUserAccount", {
+        fetch("/auth/setUserAccount", {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': 'Bearer '+ sessionStorage.getItem("token")
             },
             body: JSON.stringify({
+                "new_values": {
 
-                username: this.state.username || "",
-                email: this.state.email || "",
-                location: this.state.location|| "",
-                skills: this.state.skills|| "",
-                employment_status: this.state.employment || ""
+                    username: this.state.username || "",
+                    email: this.state.email || "",
+                    location: this.state.location || "",
+                    skills: this.state.skills || "",
+                    employment_status: this.state.employment || ""
+                }
 
             })
         })
@@ -68,7 +70,7 @@ export default class UserAccount extends React.Component {
         if(sessionStorage.getItem("token") == null){
             window.location.href = "login";
         } else {
-            fetch(this.url+"/auth/fetchUserAccount", {
+            fetch("/auth/fetchUserAccount", {
                 method: "get",
                 headers: {
                     'Content-Type': 'application/json',
