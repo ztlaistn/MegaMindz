@@ -167,14 +167,7 @@ export default (app) => {
       return res.status(400).json(errString);
     }
     client.end()
-    return res.status(200).json({full_name:row.full_name,
-                                username:row.username,
-                                location:row.location, 
-                                dob:row.dob,
-                                employment:row.employment,
-                                skills:row.skills,
-                                status:row.status
-                              });
+    return res.status(200).json({name:row.name,username:row.username,location:row.location, dob:row.dob,employment:row.employment,skills:row.skills});
 
 
   });
