@@ -201,11 +201,13 @@ export default (app) => {
 
     try{
       row = await DbUtil.set_field_for_user_id(client, userId,"location",new_values["location"])
-      row = await DbUtil.set_field_for_user_id(client, userId,"dob",new_values["dob"])
       row = await DbUtil.set_field_for_user_id(client, userId,"skills",new_values["skills"])
       row = await DbUtil.set_field_for_user_id(client, userId,"status",new_values["status"])
       row = await DbUtil.set_field_for_user_id(client, userId,"full_name",new_values["full_name"])
 
+      // DOB Set intentionally last.  It is the most likely to fail, due to date restrictions (preventing invalid dates).
+      // Therefore, if it fails, we still want to set the other fields.
+      row = await DbUtil.set_field_for_user_id(client, userId,"dob",new_values["dob"])
 
     }
     catch (err) {

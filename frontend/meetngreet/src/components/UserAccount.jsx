@@ -18,8 +18,9 @@ export default class UserAccount extends React.Component {
             dob : "",
             url : process.env.SITE_URL
         };
-        this.change_Handler.bind(this);
-        this.handle_submit.bind(this);
+        //this.change_Handler = this.change_Handler.bind(this);
+        //this.handle_submit = this.handle_submit.bind(this);
+        this.componentDidMount = this.componentDidMount.bind(this);
     }
 
     change_Handler(field, e) {
@@ -70,10 +71,13 @@ export default class UserAccount extends React.Component {
     };
 
     componentDidMount() {
+        //console.log("This is us: ", this)
+        let temp_this = this;
         // first fetch the user data to allow update of username
         if(sessionStorage.getItem("token") == null){
             window.location.href = "login";
         } else {
+            //console.log("This is us2: ", this)
             fetch("/auth/fetchUserAccount", {
                 method: "POST",
                 headers: {
@@ -82,15 +86,17 @@ export default class UserAccount extends React.Component {
                 }
             }).then(
                 function(response){
+                    //console.log("This is us3: ", this);
                     if(response.status !== 200){
                         response.json().then(function(data) {
                             console.log(data);
                             window.alert("Error: Failed User Account Fetch Code " + response.status);
                         });
                     }else{
+                        //console.log("This is us4: ", this);
                         response.json().then(function(data) {
                             console.log(data);
-                            this.setState({
+                            temp_this.setState({
                                 full_name: data.full_name,
                                 dob: data.dob,
                                 location: data.location,
