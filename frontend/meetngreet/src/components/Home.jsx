@@ -15,7 +15,7 @@ export default class Home extends React.Component {
 
     componentDidMount() {
         // first fetch the user data to allow update of username
-        if(sessionStorage.getItem("token") != null){
+        if(sessionStorage.getItem("token") == null){
             window.location.href = "login";
         } else {
             fetch(this.url+"/auth/fetchUserAccount", {
