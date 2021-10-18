@@ -41,12 +41,14 @@ export default class UserAccount extends React.Component {
                 'Authorization': 'Bearer '+ sessionStorage.getItem("token")
             },
             body: JSON.stringify({
+                "new_values": {
 
-                username: this.state.username || "",
-                email: this.state.email || "",
-                location: this.state.location|| "",
-                skills: this.state.skills|| "",
-                employment_status: this.state.employment || ""
+                    username: this.state.username || "",
+                    email: this.state.email || "",
+                    location: this.state.location || "",
+                    skills: this.state.skills || "",
+                    employment_status: this.state.employment || ""
+                }
 
             })
         })
