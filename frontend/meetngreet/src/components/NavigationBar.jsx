@@ -6,9 +6,6 @@ import {Link} from 'react-router-dom';
 class NavigationBar extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            logged_in: false
-        };
     }
 
     toLogin = () => {
@@ -20,10 +17,7 @@ class NavigationBar extends React.Component {
     };
 
     logout = () => {
-        sessionStorage.removeItem("token", null);
-        this.state = {
-            logged_in: false
-        };
+        sessionStorage.removeItem("token");
         window.location.href = "login";
     }
 

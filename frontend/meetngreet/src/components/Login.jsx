@@ -28,17 +28,16 @@ export default class Login extends React.Component {
             .then(response => response.json())
             .then(data => {
               console.log('Success:', data);
+              sessionStorage.setItem("token", data.token);
+              window.location.href = "home";
             })
             .catch((error) => {
               console.error('Error:', error);
             });
         } else {
+            sessionStorage.removeItem("token");
             window.alert("Error: Missing one or more required fields.")
         }
-    }
-
-    check_credentials = () => {
-
     }
 
     toRegistration = () => {
