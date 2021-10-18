@@ -10,6 +10,8 @@ export default class CardTemplate extends React.Component {
     render() {
         return (
             <div id="card-template" className="card-template">
+                <br/>
+                <br/>
                 <div className="card-frame">
                     <img src={gray_logo} className="alt-logo" alt=""/>
                     <br/>
