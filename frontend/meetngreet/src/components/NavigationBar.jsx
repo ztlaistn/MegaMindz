@@ -39,7 +39,7 @@ class NavigationBar extends React.Component {
                     </li>
                 </div>
             );
-        }else if(window.location.pathname === "/home"){
+        }else if(window.location.pathname === "/"){
             return(
                 <div className="login-bar">
                     <li>
