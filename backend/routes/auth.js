@@ -154,7 +154,7 @@ export default (app) => {
     catch (err) {
       const errString = "USER ACCOUNT ERROR #1:" + err
       console.log(errString);
-      return res.status(400).json(errString);
+      return res.status(400).json({message: errString});
     }
 
     try{
@@ -164,7 +164,7 @@ export default (app) => {
       const errString = "USER ACCOUNT ERROR #3:" + err
       client.end()
       console.log(errString);
-      return res.status(400).json(errString);
+      return res.status(400).json({message: errString});
     }
     client.end()
     return res.status(200).json({
@@ -172,9 +172,9 @@ export default (app) => {
       username:row.username,
       location:row.location, 
       dob:row.dob,
-      employment:row.employment,
       skills:row.skills,
-      status:row.status
+      status:row.status,
+      message:"Returned Fields"
     });
 
   });
@@ -196,7 +196,7 @@ export default (app) => {
     catch (err) {
       const errString = "SET USER ACCOUNT ERROR #1:" + err
       console.log(errString);
-      return res.status(400).json(errString);
+      return res.status(400).json({message: errString});
     }
 
     try{
@@ -212,10 +212,10 @@ export default (app) => {
       const errString = "SET USER ACCOUNT ERROR #3:" + err
       client.end()
       console.log(errString);
-      return res.status(400).json(errString);
+      return res.status(400).json({message: errString});
     }
     client.end()
-    return res.status(200).json("successfully changed fields");
+    return res.status(200).json({message:"successfully changed fields"});
 
 
   });
@@ -233,7 +233,7 @@ export default (app) => {
     } catch (err) {
       const errString = "ENTER ROOM CLIENT ERROR #1:" + err
       console.log(errString);
-      return res.status(400).json(errString);
+      return res.status(400).json({message: errString});
     }
 
     // UserID obtained by token authentication
@@ -278,7 +278,7 @@ export default (app) => {
       const errString = "ENTER ROOM CLIENT ERROR #4:" + err
       client.end()
       console.log(errString);
-      return res.status(400).json("Unable to add user to this room");
+      return res.status(400).json({message: "Unable to add user to this room"});
     }
 
     //TODO: in the future, we will want to check their role in this room and return that in the status as well
@@ -301,7 +301,7 @@ export default (app) => {
     } catch (err) {
       const errString = "LEAVE ROOM CLIENT ERROR #1:" + err
       console.log(errString);
-      return res.status(400).json(errString);
+      return res.status(400).json({message: errString});
     }
 
     // token will get the userId (next part is not needed)
@@ -346,11 +346,11 @@ export default (app) => {
       const errString = "ENTER ROOM CLIENT ERROR #4:" + err
         client.end()
         console.log(errString);
-        return res.status(400).json("Unable to add user to this room");
+        return res.status(400).json({message:"Unable to add user to this room"});
     }
 
     client.end();
-    return res.status(200).json("User removed from room");
+    return res.status(200).json({message: "User removed from room"});
   });
 
   // This one doesn't need to validate a login, as it doesn't really matter.
@@ -365,7 +365,7 @@ export default (app) => {
     }catch (err) {
       const errString = "LEAVE ROOM CLIENT ERROR #1:" + err
       console.log(errString);
-      return res.status(400).json(errString);
+      return res.status(400).json({message: errString});
     }
 
     try{
@@ -375,10 +375,9 @@ export default (app) => {
 	  client.end();
 	  return res.status(200).json({user_list: user_list});
     } catch(err){
-      console.log("Failed test: Error when trying to retrieve usernames in room" + room_id + ": " + err);
+      const errString = "Failed test: Error when trying to retrieve usernames in room" + room_id + ": " + err;
       client.end();
-      console.log("Exiting.")
-      process.exit();
+      return res.status(400).json({message: errString});
     }
   });
 
