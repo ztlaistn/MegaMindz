@@ -48,17 +48,20 @@ export default (app) => {
       console.log("Created account: " + id);
       client.end();
       //console.log("here")
-      return res.status(201).json({message: "Account successfully created"})
+      return res.status(200).json({message: "Account successfully created"})
     } catch (err) {
         let errString;
       if(err === "Account info already exists"){
-        errString = "Account info already exists";
+        errString = "Email already in use for other account";
+        client.end();
+        console.log(errString);
+        return res.status(400).json({message: errString});
       }else{
         errString = "DB ERROR #3: " + err;
+        client.end();
+        console.log(errString);
+        return res.status(400).json({message: "An error occured behind the scenes"});
       }
-      client.end();
-      console.log(errString);
-      return res.status(400).json({message: "An error occured behind the scenes"});
     }
   });
 
