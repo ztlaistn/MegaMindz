@@ -25,17 +25,18 @@ export default class Registration extends React.Component {
             body: JSON.stringify(data),
             }).then(
                 function(response) {
-                  if (response.status !== 201) {
-                    console.log('Looks like there was a problem. Status Code: ' +
-                      response.status);
-                      response.json().then(function(data) {
-                        console.log(data);
-                      });
+                  if (response.status !== 200) {
+                    console.log('Looks like there was a problem. Status Code: ' + response.status);
+                    response.json().then(function(data) {
+                      console.log(data);
+                      window.alert("Error: On User account creation: " + data.message)
+                    });
                     return;
                   }
 
                   // Examine the text in the response
                   response.json().then(function(data) {
+                    window.alert("Account Made!")
                     console.log(data.message);
                     window.location.href = "login";
                   });
