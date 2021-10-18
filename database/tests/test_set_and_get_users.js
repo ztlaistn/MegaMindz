@@ -467,7 +467,7 @@ async function main() {
 
     client.end();
 
-    console.log("\n------------------ Passed All Login Validation Tests ----------------------\n");
+    console.log("\n------------------ Passed All Set and Get Validation Tests ----------------------\n");
     process.exit();
 
 }
