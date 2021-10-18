@@ -24,18 +24,30 @@ export default class Login extends React.Component {
             'Content-Type': 'application/json',
             },
             body: JSON.stringify(data),
-            })
-            .then(response => response.json())
-            .then(data => {
-              console.log('Success:', data);
-              sessionStorage.setItem("token", data.token);
-              window.location.href = "home";
-            })
-            .catch((error) => {
-              console.error('Error:', error);
-            });
+            }).then(
+                function(response) {
+                  if (response.status !== 200) {
+                    console.log('Looks like there was a problem. Status Code: ' +
+                      response.status);
+                      response.json().then(function(data) {
+                        console.log(data);
+                        window.alert("Error: Invalid login. Code " + response.status);
+                      });
+                    return;
+                  }
+                  // Examine the text in the response
+                  response.json().then(function(data) {
+                    console.log(data.token);
+                    sessionStorage.setItem("token", data.token);
+                    sessionStorage.setItem("username", data.username);
+                    window.location.href = "home";
+                  });
+                }
+              )
+              .catch(function(err) {
+                console.log('Fetch Error :-S', err);
+              });
         } else {
-            sessionStorage.removeItem("token");
             window.alert("Error: Missing one or more required fields.")
         }
     }

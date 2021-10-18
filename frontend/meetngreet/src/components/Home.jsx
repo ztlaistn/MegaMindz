@@ -14,31 +14,12 @@ export default class Home extends React.Component {
     }
 
     componentDidMount() {
-        // first fetch the user data to allow update of username
         if(sessionStorage.getItem("token") == null){
             window.location.href = "login";
         } else {
-            fetch(this.url+"/auth/fetchUserAccount", {
-                method: "get",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + sessionStorage.getItem("token")
-                }
-            })
-                .then(res => res.json())
-                .then(
-                    result => {
-                        if (result) {
-                            console.log(result);
-                            this.setState({
-                                username: result.username || ""
-                            })
-                        }
-                    },
-                    error => {
-                        alert("error!");
-                    }
-                );
+            this.setState({
+                  username: sessionStorage.getItem("username")
+            });
         }
     }
 
