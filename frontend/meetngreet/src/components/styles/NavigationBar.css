@@ -45,3 +45,10 @@
 .logo{
     height: 50px;
 }
+
+/* Small devices (landscape phones, 576px and up) */
+@media only screen and (max-width: 768px) {
+    .logo-bar {
+        margin: auto;
+    }
+}

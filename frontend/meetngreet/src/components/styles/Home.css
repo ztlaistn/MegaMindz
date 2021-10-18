@@ -18,3 +18,11 @@
     margin-left: 50px;
     margin-right: auto;
 }
+
+/* Small devices (landscape phones, 576px and up) */
+@media only screen and (max-width: 768px) {
+    .profile-picture {
+        float: none;
+        margin: auto;
+    }
+}
