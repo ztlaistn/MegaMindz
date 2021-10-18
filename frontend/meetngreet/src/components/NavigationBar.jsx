@@ -6,9 +6,6 @@ import {Link} from 'react-router-dom';
 class NavigationBar extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            logged_in: false
-        };
     }
 
     toLogin = () => {
@@ -16,14 +13,11 @@ class NavigationBar extends React.Component {
     };
 
     toHome = () => {
-        window.location.href = "home";
+        window.location.href = "/";
     };
 
     logout = () => {
-        sessionStorage.removeItem("token", null);
-        this.state = {
-            logged_in: false
-        };
+        sessionStorage.removeItem("token");
         window.location.href = "login";
     }
 
@@ -39,7 +33,7 @@ class NavigationBar extends React.Component {
                     </li>
                 </div>
             );
-        }else if(window.location.pathname === "/home"){
+        }else if(window.location.pathname === "/"){
             return(
                 <div className="login-bar">
                     <li>

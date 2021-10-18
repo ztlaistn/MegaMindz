@@ -16,7 +16,35 @@ export default class Registration extends React.Component {
     process_registration() {
         //implement registration handler here
         if(((document.getElementById("email").validity.valid) && (document.getElementById("username").value.length !== 0) && (document.getElementById("password").value === document.getElementById("password-confirmation").value) && (document.getElementById("password").value.length > 7)) && ((document.getElementById("email").value.includes("@")) && (document.getElementById("email").value.includes(".")))){
-            window.location.href = "/";
+            const data = { email: document.getElementById("email").value, password1: document.getElementById("password").value, password2: document.getElementById("password-confirmation").value, username: document.getElementById("username").value };
+            fetch('/auth/register', {
+            method: 'POST', // or 'PUT'
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+            }).then(
+                function(response) {
+                  if (response.status !== 200) {
+                    console.log('Looks like there was a problem. Status Code: ' + response.status);
+                    response.json().then(function(data) {
+                      console.log(data);
+                      window.alert("Error: On User account creation: " + data.message)
+                    });
+                    return;
+                  }
+
+                  // Examine the text in the response
+                  response.json().then(function(data) {
+                    window.alert("Account Made!")
+                    console.log(data.message);
+                    window.location.href = "login";
+                  });
+                }
+              )
+              .catch(function(err) {
+                console.log('Fetch Error :-S', err);
+              });
         } else {
             window.alert("Error: Missing one or more required fields.")
         }

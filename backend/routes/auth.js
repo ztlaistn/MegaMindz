@@ -48,17 +48,20 @@ export default (app) => {
       console.log("Created account: " + id);
       client.end();
       //console.log("here")
-      return res.status(201).json({message: "Account successfully created"})
+      return res.status(200).json({message: "Account successfully created"})
     } catch (err) {
         let errString;
       if(err === "Account info already exists"){
-        errString = "Account info already exists";
+        errString = "Email already in use for other account";
+        client.end();
+        console.log(errString);
+        return res.status(400).json({message: errString});
       }else{
         errString = "DB ERROR #3: " + err;
+        client.end();
+        console.log(errString);
+        return res.status(400).json({message: "An error occured behind the scenes"});
       }
-      client.end();
-      console.log(errString);
-      return res.status(400).json({message: "An error occured behind the scenes"});
     }
   });
 
@@ -141,11 +144,11 @@ export default (app) => {
 
 
 
-  router.post('/fetchUserAccount', async function (req, res) {
+  router.post('/fetchUserAccount', tokenAuthorization,async function (req, res) {
     // making sure all login credentials provided
-    const {email} = req.body;
+    const {userId} = req.body;
     let client;
-    let id_array;
+
     let row;
     try {
       // connect client
@@ -154,46 +157,40 @@ export default (app) => {
     catch (err) {
       const errString = "USER ACCOUNT ERROR #1:" + err
       console.log(errString);
-      return res.status(400).json(errString);
+      return res.status(400).json({message: errString});
     }
-    try{
-      id_array = await DbUtil.get_user_ids_from_fields(client, "email",email)
 
-      if (id_array.length !== 1){
-        client.end()
-        return res.status(400).json("Email does not exist");
-      }
-    }
-    catch (err) {
-      const errString = "USER ACCOUNT ERROR #2:" + err
-      client.end()
-      console.log(errString);
-      return res.status(400).json(errString);
-    }
     try{
-      row = await DbUtil.select_user_with_id(client, id_array[0])
+      row = await DbUtil.select_user_with_id(client, userId)
     }
     catch (err) {
       const errString = "USER ACCOUNT ERROR #3:" + err
       client.end()
       console.log(errString);
-      return res.status(400).json(errString);
+      return res.status(400).json({message: errString});
     }
     client.end()
-    return res.status(200).json({name:row.name,username:row.username,location:row.location, dob:row.dob,employment:row.employment,skills:row.skills});
-
+    return res.status(200).json({
+      full_name:row.full_name,
+      username:row.username,
+      location:row.location, 
+      dob:row.dob,
+      skills:row.skills,
+      status:row.status,
+      message:"Returned Fields"
+    });
 
   });
 
-  router.post('/setUserAccount', async function (req, res) {
+  router.post('/setUserAccount', tokenAuthorization,async function (req, res) {
     // making sure all login credentials provided
     //email
     //fields_to_change : array of all the fields that need to be changed
     // new_values: new values of the fields.
-    const {email,new_values} = req.body;
+    const {userId,new_values} = req.body;
 
     let client;
-    let id_array;
+
     let row;
     try {
       // connect client
@@ -202,38 +199,28 @@ export default (app) => {
     catch (err) {
       const errString = "SET USER ACCOUNT ERROR #1:" + err
       console.log(errString);
-      return res.status(400).json(errString);
+      return res.status(400).json({message: errString});
     }
-    try{
-      id_array = await DbUtil.get_user_ids_from_fields(client, "email",email)
 
-      if (id_array.length !== 1){
-        return res.status(400).json("Email does not exist");
-      }
-    }
-    catch (err) {
-      const errString = "SET USER ACCOUNT ERROR #2:" + err
-      client.end()
-      console.log(errString);
-      return res.status(400).json(errString);
-    }
     try{
-      row = await DbUtil.set_field_for_user_id(client, id_array[0],"location",new_values["location"])
-      row = await DbUtil.set_field_for_user_id(client, id_array[0],"dob",new_values["dob"])
-      row = await DbUtil.set_field_for_user_id(client, id_array[0],"skills",new_values["skills"])
-      row = await DbUtil.set_field_for_user_id(client, id_array[0],"status",new_values["status"])
-      row = await DbUtil.set_field_for_user_id(client, id_array[0],"full_name",new_values["full_name"])
+      row = await DbUtil.set_field_for_user_id(client, userId,"location",new_values["location"])
+      row = await DbUtil.set_field_for_user_id(client, userId,"skills",new_values["skills"])
+      row = await DbUtil.set_field_for_user_id(client, userId,"status",new_values["status"])
+      row = await DbUtil.set_field_for_user_id(client, userId,"full_name",new_values["full_name"])
 
+      // DOB Set intentionally last.  It is the most likely to fail, due to date restrictions (preventing invalid dates).
+      // Therefore, if it fails, we still want to set the other fields.
+      row = await DbUtil.set_field_for_user_id(client, userId,"dob",new_values["dob"])
 
     }
     catch (err) {
       const errString = "SET USER ACCOUNT ERROR #3:" + err
       client.end()
       console.log(errString);
-      return res.status(400).json(errString);
+      return res.status(400).json({message: errString});
     }
     client.end()
-    return res.status(200).json("successfully changed fields");
+    return res.status(200).json({message:"successfully changed fields"});
 
 
   });
@@ -251,7 +238,7 @@ export default (app) => {
     } catch (err) {
       const errString = "ENTER ROOM CLIENT ERROR #1:" + err
       console.log(errString);
-      return res.status(400).json(errString);
+      return res.status(400).json({message: errString});
     }
 
     // UserID obtained by token authentication
@@ -296,7 +283,7 @@ export default (app) => {
       const errString = "ENTER ROOM CLIENT ERROR #4:" + err
       client.end()
       console.log(errString);
-      return res.status(400).json("Unable to add user to this room");
+      return res.status(400).json({message: "Unable to add user to this room"});
     }
 
     //TODO: in the future, we will want to check their role in this room and return that in the status as well
@@ -319,7 +306,7 @@ export default (app) => {
     } catch (err) {
       const errString = "LEAVE ROOM CLIENT ERROR #1:" + err
       console.log(errString);
-      return res.status(400).json(errString);
+      return res.status(400).json({message: errString});
     }
 
     // token will get the userId (next part is not needed)
@@ -364,11 +351,11 @@ export default (app) => {
       const errString = "ENTER ROOM CLIENT ERROR #4:" + err
         client.end()
         console.log(errString);
-        return res.status(400).json("Unable to add user to this room");
+        return res.status(400).json({message:"Unable to add user to this room"});
     }
 
     client.end();
-    return res.status(200).json("User removed from room");
+    return res.status(200).json({message: "User removed from room"});
   });
 
   // This one doesn't need to validate a login, as it doesn't really matter.
@@ -383,7 +370,7 @@ export default (app) => {
     }catch (err) {
       const errString = "LEAVE ROOM CLIENT ERROR #1:" + err
       console.log(errString);
-      return res.status(400).json(errString);
+      return res.status(400).json({message: errString});
     }
 
     try{
@@ -393,10 +380,9 @@ export default (app) => {
 	  client.end();
 	  return res.status(200).json({user_list: user_list});
     } catch(err){
-      console.log("Failed test: Error when trying to retrieve usernames in room" + room_id + ": " + err);
+      const errString = "Failed test: Error when trying to retrieve usernames in room" + room_id + ": " + err;
       client.end();
-      console.log("Exiting.")
-      process.exit();
+      return res.status(400).json({message: errString});
     }
   });
 
