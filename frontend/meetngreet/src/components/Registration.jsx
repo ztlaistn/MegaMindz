@@ -23,15 +23,26 @@ export default class Registration extends React.Component {
             'Content-Type': 'application/json',
             },
             body: JSON.stringify(data),
-            })
-            .then(response => response.json())
-            .then(data => {
-              console.log('Success:', data);
-              window.location.href = "login";
-            })
-            .catch((error) => {
-              console.error('Error:', error);
-            });
+            }).then(
+                function(response) {
+                  if (response.status !== 201) {
+                    console.log('Looks like there was a problem. Status Code: ' +
+                      response.status);
+                      response.json().then(function(data) {
+                        console.log(data);
+                      });
+                    return;
+                  }
+
+                  // Examine the text in the response
+                  response.json().then(function(data) {
+                    console.log(data.message);
+                  });
+                }
+              )
+              .catch(function(err) {
+                console.log('Fetch Error :-S', err);
+              });
         } else {
             window.alert("Error: Missing one or more required fields.")
         }
