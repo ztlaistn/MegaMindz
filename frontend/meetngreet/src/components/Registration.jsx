@@ -16,7 +16,21 @@ export default class Registration extends React.Component {
     process_registration() {
         //implement registration handler here
         if(((document.getElementById("email").validity.valid) && (document.getElementById("username").value.length !== 0) && (document.getElementById("password").value === document.getElementById("password-confirmation").value) && (document.getElementById("password").value.length > 7)) && ((document.getElementById("email").value.includes("@")) && (document.getElementById("email").value.includes(".")))){
-            window.location.href = "/";
+            const data = { email: document.getElementById("email").value, password1: document.getElementById("password").value, password2: document.getElementById("password-confirmation").value, username: document.getElementById("username").value };
+            fetch('/auth/register', {
+            method: 'POST', // or 'PUT'
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(data => {
+              console.log('Success:', data);
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+            });
         } else {
             window.alert("Error: Missing one or more required fields.")
         }
