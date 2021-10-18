@@ -343,6 +343,9 @@ function set_field_for_user_id(client, uid, field, value){
 			reject("Cannot change user id with set_field_for_user_id function");
 		});
 	}
+	// else if(field.toLowerCase() === "dob"){
+	// 	//Going to need to do something here to convert a date object
+	// }
 
 	update_query = {
 		text: 'UPDATE user_info SET ' + field + ' = $1 WHERE user_id = $2 RETURNING user_id',

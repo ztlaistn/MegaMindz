@@ -10,16 +10,17 @@ export default class UserAccount extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-          username: "",
-            email: "",
+            //username: "",
+            full_name: "",
             location: "",
             skills: "",
-            employment_status : "",
+            status : "",
             dob : "",
             url : process.env.SITE_URL
         };
-        this.change_Handler.bind(this);
-        this.handle_submit.bind(this);
+        //this.change_Handler = this.change_Handler.bind(this);
+        //this.handle_submit = this.handle_submit.bind(this);
+        this.componentDidMount = this.componentDidMount.bind(this);
     }
 
     change_Handler(field, e) {
@@ -42,60 +43,73 @@ export default class UserAccount extends React.Component {
             },
             body: JSON.stringify({
                 "new_values": {
-
-                    username: this.state.username || "",
-                    email: this.state.email || "",
-                    location: this.state.location || "",
-                    skills: this.state.skills || "",
-                    employment_status: this.state.employment || ""
+                    full_name: this.state.full_name,
+                    dob: this.state.dob,
+                    location: this.state.location,
+                    status: this.state.status,
+                    skills: this.state.skills
                 }
-
             })
-        })
-            .then(res => res.json())
-            .then(
-                result => {
-                    this.setState({
-                        responseMessage: result
+        }).then(
+            function(response){
+                if(response.status !== 200){
+                    response.json().then(function(data) {
+                        console.log(data);
+                        window.alert("Error: Failed User Account Set " + response.status);
                     });
-                    window.location.href = "home";
-                },
-            )
-
+                }else{
+                    response.json().then(function(data) {
+                        console.log(data);
+                    });
+                }
+            }
+        ).catch( function(err) {
+            console.log('Set Error :-S', err);
+            window.location.href = "/";
+        })
 
     };
 
     componentDidMount() {
+        //console.log("This is us: ", this)
+        let temp_this = this;
         // first fetch the user data to allow update of username
         if(sessionStorage.getItem("token") == null){
             window.location.href = "login";
         } else {
+            //console.log("This is us2: ", this)
             fetch("/auth/fetchUserAccount", {
-                method: "get",
+                method: "POST",
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': 'Bearer ' + sessionStorage.getItem("token")
                 }
-            })
-                .then(res => res.json())
-                .then(
-                    result => {
-                        if (result) {
-                            console.log(result);
-                            this.setState({
-                                username: result.username || "",
-                                email: result.email || "",
-                                location: result.location|| "",
-                                skills: result.skills|| "",
-                                employment_status: result.employment || ""
-
-                            })
-                        }
-                    },
-                    error => {
-                        alert("error!");
+            }).then(
+                function(response){
+                    //console.log("This is us3: ", this);
+                    if(response.status !== 200){
+                        response.json().then(function(data) {
+                            console.log(data);
+                            window.alert("Error: Failed User Account Fetch Code " + response.status);
+                        });
+                    }else{
+                        //console.log("This is us4: ", this);
+                        response.json().then(function(data) {
+                            console.log(data);
+                            temp_this.setState({
+                                full_name: data.full_name,
+                                dob: data.dob,
+                                location: data.location,
+                                status: data.status,
+                                skills: data.skills
+                            });
+                        });
                     }
-                );
+                }
+            ).catch(function(err) {
+                console.log('Fetch Error :-S', err);
+                window.location.href = "/";
+            });
         }
     }
 
@@ -110,8 +124,8 @@ export default class UserAccount extends React.Component {
                             Name
                             <input
                                 type="text"
-                                onChange={e => this.change_Handler("username", e)}
-                                value={this.state.username}
+                                onChange={e => this.change_Handler("full_name", e)}
+                                value={this.state.full_name}
                             />
                         </label>
                         <label className="age">
@@ -134,8 +148,8 @@ export default class UserAccount extends React.Component {
                             Employment Status
                             <input
                                 type="text"
-                                onChange={e => this.change_Handler("employment_status", e)}
-                                value={this.state.employment_status}
+                                onChange={e => this.change_Handler("status", e)}
+                                value={this.state.status}
                             />
                         </label>
                         <label className="Skills">
