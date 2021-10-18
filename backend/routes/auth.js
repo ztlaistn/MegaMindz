@@ -141,11 +141,11 @@ export default (app) => {
 
 
 
-  router.post('/fetchUserAccount', tokenAuthorization,async function (req, res) {
+  router.post('/fetchUserAccount', async function (req, res) {
     // making sure all login credentials provided
-    const {userId} = req.body;
+    const {email} = req.body;
     let client;
-
+    let id_array;
     let row;
     try {
       // connect client
@@ -156,9 +156,22 @@ export default (app) => {
       console.log(errString);
       return res.status(400).json(errString);
     }
-
     try{
-      row = await DbUtil.select_user_with_id(client, userId)
+      id_array = await DbUtil.get_user_ids_from_fields(client, "email",email)
+
+      if (id_array.length !== 1){
+        client.end()
+        return res.status(400).json("Email does not exist");
+      }
+    }
+    catch (err) {
+      const errString = "USER ACCOUNT ERROR #2:" + err
+      client.end()
+      console.log(errString);
+      return res.status(400).json(errString);
+    }
+    try{
+      row = await DbUtil.select_user_with_id(client, id_array[0])
     }
     catch (err) {
       const errString = "USER ACCOUNT ERROR #3:" + err
@@ -172,15 +185,15 @@ export default (app) => {
 
   });
 
-  router.post('/setUserAccount', tokenAuthorization,async function (req, res) {
+  router.post('/setUserAccount', async function (req, res) {
     // making sure all login credentials provided
     //email
     //fields_to_change : array of all the fields that need to be changed
     // new_values: new values of the fields.
-    const {userId,new_values} = req.body;
+    const {email,new_values} = req.body;
 
     let client;
-
+    let id_array;
     let row;
     try {
       // connect client
@@ -191,13 +204,25 @@ export default (app) => {
       console.log(errString);
       return res.status(400).json(errString);
     }
-
     try{
-      row = await DbUtil.set_field_for_user_id(client, userId,"location",new_values["location"])
-      row = await DbUtil.set_field_for_user_id(client, userId,"dob",new_values["dob"])
-      row = await DbUtil.set_field_for_user_id(client, userId,"skills",new_values["skills"])
-      row = await DbUtil.set_field_for_user_id(client, userId,"status",new_values["status"])
-      row = await DbUtil.set_field_for_user_id(client, userId,"full_name",new_values["full_name"])
+      id_array = await DbUtil.get_user_ids_from_fields(client, "email",email)
+
+      if (id_array.length !== 1){
+        return res.status(400).json("Email does not exist");
+      }
+    }
+    catch (err) {
+      const errString = "SET USER ACCOUNT ERROR #2:" + err
+      client.end()
+      console.log(errString);
+      return res.status(400).json(errString);
+    }
+    try{
+      row = await DbUtil.set_field_for_user_id(client, id_array[0],"location",new_values["location"])
+      row = await DbUtil.set_field_for_user_id(client, id_array[0],"dob",new_values["dob"])
+      row = await DbUtil.set_field_for_user_id(client, id_array[0],"skills",new_values["skills"])
+      row = await DbUtil.set_field_for_user_id(client, id_array[0],"status",new_values["status"])
+      row = await DbUtil.set_field_for_user_id(client, id_array[0],"full_name",new_values["full_name"])
 
 
     }
