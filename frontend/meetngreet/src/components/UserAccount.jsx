@@ -55,10 +55,11 @@ export default class UserAccount extends React.Component {
                 if(response.status !== 200){
                     response.json().then(function(data) {
                         console.log(data);
-                        window.alert("Error: Failed User Account Set " + response.status);
+                        window.alert("Error: Failed User Account Set: " + data.message);
                     });
                 }else{
                     response.json().then(function(data) {
+                        window.alert("Changes have been saved!");
                         console.log(data);
                     });
                 }
@@ -90,7 +91,7 @@ export default class UserAccount extends React.Component {
                     if(response.status !== 200){
                         response.json().then(function(data) {
                             console.log(data);
-                            window.alert("Error: Failed User Account Fetch Code " + response.status);
+                            window.alert("Error: Failed User Account Fetch Code: " + data.message);
                         });
                     }else{
                         //console.log("This is us4: ", this);
