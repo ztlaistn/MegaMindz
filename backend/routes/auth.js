@@ -180,7 +180,7 @@ export default (app) => {
     const {userId,new_values} = req.body;
 
     let client;
-    let id_array;
+
     let row;
     try {
       // connect client

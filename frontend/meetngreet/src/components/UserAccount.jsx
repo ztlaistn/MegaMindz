@@ -16,7 +16,7 @@ export default class UserAccount extends React.Component {
             skills: "",
             employment_status : "",
             dob : "",
-            url : process.env.SITE_URL
+            url : process.env.SITE
         };
         this.change_Handler.bind(this);
         this.handle_submit.bind(this);

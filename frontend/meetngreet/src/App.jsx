@@ -17,17 +17,17 @@ class App extends React.Component {
                 <div className="App">
                     <header className="App-header">
                         <Switch>
-                            <Route path="/registration">
+                            <Route exact path="/registration">
                                 <CardTemplate page_title={"User Registration"}>
                                     <RegistrationForm/>
                                 </CardTemplate>
                             </Route>
-                            <Route path="/user-account">
-                                <CardTemplate page_title={"User Registration"}>
+                            <Route exact path="/userAccount">
+                                <CardTemplate page_title={"User Account"}>
                                     <UserAccount/>
                                 </CardTemplate>
                             </Route>
-                            <Route path="/">
+                            <Route exact path="/">
                                 <CardTemplate page_title={"User Login"}>
                                     <LoginForm/>
                                 </CardTemplate>
