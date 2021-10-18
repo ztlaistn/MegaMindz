@@ -15,15 +15,11 @@ export default class Registration extends React.Component {
 
     process_registration() {
         //implement registration handler here
-        if(((document.getElementById("email").validity.valid) && (document.getElementById("username").value.length !== 0) && (document.getElementById("password").value == document.getElementById("password-confirmation").value) && (document.getElementById("password").value.length > 7)) && ((document.getElementById("email").value.includes("@")) && (document.getElementById("email").value.includes(".")))){
+        if(((document.getElementById("email").validity.valid) && (document.getElementById("username").value.length !== 0) && (document.getElementById("password").value === document.getElementById("password-confirmation").value) && (document.getElementById("password").value.length > 7)) && ((document.getElementById("email").value.includes("@")) && (document.getElementById("email").value.includes(".")))){
             window.location.href = "/";
         } else {
             window.alert("Error: Missing one or more required fields.")
         }
-    }
-
-    check_credentials = () => {
-
     }
 
     render() {
@@ -40,9 +36,10 @@ export default class Registration extends React.Component {
                         <input type="password" required id="password" name="password" placeholder="Password" onChange={this.check_credentials}/>
                         <label for="password-confirmation">Confirm Password</label>
                         <input type="password" required id="password-confirmation" name="password-confirmation" placeholder="Password" onChange={this.check_credentials}/>
-                        <Link to='/registration'> Register </Link>
+                        <br/>
+                        <br/>
+                        <input type="button" value="Register" className="button-primary" onClick={this.process_registration}/>
                     </form>
-                    <br/>
                 </div>
             </div>
         );

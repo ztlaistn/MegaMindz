@@ -64,32 +64,36 @@ export default class UserAccount extends React.Component {
 
     componentDidMount() {
         // first fetch the user data to allow update of username
-        fetch(this.url+"/auth/fetchUserAccount", {
-            method: "get",
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + sessionStorage.getItem("token")
-            }
-        })
-            .then(res => res.json())
-            .then(
-                result => {
-                    if (result) {
-                        console.log(result);
-                        this.setState({
-                            username: result.username || "",
-                            email: result.email || "",
-                            location: result.location|| "",
-                            skills: result.skills|| "",
-                            employment_status: result.employment || ""
-
-                        })
-                    }
-                },
-                error => {
-                    alert("error!");
+        if(sessionStorage.getItem("token") == null){
+            window.location.href = "login";
+        } else {
+            fetch(this.url+"/auth/fetchUserAccount", {
+                method: "get",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + sessionStorage.getItem("token")
                 }
-            );
+            })
+                .then(res => res.json())
+                .then(
+                    result => {
+                        if (result) {
+                            console.log(result);
+                            this.setState({
+                                username: result.username || "",
+                                email: result.email || "",
+                                location: result.location|| "",
+                                skills: result.skills|| "",
+                                employment_status: result.employment || ""
+
+                            })
+                        }
+                    },
+                    error => {
+                        alert("error!");
+                    }
+                );
+        }
     }
 
 
