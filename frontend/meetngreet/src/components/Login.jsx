@@ -17,6 +17,21 @@ export default class Login extends React.Component {
         console.log("Initiated login");
         if(((document.getElementById("email").validity.valid) && (document.getElementById("password").value.length !== 0)) && ((document.getElementById("email").value.includes("@")) && (document.getElementById("email").value.includes(".")))){
             //check database and redirect to home page
+            const data = { email: document.getElementById("email").value, password: document.getElementById("password").value };
+            fetch('/auth/login', {
+            method: 'POST', // or 'PUT'
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(data => {
+              console.log('Success:', data);
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+            });
         } else {
             window.alert("Error: Missing one or more required fields.")
         }

@@ -56,6 +56,7 @@ export default class UserAccount extends React.Component {
                     this.setState({
                         responseMessage: result
                     });
+                    window.location.href = "home";
                 },
             )
 
@@ -143,9 +144,10 @@ export default class UserAccount extends React.Component {
                                 value={this.state.skills}
                             />
                         </label>
+                        <br/>
+                        <br/>
+                        <input type="submit" id="login_button" value="Save Changes" className="button-primary"/>
                     </form>
-                    <br/>
-                    <input type="submit" id="login_button" value="Save Changes" className="button-primary"/>
                 </div>
             </div>
         );
