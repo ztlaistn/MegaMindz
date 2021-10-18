@@ -37,6 +37,7 @@ export default class Registration extends React.Component {
                   // Examine the text in the response
                   response.json().then(function(data) {
                     console.log(data.message);
+                    window.location.href = "login";
                   });
                 }
               )

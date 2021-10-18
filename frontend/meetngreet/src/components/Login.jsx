@@ -40,7 +40,7 @@ export default class Login extends React.Component {
                     console.log(data.token);
                     sessionStorage.setItem("token", data.token);
                     sessionStorage.setItem("username", data.username);
-                    window.location.href = "home";
+                    window.location.href = "/";
                   });
                 }
               )
