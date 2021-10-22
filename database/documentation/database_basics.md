@@ -104,6 +104,7 @@ If the user already has acces to the backend, its probably too late.
 ***Room Role Info Table***
 
 There is now also a table that will store the roles of users in a given room.  It will have the following fields:
+	- room_role_id (type: int): primary key for the table, needed since we can have duplicate user_id in this table
     - user_id (type int): This will be the user that we are storing the information for (their user_id from the user_info table)
     - room_code (type int): This will be a room that the row corresponds to, this will be randomly generated, and should not match any rows that already exist
     - role (type: int): This will be the role of the user in the given room
@@ -121,6 +122,8 @@ room_exists: given a connected client and a room_code, will check if there are a
 
 create_new_room: Will check if the room you want to add already exists.  If it does, it will resolve with -1.  If it doesn't, it will add the row to the table, with the owner getting an owner role.  Then resolve with the added room_code (should be the same one as passed).
 
-find_user_role_in_rooms: will take a client, user_id, and room_code.  Returns the user's role in the given room, or -1 if they do not have a role in that room yet.
+find_user_in_room_roll: will take a client, user_id, and room_code.  Returns the user's row in the given room, or null if they do not have a role in that room yet.
 
-set_role: takes a client, user_id, role, and room_code.  Gives the user that given role in that given room.  If the user already has a role in that room, updates that row, otherwise makes a new row.  Returns a promise that will resolve with the user_id that was modified (should be the same one passed).
+set_role: takes a client, user_id, role, and room_code.  Gives the user that given role in that given room.  If the user already has a role in that room, updates that row, otherwise makes a new row.  Returns a promise that will resolve with the row that was modified/added (should be the same one passed).
+
+close_room: takes a client and room_code.  Will delete all rows in the table that refer to the given room.  Will return a promise with the room_code of the affected rows.

@@ -55,6 +55,12 @@ function room_exists(client, room_code){
  *      - Generate a random room id for the user on backend, and just loop on this function until it makes a room and resolves with a non-negative number 
 */
 async function create_new_room(client, owner_id, room_code){
+    if(room_code < 0){
+        return new Promise((resolve, reject) => {
+            reject("Negative room number in create_new_room");
+        })
+    }
+
     try{
         const in_use = await room_exists(client, room_code);
         if(in_use){
@@ -86,7 +92,7 @@ async function create_new_room(client, owner_id, room_code){
 
 
 /**
- * Function that will check if a user already has a role in a room, and return it if they do.
+ * Function that will check if a user already has a role in a room, and return the row it if they do.
  * Parameters:
  *  client:     client object connected to the database
  *  user_id:    id of user in question
@@ -94,12 +100,12 @@ async function create_new_room(client, owner_id, room_code){
  * 
  * Returns:     A promise
  *              - Reject with an error message for any sql errors
- *              - Reslove with -1 if they are not found in that room
- *              - Resolve with their role if they are in the room
+ *              - Reslove with null if they are not found in that room
+ *              - Resolve with their row if they are in the room
  */
-function find_user_role_in_room(client, user_id, room_code){
+function find_user_in_room_roll(client, user_id, room_code){
     select_query = {
-        text: 'SELECT role FROM room_role_info WHERE user_id = $1 AND room_code = $2',
+        text: 'SELECT * FROM room_role_info WHERE user_id = $1 AND room_code = $2',
         values: [user_id, room_code]
     };
 
@@ -107,9 +113,9 @@ function find_user_role_in_room(client, user_id, room_code){
         if(err){
             reject("Error in find_user_role_in_room: " + err);
         }else if(res.rows.length === 0){
-            resolve(-1);
+            resolve(null);
         }else{
-            resolve(res.rows[0].role);
+            resolve(res.rows[0]);
         }
     }))
 }
@@ -126,35 +132,35 @@ function find_user_role_in_room(client, user_id, room_code){
  * 
  * Return:  A promise
  *          - If there are any sql errors, rejects with error message
- *          - Otherwise, resolves with the user_id that it set the role for
+ *          - Otherwise, resolves with the row that it changed
  */
 async function set_role(client, user_id, role, room_code){
     try{
-        const in_table = await find_user_role_in_room(client, user_id, role, room_code)
-        if(in_table){
+        const in_table = await find_user_in_room_roll(client, user_id, room_code)        
+        if(in_table !== null){
             // already there, just update
             update_query = {
-                text: 'UPDATE room_role_info SET role = $1 WHERE user_id = $2 AND room_code = $3 RETURNING user_id',
+                text: 'UPDATE room_role_info SET role = $1 WHERE user_id = $2 AND room_code = $3 RETURNING *',
                 values: [role, user_id, room_code]
             };
             return new Promise((resolve, reject) => client.query(update_query, (err, res) =>{
                 if(err){
                     reject("Error in set_role update: " + err);
                 }else{
-                    resolve(res.rows[0].user_id);
+                    resolve(res.rows[0]);
                 }
             }));
         }else{
             // not there, make new row
             insert_query = {
-                text: 'INSERT INTO room_role_info (user_id, room_code, role) VALUES ($1, $2, $3) RETURNING user_id',
+                text: 'INSERT INTO room_role_info (user_id, room_code, role) VALUES ($1, $2, $3) RETURNING *',
                 values: [user_id, room_code, role]
             };
             return new Promise((resolve, reject) => client.query(insert_query, (err, res) =>{
                 if(err){
                     reject("Error in set_role insert: " + err);
                 }else{
-                    resolve(res.rows[0].user_id);
+                    resolve(res.rows[0]);
                 }
             }));
         }
@@ -165,9 +171,41 @@ async function set_role(client, user_id, role, room_code){
     }
 }
 
-modeule.exports = {
+
+/**
+ * Function that will delete all rows in the table that refer to the given room 
+ * Parameters:
+ *  client:     client object with connection to the database
+ *  room_code:  room id that we are deleting the rows for
+ * 
+ * Return:      A promise
+ *              If there was an sql error, will reject with the error message
+ *              If not, will resolve with the room_code of the room it deleted the rows for
+*/
+function close_room(client, room_code){
+    delete_query = {
+        text: 'DELETE FROM room_role_info WHERE room_code = $1',
+        values: [room_code]
+    };
+
+    return new Promise((resolve, reject) => client.query(delete_query, (err) =>{
+        if(err){
+            reject("Error in close_room: " + err);
+        }else{
+            resolve(room_code);
+        }
+    }))
+
+}
+
+module.exports = {
     room_exists,
     create_new_room,
-    find_user_role_in_room,
-    set_role
+    find_user_in_room_roll,
+    set_role,
+    close_room,
+    ROLE_GUEST,
+    ROLE_VIP,
+    ROLE_MODERATOR,
+    ROLE_OWNER
 };

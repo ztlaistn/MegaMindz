@@ -473,6 +473,6 @@ async function main() {
 }
 
 if (require.main === module) {
-	console.log("Starting Login Validation Test");
+	console.log("Starting Set and Get Users Test");
 	main();
 }
