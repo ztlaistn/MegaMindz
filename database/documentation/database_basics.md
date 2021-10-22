@@ -100,3 +100,27 @@ If there is a variable field being used in a query, it is injected directly with
 The reason for this is that we assume that the user should never have the power to set a query field.  The only one calling these functions are backend functions.
 The backend functions will always be looking for a specific function, and so they will simply pass a string constant that the user never had a chance to modify (unlike the values, that ARE dangerous, thus is run through the built in sanitation).
 If the user already has acces to the backend, its probably too late.
+
+***Room Role Info Table***
+
+There is now also a table that will store the roles of users in a given room.  It will have the following fields:
+    - user_id (type int): This will be the user that we are storing the information for (their user_id from the user_info table)
+    - room_code (type int): This will be a room that the row corresponds to, this will be randomly generated, and should not match any rows that already exist
+    - role (type: int): This will be the role of the user in the given room
+        Roles (a role x will have all the priv of role x-1):
+	        - 0: guest
+	        - 1: VIP
+	        - 2: Moderator
+	        - 3: Owner
+
+**Connecting to the Room role table:** Simply user the connect_client() function from user_database_utils.js
+
+**Supported Functions**
+
+room_exists: given a connected client and a room_code, will check if there are any rows in the database containing that room_code.  If theree are no sql errors, will either resolve with true or false.
+
+create_new_room: Will check if the room you want to add already exists.  If it does, it will resolve with -1.  If it doesn't, it will add the row to the table, with the owner getting an owner role.  Then resolve with the added room_code (should be the same one as passed).
+
+find_user_role_in_rooms: will take a client, user_id, and room_code.  Returns the user's role in the given room, or -1 if they do not have a role in that room yet.
+
+set_role: takes a client, user_id, role, and room_code.  Gives the user that given role in that given room.  If the user already has a role in that room, updates that row, otherwise makes a new row.  Returns a promise that will resolve with the user_id that was modified (should be the same one passed).
