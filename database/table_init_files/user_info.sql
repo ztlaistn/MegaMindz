@@ -17,7 +17,6 @@ user_info (
 -- Additional account information (feel free to add more to this, as we add features)
 --first_name		VARCHAR(30) NOT NULL DEFAULT '',
 --last_name			VARCHAR(30) NOT NULL DEFAULT '',
-	token			TEXT DEFAULT NULL,
 	full_name		VARCHAR(80) NOT NULL DEFAULT '',
 	dob				DATE DEFAULT '1900-01-01',
 	location		VARCHAR(50) NOT NULL DEFAULT '',
@@ -30,8 +29,7 @@ user_info (
 
 CREATE INDEX index1 ON user_info(enabled, user_id, hash);
 CREATE INDEX index2 ON user_info(enabled, curr_room, user_id);
-CREATE INDEX index3 ON user_info(enabled, user_id, token);
-CREATE INDEX index4 On user_info(enabled, email, user_id)
+CREATE INDEX index3 On user_info(enabled, email, user_id)
 	
 -- Will print table structure when created
 -- DESCRIBE user_info;
