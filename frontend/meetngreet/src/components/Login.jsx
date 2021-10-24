@@ -17,13 +17,39 @@ export default class Login extends React.Component {
         console.log("Initiated login");
         if(((document.getElementById("email").validity.valid) && (document.getElementById("password").value.length !== 0)) && ((document.getElementById("email").value.includes("@")) && (document.getElementById("email").value.includes(".")))){
             //check database and redirect to home page
+            const data = { email: document.getElementById("email").value, password: document.getElementById("password").value };
+            fetch('/auth/login', {
+            method: 'POST', // or 'PUT'
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+            }).then(
+                function(response) {
+                  if (response.status !== 200) {
+                    console.log('Looks like there was a problem. Status Code: ' +
+                      response.status);
+                      response.json().then(function(data) {
+                        console.log(data);
+                        window.alert("Error: Invalid login. Code " + response.status);
+                      });
+                    return;
+                  }
+                  // Examine the text in the response
+                  response.json().then(function(data) {
+                    console.log(data.token);
+                    sessionStorage.setItem("token", data.token);
+                    sessionStorage.setItem("username", data.username);
+                    window.location.href = "/";
+                  });
+                }
+              )
+              .catch(function(err) {
+                console.log('Fetch Error :-S', err);
+              });
         } else {
             window.alert("Error: Missing one or more required fields.")
         }
-    }
-
-    check_credentials = () => {
-
     }
 
     toRegistration = () => {

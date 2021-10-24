@@ -51,7 +51,8 @@ function user_or_email_unique(client, user, email){
 		if (err){
 			reject("Error in user_or_email_unique: " + err)
 		}else if(res.rows[0].count > 0){
-			reject("Number of rows already containing this data: " + res.rows[0].count)
+			//reject("Number of rows already containing this data: " + res.rows[0].count)
+			reject("Account info already exists")
 		}else{
 			resolve(res.rows[0].count);
 		}
@@ -66,16 +67,14 @@ function user_or_email_unique(client, user, email){
 * 	user: new username
 * 	hash: new hashed password
 * 	email: new email
-* 	full_name: new name
-* 	salt: new salt
 *
 * Return: 	A promise where, when query has an error, will reject with that error.
 *			When it inserts correctly (and there is no error), will resolve with user_id
  */
-function insert_new_user_row(client, user, hash, email, salt){
+function insert_new_user_row(client, user, hash, email){
 	const insert_query = {
-		text: 'INSERT INTO user_info (username, hash, email, salt) VALUES ($1, $2, $3, $4) RETURNING user_id',
-		values: [user, hash, email, salt],
+		text: 'INSERT INTO user_info (username, hash, email) VALUES ($1, $2, $3) RETURNING user_id',
+		values: [user, hash, email],
 	};
 	
 	return new Promise((resolve, reject) => client.query(insert_query, (err, res) =>{
@@ -97,20 +96,19 @@ function insert_new_user_row(client, user, hash, email, salt){
 * 	hash: new hashed password
 * 	email: new email
 * 	last: new last name
-* 	salt: new salt
 * 
 * Return: 	A promise where, when a successfull insert has happened it will resolve, passing the user_id of the new user.
 			When the user_or_email_unique check fails, it will reject with the error message.
 			When the insert fails, it will reject with the error message.
 **/
-async function new_user(client, user, hash, email, salt){	
+async function new_user(client, user, hash, email){	
 	// This seems to work, and fixes the problems with the commented out version
 	// below, that doesn't return the promise right away.
 	return new Promise(async (resolve, reject) => {
 		try{
 			//First makes sure the user and 
 			const count = await user_or_email_unique(client, user, email);
-			const uid = await insert_new_user_row(client, user, hash, email, salt);
+			const uid = await insert_new_user_row(client, user, hash, email);
 			resolve(uid);
 		} catch (err){
 			reject(err);
@@ -174,15 +172,14 @@ function dump_user_info(client, field = "", value = ""){
 * 	user: user's username
 * 	pass: user's Password
 * 	email: user's email
-* 	salt: user's salt
 * 
 * Return:	A promise where, when the query has an error, will reject with that error.
 *			When the delete is done (or there is nothing to delete), it will resolve with true.
 */
-function delete_user(client, user, hash, email, salt){
+function delete_user(client, user, hash, email){
 	delete_query = {
-		text: 'DELETE FROM user_info WHERE username = $1 AND hash = $2 AND email = $3 AND salt = $4',
-		values: [user, hash, email, salt]
+		text: 'DELETE FROM user_info WHERE username = $1 AND hash = $2 AND email = $3',
+		values: [user, hash, email]
 	};
 
 	return new Promise((resolve, reject) => client.query(delete_query, (err) =>{
@@ -334,7 +331,7 @@ function get_user_ids_from_fields(client, field1, value1, field2 = "", value2 = 
 * Parameters:
 *	- client: client that has made a connection to the user_info table
 *	- uid: user id of the user we want to change
-*	- field: field we want to chage
+*	- field (string): field we want to chage
 *	- value: value we wanted to change
 * 
 * Returns: 	A promise that, when passes, will resolve and return the changed user_id (should be the same as the one passed)
@@ -346,6 +343,9 @@ function set_field_for_user_id(client, uid, field, value){
 			reject("Cannot change user id with set_field_for_user_id function");
 		});
 	}
+	// else if(field.toLowerCase() === "dob"){
+	// 	//Going to need to do something here to convert a date object
+	// }
 
 	update_query = {
 		text: 'UPDATE user_info SET ' + field + ' = $1 WHERE user_id = $2 RETURNING user_id',
@@ -363,6 +363,58 @@ function set_field_for_user_id(client, uid, field, value){
 	}));
 }
 
+/*
+* Function that will return an array of rows that correlates to all the users in a given room.
+* If you only want one field from the users, you can pass that field as an optional paramter.
+	- If this is the case, it will just return an array of those field values
+* Parameters:
+*	- client: client that has made a connection to the user_info table
+*	- room_num: room_code/number for the room we are trying to lookup
+*	- field="": optional paramter, if a field is given, will only return the values for that field rather than the whole rows
+* 
+* Returns: 	A promise that, when passes, will resolve and return the array of rows (or just a array of values if a field was given)
+*			When fails, will reject with an error message
+*
+* NOTE: this function can return an empty array if no one is in the room.
+* Also Note: if list has strings, they will be in single quotes.
+*/
+function get_rows_in_room(client, room_num, field=""){
+	if (field === ""){
+		// no field was given, return whole row
+		select_query = {
+			text: 'SELECT * FROM user_info WHERE curr_room = $1',
+			values: [room_num]
+		};
+
+		return new Promise((resolve, reject) => client.query(select_query, (err, res) => {
+			if(err){
+				rejcect("Error in get_rows_in_room: "+ err);
+			}else{
+				resolve(res.rows)
+			}
+		}));
+	}else{
+		// we were given a specific field
+		select_query = {
+			text: 'SELECT ' + field + ' FROM user_info WHERE curr_room = $1',
+			values: [room_num]
+		};
+	
+		return new Promise((resolve, reject) => client.query(select_query, (err, res) => {
+			if(err){
+				rejcect("Error in get_rows_in_room: "+ err);
+			}else{
+				ret_arr = []
+				res.rows.forEach(x=>{
+					ret_arr.push(x[field]);
+				});
+				resolve(ret_arr)
+			}
+		}));
+	}
+}
+
+
 module.exports = {
 	connect_client,
 	user_or_email_unique,
@@ -372,5 +424,6 @@ module.exports = {
 	select_user_with_id,
 	login_validation,
 	get_user_ids_from_fields,
-	set_field_for_user_id
+	set_field_for_user_id,
+	get_rows_in_room
 };

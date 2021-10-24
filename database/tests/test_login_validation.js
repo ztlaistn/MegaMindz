@@ -21,7 +21,7 @@ async function main() {
 
     // Delete our test user from any previous test runs
     try{
-        await database_funs.delete_user(client, 'test_login_valid_user', 'test_login_valid_hash', 'test_login_valid@fake.com', 'test_login_valid_salt');
+        await database_funs.delete_user(client, 'test_login_valid_user', 'test_login_valid_hash', 'test_login_valid@fake.com');
         console.log("Any previous test user from previous runs have been cleared out of the user_info table.")
     } catch (err){
         console.log("Failed test, when trying to remove previous test user, threw the following error: " + err)
@@ -44,7 +44,7 @@ async function main() {
     // Add user back in
     ret_id = -1;
 	try{
-		ret_id = await database_funs.new_user(client, 'test_login_valid_user', 'test_login_valid_hash', 'test_login_valid@fake.com', 'test_login_valid_salt');
+		ret_id = await database_funs.new_user(client, 'test_login_valid_user', 'test_login_valid_hash', 'test_login_valid@fake.com');
 		console.log("We added the user with id: " + ret_id);
 	} catch (err){
         console.log("Failed test: when trying to add first user, we threw the following error: " + err +

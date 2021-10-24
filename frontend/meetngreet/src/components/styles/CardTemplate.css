@@ -28,3 +28,11 @@
     text-align: center;
     color: #000000;
 }
+
+/* Small devices (landscape phones, 576px and up) */
+@media only screen and (max-width: 768px) {
+    .card-frame {
+        width: 100vw;
+        border-radius: 0px;
+    }
+}
