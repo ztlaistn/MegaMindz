@@ -42,6 +42,9 @@ class Server {
     /* backend routes exist here
     NOTE: will likely need to organize into seperate files as we add more routes*/
     backendRoutes() {
+        this.app.get("/chatroom", (req,res) => {
+            res.render("chatroom");
+        });
         const rootdir = __dirname.substring(0, __dirname.length-7);
         const root = require('path').join(rootdir, 'frontend', 'meetngreet', 'build')
             this.app.use(express.static(root));
@@ -52,29 +55,44 @@ class Server {
         authRouter(this.app);
         usersRouter(this.app);
 
-        //this.app.get('/', (req, res) => {
-        //    res.redirect('login');
-        //})
-        //this.app.get('/useraccount', (req, res) => {
-        //    res.sendFile(path.resolve(__dirname, 'public', 'index.ejs'));
-        //    res.render('userAccount');
-        //});
-
-        //this.app.get('/login', (req, res) => {
-        //      res.sendFile(path.resolve(__dirname, 'public', 'index.ejs'));
-        //    res.render('login');
-        //});
-
-        //this.app.get('/register', (req, res) => {
-        //    res.render('register');
-        //});
-    }
-
-    handleSocketConnection() {
-        this.io.on("connection", socket => {
-            console.log("Socket connected.");
+        this.app.get('/register', (req, res) => {
+            res.render('register');
         });
-    }
+
+    /*this.app.get("/chat/:room", (req, res) => {
+      res.render("chatroom" , {roomId: req.param.room});
+    });*/
+  }
+
+  handleSocketConnection() {
+      const io = this.io;
+      this.io.on("connection", function (socket) {
+          let user;
+
+          console.log("Socket connected.");
+          socket.emit('new-message', 'Connection established with server');
+
+          socket.on("new-user", function (username) {
+              // save username for future use
+              user = username;
+              io.emit('new-message', `${username} has connected`);
+          });
+
+          socket.on('new-message', function (data) {
+            const { msg } = data;
+            console.log("server received:" + msg);
+            io.emit("new-message", `${user}:  ${msg}`);
+          });
+          socket.on('disconnect',function(){
+            console.log('Client has disconnected');
+            io.emit("new-message", `${user} has disconnected`);
+          });
+
+     /*socket.on("join-room", (roomId, userId) => {
+       socket.join(roomId);
+       socket.emit("")});*/
+   });
+  }
 
     // pass in a callback function that returns port number
     listen(callbackFunction) {
