@@ -14,3 +14,24 @@
     margin-right: auto;
     max-width: 40%;
 }
+
+/* Small devices (landscape phones, 576px and up) */
+@media only screen and (max-width: 768px) {
+    .registration-credentials {
+        display: block;
+        float: initial;
+        margin-top: 2vh;
+        margin-left: auto;
+        margin-right: auto;
+        width: 80%;
+    }
+
+    .registration-icon {
+        display: block;
+        float: initial;
+        margin-top: 5vh;
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 80%;
+    }
+}
