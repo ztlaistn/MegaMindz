@@ -22,6 +22,18 @@ class NavigationBar extends React.Component {
         window.location.href = "login";
     }
 
+    toggleMute = () => {
+        window.location.href = "/";
+    };
+
+    openRoomMenu = () => {
+        window.location.href = "/";
+    };
+
+    leaveRoom = () => {
+        window.location.href = "/";
+    };
+
     showLogin = () => {
         if(window.location.pathname === "/registration"){
             return(
@@ -31,6 +43,23 @@ class NavigationBar extends React.Component {
                     </li>
                     <li>
                         <input type="button" value="Log In" className="button-primary" onClick={this.toLogin}/>
+                    </li>
+                </div>
+            );
+        }else if(window.location.pathname === "/chatroom2"){
+            return(
+                <div className="chatroom-bar">
+                    <li>
+                        <input type="button" value="Room Code: ABC123" className="button-primary"/>
+                    </li>
+                    <li>
+                        <input type="button" value="Toggle Mute" className="button-chatroom" onClick={this.toggleMute}/>
+                    </li>
+                    <li>
+                        <input type="button" value="Menu" className="button-chatroom" onClick={this.openRoomMenu}/>
+                    </li>
+                    <li>
+                        <input type="button" value="Leave Room" className="button-chatroom-leave" onClick={this.leaveRoom}/>
                     </li>
                 </div>
             );
@@ -55,21 +84,31 @@ class NavigationBar extends React.Component {
                 </div>
             );
         }
+        
     }
 
     render() {
-        return (
-            <div className="navigation-bar">
-                <div className="logo-bar">
-                    <li>
-                        <Link to="/" >
-                            <img src={logo} title="Home" className="logo"/>
-                        </Link>
-                    </li>
+        if(window.location.pathname === "/chatroom2"){
+            return (
+                <div className="navigation-bar">
+                    {this.showLogin()}
                 </div>
-                {this.showLogin()}
-            </div>
-        );
+            );
+        }
+        else {
+            return (
+                <div className="navigation-bar">
+                    <div className="logo-bar">
+                        <li>
+                            <Link to="/" >
+                                <img src={logo} title="Home" className="logo"/>
+                            </Link>
+                        </li>
+                    </div>
+                    {this.showLogin()}
+                </div>
+            );
+        }
     }
 }
 export default NavigationBar;
