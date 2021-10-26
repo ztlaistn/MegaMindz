@@ -6,6 +6,8 @@ import UserAccount from "./components/UserAccount.jsx";
 import React from "react";
 import NavigationBar from './components/NavigationBar.jsx';
 import Home from './components/Home.jsx';
+
+import Chatroom from './components/Chatroom'
 import {
   BrowserRouter as Router, Route, Switch
 } from 'react-router-dom';
@@ -32,6 +34,11 @@ class App extends React.Component {
                             <Route path="/login">
                                 <CardTemplate page_title={"User Login"}>
                                     <LoginForm/>
+                                </CardTemplate>
+                            </Route>
+                            <Route path="/chatroom-react">
+                                <CardTemplate page_title={"Chatroom"}>
+                                    <Chatroom/>
                                 </CardTemplate>
                             </Route>
                             <Route path="/">
