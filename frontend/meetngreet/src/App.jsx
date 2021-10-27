@@ -3,6 +3,7 @@ import CardTemplate from "./components/CardTemplate.jsx";
 import LoginForm from "./components/Login.jsx";
 import RegistrationForm from "./components/Registration.jsx";
 import UserAccount from "./components/UserAccount.jsx";
+import Chatroom from "./components/Chatroom.jsx";
 import React from "react";
 import NavigationBar from './components/NavigationBar.jsx';
 import Home from './components/Home.jsx';
@@ -33,6 +34,9 @@ class App extends React.Component {
                                 <CardTemplate page_title={"User Login"}>
                                     <LoginForm/>
                                 </CardTemplate>
+                            </Route>
+                            <Route path="/chatroom2">
+                                <Chatroom/>
                             </Route>
                             <Route path="/">
                                 <CardTemplate page_title={"Home"}>
