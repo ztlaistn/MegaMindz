@@ -3,6 +3,7 @@ import "./styles/Login.css";
 import "./styles/Input.css";
 import login_icon from "../assets/login_icon.png";
 import socketIOClient from "socket.io-client";
+import {postgresMd5PasswordHash} from "pg/lib/utils";
 
 
 export default class Chatroom extends React.Component {
@@ -18,14 +19,12 @@ export default class Chatroom extends React.Component {
     componentDidMount() {
         const socket = socketIOClient("/");
 
-
         socket.on("connect",function() {
             console.log('Client has connected to the server!');
-            console.log(sessionStorage.getItem("username"));
-
-            this.response = socket.emit("new-user", sessionStorage.getItem("username"));
-            console.log(this.response);
-
+            console.log(sessionStorage.getItem("username") + " has joined");
+            socket.emit("new-user", function()  {
+                console.log(sessionStorage.getItem("username") + " has joined");
+            });
 
         });
 
@@ -33,11 +32,12 @@ export default class Chatroom extends React.Component {
 
 
     render() {
+        let {response} = this.state.response
         return (
             <div id="login-form">
                 <div className="login-credentials">
                     <p>
-                        {this.state.response}
+                        {response}
                     </p>
                 </div>
             </div>
