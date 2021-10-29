@@ -35,6 +35,21 @@
     list-style-type: none;
 }
 
+.chatroom-bar{
+    width: 100%;
+    display:flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 10%;
+    padding-right: 10%;
+    font-size: 20px;
+    list-style-type: none;
+    margin-right: auto;
+    margin-left: auto;
+    gap: 30px;
+    list-style-type: none;
+}
+
 .navigation-items{
     display:flex;
     align-items: center;

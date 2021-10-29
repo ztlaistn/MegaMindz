@@ -5,7 +5,8 @@ import path from "path";
 import bodyParser from "body-parser";
 
 import authRouter from "./routes/auth";
-import usersRouter from "./routes/users"
+import usersRouter from "./routes/users";
+import roomRouter from "./routes/room";
 
 class Server {
     httpServer;
@@ -54,6 +55,7 @@ class Server {
 
         authRouter(this.app);
         usersRouter(this.app);
+        roomRouter(this.app);
 
         this.app.get('/register', (req, res) => {
             res.render('register');
@@ -69,6 +71,13 @@ class Server {
       this.io.on("connection", function (socket) {
           let user;
 
+          //TODO: any call: validate token, get user_id from it (or maybe from the socket itself)
+
+          //TODO: On join: db call to make sure room_exists
+          //TODO: On join: db call to make sure user is in that room
+
+          //TODO: message send and disconnect only on the room (as string)
+          
           console.log("Socket connected.");
           socket.emit('new-message', 'Connection established with server');
 

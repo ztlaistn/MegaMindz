@@ -1,0 +1,44 @@
+.chatroom-background {
+    width: 72vw;
+    height: 80vh;
+    padding: 2%;
+}
+
+.chatroom {
+    padding-top: 70px;
+    margin: auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.chatroom-card-frame {
+    width: 22vw;
+    background: #4f8fea;
+    display: block;
+    overflow: auto;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 2%;
+    flex-direction: column;
+    text-align: center;
+    height: 80vh;
+    /* Card Shadow */
+    box-shadow: 0px 4px 8px 2px rgba(57, 53, 52, 0.2);
+    border-radius: 12px;
+
+}
+
+.chat-messages {
+    height: 52vh;
+    width: 100%;
+    background-color: #F3F7F9;
+    overflow-y: scroll;
+}
+
+.chatroom-character {
+    position: absolute;
+    top: 200px;
+    left: 100px;
+}
