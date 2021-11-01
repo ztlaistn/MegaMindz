@@ -4,6 +4,7 @@ import LoginForm from "./components/Login.jsx";
 import RegistrationForm from "./components/Registration.jsx";
 import UserAccount from "./components/UserAccount.jsx";
 import Chatroom from "./components/Chatroom.jsx";
+import EnterChat from "./components/EnterChat.jsx";
 import React from "react";
 import NavigationBar from './components/NavigationBar.jsx';
 import Home from './components/Home.jsx';
@@ -37,6 +38,9 @@ class App extends React.Component {
                             </Route>
                             <Route path="/chatroom2">
                                 <Chatroom/>
+                            </Route>
+                            <Route path="/chatroom3">
+                                <EnterChat/>
                             </Route>
                             <Route path="/">
                                 <CardTemplate page_title={"Home"}>
