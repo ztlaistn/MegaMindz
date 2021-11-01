@@ -43,9 +43,9 @@ class Server {
     /* backend routes exist here
     NOTE: will likely need to organize into seperate files as we add more routes*/
     backendRoutes() {
-        this.app.get("/chatroom", (req,res) => {
-            res.render("chatroom");
-        });
+        // this.app.get("/chatroom", (req,res) => {
+        //     res.render("chatroom");
+        // });
         const rootdir = __dirname.substring(0, __dirname.length-7);
         const root = require('path').join(rootdir, 'frontend', 'meetngreet', 'build')
             this.app.use(express.static(root));
@@ -79,18 +79,21 @@ class Server {
           //TODO: message send and disconnect only on the room (as string)
           
           console.log("Socket connected.");
+          console.log("custom message.");
           socket.emit('new-message', 'Connection established with server');
 
           socket.on("new-user", function (username) {
               // save username for future use
               user = username;
               io.emit('new-message', `${username} has connected`);
+              console.log(`${username} has connected`)
           });
 
-          socket.on('new-message', function (data) {
+          socket.on('new-message', function (data)  {
             const { msg } = data;
-            console.log("server received:" + msg);
-            io.emit("new-message", `${user}:  ${msg}`);
+              console.log(data);
+            console.log("server received:" + data);
+            io.emit("new-message", `${user}:  ${data}`);
           });
           socket.on('disconnect',function(){
             console.log('Client has disconnected');
