@@ -11,14 +11,11 @@ export default function Chat({socket, username}) {
     const [connected, setConnected] = useState(false);
     const [currentMessage, setCurrentMessage] = useState("")
     const [messages, setMessages] = useState([])
-    console.log("it was here12")
+
     const sendMessage = async () =>{
         console.log(currentMessage)
         if (currentMessage!== "") {
-            // const messageData = {
-            //     message: currentMessage,
-            //     user: username
-            // }
+
             console.log(currentMessage)
 
             await socket.emit("new-message", currentMessage)
@@ -26,19 +23,13 @@ export default function Chat({socket, username}) {
     }
 
     useEffect(() => {
-        console.log("use Effect")
+
         socket.on("new-message",(data)=>{
-            console.log(data)
-            console.log("it was here line 31")
+
             setMessages((list) =>[...list,data])
         })
     },[socket]);
-    //
-    // let joinRoom = () =>{
-    //     console.log("user connected")
-    //     socket.emit("new-user", "mana");
-    //
-    // }
+
 
     return (
         <div>
