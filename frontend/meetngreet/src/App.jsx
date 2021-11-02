@@ -38,6 +38,8 @@ class App extends React.Component {
                             <Route path="/chatroom">
                                 <Chatroom/>
                             </Route>
+                            <Route path="/chat/:roomCode" component={Chatroom}>
+                            </Route>
                             <Route path="/">
                                 <CardTemplate page_title={"Home"}>
                                     <Home/>

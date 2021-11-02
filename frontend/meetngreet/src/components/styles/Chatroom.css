@@ -1,16 +1,21 @@
-.chatroom-background {
-    width: 72vw;
-    height: 80vh;
-    padding: 2%;
+.chatroom-container {
+    padding-top: 50px;
+}
+
+.chatroom-container > * {
+    padding-left: 2%;
 }
 
 .chatroom {
-    padding-top: 70px;
-    margin: auto;
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: center;
+}
+
+.chatroom-background {
+    width: 72vw;
+    height: 80vh;
+    padding-right: 2%;
 }
 
 .chatroom-card-frame {

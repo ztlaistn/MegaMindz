@@ -82,11 +82,11 @@ class Server {
           console.log("custom message.");
           socket.emit('new-message', 'Connection established with server');
 
-          socket.on("new-user", function (username) {
+          socket.on("new-user", function (data) {
               // save username for future use
-              user = username;
-              io.emit('new-message', `${username} has connected`);
-              console.log(`${username} has connected`)
+              user = data.username;
+              io.emit('new-message', `${user} has connected`);
+              console.log(`${user} has connected`)
           });
 
           socket.on('new-message', function (data)  {
