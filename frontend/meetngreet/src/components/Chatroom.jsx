@@ -5,7 +5,7 @@ import chatroom_background from "../assets/chatroom-background.jpg";
 import chatroom_character from "../assets/chatroom-character.gif";
 import io from "socket.io-client";
 import Chat from "./EnterChat"
-let socket = io.connect("http://localhost:5001/")
+let socket = io.connect("/")
 export default class Chatroom extends React.Component {
     constructor(props) {
         super(props);
