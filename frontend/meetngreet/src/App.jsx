@@ -35,7 +35,7 @@ class App extends React.Component {
                                     <LoginForm/>
                                 </CardTemplate>
                             </Route>
-                            <Route path="/chatroom2">
+                            <Route path="/chatroom">
                                 <Chatroom/>
                             </Route>
                             <Route path="/">
