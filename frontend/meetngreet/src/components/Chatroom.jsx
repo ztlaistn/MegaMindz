@@ -4,11 +4,10 @@ import "./styles/Input.css";
 import "./styles/Chatroom.css";
 import chatroom_background from "../assets/chatroom-background.jpg";
 import chatroom_character from "../assets/chatroom-character.gif";
+import Gamified from "./Gamified.jsx";
 import io from "socket.io-client";
 import Chat from "./EnterChat"
-import { useParams } from 'react-router-dom';
-
-let socket = io.connect("http://localhost:5001/")
+let socket = io.connect("/")
 export default class Chatroom extends React.Component {
     constructor(props) {
         console.log(props.match.params.roomCode);
@@ -46,11 +45,9 @@ export default class Chatroom extends React.Component {
 
     render() {
         return (
-            <div class="chatroom-container">
-                <h1 class="title-font">Room Code:  <b>{this.state.roomCode}</b></h1>
-                <img src={chatroom_character} className="chatroom-character" alt=""/>
+            <div>
                 <div class="chatroom">
-                    <img src={chatroom_background} className="chatroom-background" alt=""/>
+                    <Gamified/>
                     <Chat socket={socket} username={this.username} />
                 </div>
             </div>

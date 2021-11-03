@@ -1,0 +1,40 @@
+Peer JS will be used to implement voice/video calling
+PeerJS Docs:
+https://peerjs.com/
+Here is a great example of how peer.js is used:
+https://levelup.gitconnected.com/building-a-video-chat-app-with-node-js-socket-io-webrtc-26f46b213017
+
+PeerServer:
+To broker connections, PeerJS connects to a PeerServer. 
+Note that no peer-to-peer data goes through the server; The server acts only as a connection broker.
+(Source: Peer.JS docs)
+
+Example code to initialize peer server:
+const { ExpressPeerServer } = require(“peer”);
+const peerServer = ExpressPeerServer(server, {
+debug: true,
+});
+app.use(“/peerjs”, peerServer);
+
+Example code to initialize peer client:
+var peer = new Peer(undefined, {
+path: “/peerjs”,
+host: “/”,
+port: “3030”,
+});
+
+Example code to initialize video stream on client:
+navigator.mediaDevices.getUserMedia({
+    audio: true,
+    video: true,
+})
+.then((stream) => {
+    myVideoStream = stream;
+    addVideoStream(myVideo, stream);
+});
+
+Main peer events that client should listen for:
+peer.on("open", ... initialize)
+peer.on(“call”, ... {call.answer} )
+peer.call(userId, stream)
+
