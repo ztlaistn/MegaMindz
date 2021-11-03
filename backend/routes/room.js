@@ -15,7 +15,7 @@ export default (app) => {
   // Lists all the usernames of people in the given room
   // This one doesn't need to validate a login, as it doesn't really matter.
   router.post('/listRoom', async function (req, res) {
-    const { room_id } = req.body;
+    const { roomId } = req.body;
     let client;
 
     try {
@@ -28,9 +28,9 @@ export default (app) => {
     }
 
     try{
-	  const user_list = await DbUtil.get_rows_in_room(client, room_id, "username");
+	  const user_list = await DbUtil.get_rows_in_room(client, roomId, "username");
       //Note: this user_list could be empty
-	  console.log("Number of users in room " + room_id + " is " + user_list.length);
+	  console.log("Number of users in room " + roomId + " is " + user_list.length);
 	  client.end();
 	  return res.status(200).json({user_list: user_list});
     } catch(err){
@@ -108,14 +108,14 @@ export default (app) => {
 
     // if all else passed and we got here, return to frontend
     client.end();
-    return res.status(200).json({role: DbRoll.ROLE_OWNER, room_id: create_room_return, message:"User created room " + create_room_return});
+    return res.status(200).json({role: DbRoll.ROLE_OWNER, roomId: create_room_return, message:"User created room " + create_room_return});
   });
 
   
   /* ---------------------------- JOIN ROOM ---------------------------- */
   // define the join_room route
   router.post('/joinRoom', tokenAuthorization, async function (req, res) {
-    const { room_id, userId } = req.body;
+    const { roomId, userId } = req.body;
     let client;
     //let row;
 
@@ -132,7 +132,7 @@ export default (app) => {
 
     // make sure the room exists on the role table
     try{
-      const exists = await DbRoll.room_exists(client, room_id);
+      const exists = await DbRoll.room_exists(client, roomId);
       if(!exists){
         const errString = "ENTER ROOM CLIENT ERROR #2:" + err
         client.end()
@@ -152,30 +152,30 @@ export default (app) => {
 
     // see if user already has a role in that room
     try{
-      const row = await DbRoll.find_user_in_room_roll(client, userId, room_id);
+      const row = await DbRoll.find_user_in_room_roll(client, userId, roomId);
       if (row !== null){
         our_role = row.role;
         set_role_flag = true;
       }
     } catch (err){
       const errString = "ENTER ROOM CLIENT ERROR #4:" + err;
-      console.log("Unable to get user "+ userId + "'s role in room "+ room_id + ", setting it to guest. Err: " + errString)
+      console.log("Unable to get user "+ userId + "'s role in room "+ roomId + ", setting it to guest. Err: " + errString)
     }
 
     // if we didn't have a role for the user, make an entry as a guest.
     if(!set_role_flag){
       try{
-        await DbRoll.set_role(client, userId, DbRoll.ROLE_GUEST, room_id);
+        await DbRoll.set_role(client, userId, DbRoll.ROLE_GUEST, roomId);
       } catch (err){
         const errString = "ENTER ROOM CLIENT ERROR #5:" + err;
-        console.log("Unable to make " + userId + " guest in room " + room_id + ". Err: " + errString);
+        console.log("Unable to make " + userId + " guest in room " + roomId + ". Err: " + errString);
         return res.status(400).json({message: "Unable to find/give user role in this room."});
       }
     }
 
     // add them to the room
     try{
-      await DbUtil.set_field_for_user_id(client, userId, "curr_room", room_id);
+      await DbUtil.set_field_for_user_id(client, userId, "curr_room", roomId);
 
     } catch (err){
       const errString = "ENTER ROOM CLIENT ERROR #6:" + err
@@ -191,7 +191,7 @@ export default (app) => {
        */
 
     client.end();
-    return res.status(200).json({role: our_role, message:"User added to room " + room_id});
+    return res.status(200).json({role: our_role, message:"User added to room " + roomId});
   });
 
 
