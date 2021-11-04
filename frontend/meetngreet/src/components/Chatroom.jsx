@@ -29,24 +29,24 @@ export default class Chatroom extends React.Component {
 
             });
         }
+
+        // get roomCode
+        const roomCode = sessionStorage.getItem("roomCode");
+
         // if no roomCode, show error message to user
-        if (!sessionStorage.getItem("roomCode")) {
-            console.log(sessionStorage.getItem("roomCode"));
+        if (!roomCode) {
             this.setState({noRoomError: true});
         } else {
-            console.log(sessionStorage.getItem("roomCode"));
-            this.setState({roomCode: sessionStorage.getItem("roomCode")});
+            this.setState({roomCode: roomCode});
+            // initialize socket new user event only if we have both token and roomCode
+            socket.on("connect",function() {
+                const data = {
+                    username: temp.state.username,
+                    roomCode: roomCode
+                }
+                socket.emit("new-user", data);
+            });
         }
-        console.log(sessionStorage.getItem("roomCode"));
-        // connect socket if we have both token and roomCode
-        socket.on("connect",function() {
-            const data = {
-                username: temp.state.username,
-                roomCode: sessionStorage.getItem("roomCode")
-            }
-            socket.emit("new-user", data);
-        });
-
     }
 
     toHome = () => {
