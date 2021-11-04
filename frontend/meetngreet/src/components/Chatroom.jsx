@@ -10,15 +10,16 @@ import Chat from "./EnterChat"
 let socket = io.connect("/")
 export default class Chatroom extends React.Component {
     constructor(props) {
-        console.log(props.match.params.roomCode);
         super(props);
         this.state = {
           username: "",
-          roomCode: props.match.params.roomCode,
+          roomCode: null,
+          noRoomError: false,
         };
     }
 
     componentDidMount() {
+        // if no token, redirect to login page
         let temp = this
         if(sessionStorage.getItem("token") == null){
             window.location.href = "login";
@@ -28,15 +29,30 @@ export default class Chatroom extends React.Component {
 
             });
         }
+        // if no roomCode, show error message to user
+        if (!sessionStorage.getItem("roomCode")) {
+            console.log(sessionStorage.getItem("roomCode"));
+            this.setState({noRoomError: true});
+        } else {
+            console.log(sessionStorage.getItem("roomCode"));
+            this.setState({roomCode: sessionStorage.getItem("roomCode")});
+        }
+        console.log(sessionStorage.getItem("roomCode"));
+        // connect socket if we have both token and roomCode
         socket.on("connect",function() {
             const data = {
-                username: temp.state.username
+                username: temp.state.username,
+                roomCode: sessionStorage.getItem("roomCode")
             }
             socket.emit("new-user", data);
-            console.log("this is line 29")
         });
 
     }
+
+    toHome = () => {
+        window.location.href = "home";
+    };
+
 
 
     sendMessage = () => {
@@ -44,8 +60,19 @@ export default class Chatroom extends React.Component {
     };
 
     render() {
+        console.log(this.state.noRoomError);
+        if (this.state.noRoomError) {
+            return (
+                <div class="chatroom-container">
+                    <h1 class="title-font">Error: You have not joined a valid room</h1>
+                    <input type="button" value="Return to Home" className="button-primary" onClick={this.toHome}/>
+                </div>
+            )
+        }
+
         return (
-            <div>
+            <div class="chatroom-container">
+                <h1 class="title-font">Room Code:  <b>{this.state.roomCode}</b></h1>
                 <div class="chatroom">
                     <Gamified/>
                     <Chat socket={socket} username={this.username} />
