@@ -13,7 +13,7 @@ export default class Chatroom extends React.Component {
         super(props);
         this.state = {
           username: "",
-          roomCode: null,
+          roomId: null,
           noRoomError: false,
         };
     }
@@ -30,19 +30,19 @@ export default class Chatroom extends React.Component {
             });
         }
 
-        // get roomCode
-        const roomCode = sessionStorage.getItem("roomCode");
+        // get roomId
+        const roomId = sessionStorage.getItem("roomId");
 
-        // if no roomCode, show error message to user
-        if (!roomCode) {
+        // if no roomId, show error message to user
+        if (!roomId) {
             this.setState({noRoomError: true});
         } else {
-            this.setState({roomCode: roomCode});
-            // initialize socket new user event only if we have both token and roomCode
+            this.setState({roomId: roomId});
+            // send socket new-user event only if we have both token and roomId
             socket.on("connect",function() {
                 const data = {
                     username: temp.state.username,
-                    roomCode: roomCode
+                    roomId: roomId
                 }
                 socket.emit("new-user", data);
             });
@@ -72,7 +72,7 @@ export default class Chatroom extends React.Component {
 
         return (
             <div class="chatroom-container">
-                <h1 class="title-font">Room Code:  <b>{this.state.roomCode}</b></h1>
+                <h1 class="title-font">Room Code:  <b>{this.state.roomId}</b></h1>
                 <div class="chatroom">
                     <Gamified/>
                     <Chat socket={socket} username={this.username} />
