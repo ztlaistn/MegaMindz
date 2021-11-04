@@ -1,4 +1,5 @@
 import React from "react";
+import "./styles/Text.css";
 import "./styles/Input.css";
 import "./styles/Chatroom.css";
 import chatroom_background from "../assets/chatroom-background.jpg";
@@ -11,11 +12,14 @@ export default class Chatroom extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-          username: ""
+          username: "",
+          roomCode: null,
+          noRoomError: false,
         };
     }
 
     componentDidMount() {
+        // if no token, redirect to login page
         let temp = this
         if(sessionStorage.getItem("token") == null){
             window.location.href = "login";
@@ -25,12 +29,30 @@ export default class Chatroom extends React.Component {
 
             });
         }
+        // if no roomCode, show error message to user
+        if (!sessionStorage.getItem("roomCode")) {
+            console.log(sessionStorage.getItem("roomCode"));
+            this.setState({noRoomError: true});
+        } else {
+            console.log(sessionStorage.getItem("roomCode"));
+            this.setState({roomCode: sessionStorage.getItem("roomCode")});
+        }
+        console.log(sessionStorage.getItem("roomCode"));
+        // connect socket if we have both token and roomCode
         socket.on("connect",function() {
-            socket.emit("new-user",temp.state.username);
-            console.log("this is line 29")
+            const data = {
+                username: temp.state.username,
+                roomCode: sessionStorage.getItem("roomCode")
+            }
+            socket.emit("new-user", data);
         });
 
     }
+
+    toHome = () => {
+        window.location.href = "home";
+    };
+
 
 
     sendMessage = () => {
@@ -38,8 +60,19 @@ export default class Chatroom extends React.Component {
     };
 
     render() {
+        console.log(this.state.noRoomError);
+        if (this.state.noRoomError) {
+            return (
+                <div class="chatroom-container">
+                    <h1 class="title-font">Error: You have not joined a valid room</h1>
+                    <input type="button" value="Return to Home" className="button-primary" onClick={this.toHome}/>
+                </div>
+            )
+        }
+
         return (
-            <div>
+            <div class="chatroom-container">
+                <h1 class="title-font">Room Code:  <b>{this.state.roomCode}</b></h1>
                 <div class="chatroom">
                     <Gamified/>
                     <Chat socket={socket} username={this.username} />
