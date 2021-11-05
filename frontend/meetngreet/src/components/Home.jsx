@@ -10,10 +10,16 @@ export default class Home extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-          username: ""
+          username: "",
+            roomId:0
         };
     }
-
+    change_Handler(field, e) {
+        console.log("field change");
+        this.setState({
+            [field]: e.target.value
+        });
+    };
     componentDidMount() {
         if(sessionStorage.getItem("token") == null){
             window.location.href = "login";
@@ -37,6 +43,7 @@ export default class Home extends React.Component {
             window.location.href = "chatroom/" + document.getElementById("code").value;
         }
     };
+
 
     create_room = event => {
         //keep the form from actually submitting
@@ -77,6 +84,51 @@ export default class Home extends React.Component {
         }
 
     };
+    join_room = event => {
+        //keep the form from actually submitting
+        event.preventDefault();
+        let temp = this
+        console.log(temp.state.roomId)
+        if(sessionStorage.getItem("token") == null){
+            window.location.href = "login";
+        } else {
+            console.log(sessionStorage)
+            //console.log("This is us2: ", this)
+            fetch("/room/joinRoom", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+                },
+                body: JSON.stringify({
+                       roomId:temp.state.roomId
+                })
+            }).then(
+                function(response){
+
+                    if(response.status !== 200){
+                        response.json().then(function(data) {
+                            console.log(data);
+                            window.alert("Error: Failed to Create Room : " + data.message);
+                        });
+                    }else{
+                        //console.log("This is us4: ", this);
+                        response.json().then(function(data) {
+                            console.log(temp.state.roomId);
+                            console.log(data);
+                            sessionStorage.setItem("roomId", temp.state.roomId);
+                            window.location.href = "/chatroom";
+
+                        });
+                    }
+                }
+            ).catch(function(err) {
+                console.log('Fetch Error :-S', err);
+                window.location.href = "/";
+            });
+        }
+
+    };
 
 
     render() {
@@ -90,8 +142,16 @@ export default class Home extends React.Component {
                 <br/>
                 <input type="button" value="Create Room" className="button-primary" onClick={this.create_room}/>
                 <br/>
-                <input type="text" required id="code" name="message" placeholder="Enter Room code"/>
-                <input type="button" value="Join Chat Room" className="button-primary" onClick={this.toChatroom}/>
+                {/*<input type="text" required id="code" name="message" placeholder="Enter Room code" on/>*/}
+                <label className="Enter room code">
+                    Enter room code
+                    <input
+                        type="text"
+                        onChange={e => this.change_Handler("roomId", e)}
+                        value={this.state.roomId}
+                    />
+                </label>
+                <input type="button" value="Join Chat Room" className="button-primary" onClick={this.join_room}/>
             </div>
         );
     }
