@@ -3,7 +3,7 @@ import socketIO from "socket.io";
 import { createServer } from "http";
 import path from "path";
 import bodyParser from "body-parser";
-import jwt from "jasonwebtoken";
+import jwt from "jsonwebtoken";
 
 import authRouter from "./routes/auth";
 import usersRouter from "./routes/users";
@@ -124,7 +124,7 @@ class Server {
 
     handleSocketConnection() {
         const io = this.io;
-        this.io.on("connection", function (socket) {
+        this.io.on("connection", async function (socket) {
             // variables for this connection
             let ourUsername;
             let ourUserId = -1;
@@ -143,18 +143,19 @@ class Server {
             * Will emit a new user new-message to the room if success.
             * Otherwise will trigger error event with error message.
             */
-            socket.on("new-user", function (data) {
-                const {auth, roomId} = data.body //should we be getting the token from the header?
+            socket.on("new-user", async function (data) {
+                const {auth, roomId} = data //should we be getting the token from the header?
                 let client;
+                let errString;
 
-                const temp = validateSocketToken(auth);
-                if (temp < 0){
+                const tokenUID = 1; //this.validateSocketToken(auth);
+                if (tokenUID < 0){
                     errString = "SOCKET NEW-USER ERROR #0: Access Denied";
                     console.log(errString);
                     socket.emil('error', {message:errString});
                 }else{
                     // set our_userId based on the packet
-                    ourUserId = temp;
+                    ourUserId = tokenUID;
                     // connect a client to the database
                     try{
                         client = await DbUtil.connect_client()
@@ -204,14 +205,14 @@ class Server {
             * Will emit the message to everyone in the room if the user is in a room.
             * Otherwise will trigger error event with error message.
             */
-            socket.on('new-message', function (data)  {
+            socket.on('new-message', async function (data)  {
                 const { auth, msg } = data;
                 // start by checking the userId and roomId are set (user has connected)
                 if(ourRoomId === -1 || ourUserId === -1){
                     socket.emit('error', {message:"SOCKET NEW-MESSAGE ERROR #1: User trying to relay message when they are not connected to a room."});
                 }else{
-                    const temp = validateSocketToken(auth);
-                    if (temp < 0 || temp !== ourUserId){
+                    const tokenUID = validateSocketToken(auth);
+                    if (tokenUID < 0 || tokenUID !== ourUserId){
                         errString = "SOCKET NEW-MESSAGE ERROR #2: Access Denied";
                         console.log(errString);
                         socket.emil('error', {message:errString});
@@ -230,7 +231,7 @@ class Server {
             * Will emit a disconnect new-message to the room if success.
             * Otherwise will trigger error event with error message.
             */
-            socket.on('disconnect',function(){
+            socket.on('disconnect', async function(){
                 // start by checking the userId and roomId are set (user has connected)
                 if(ourRoomId === -1 || ourUserId === -1){
                     socket.emit('error', {message:"SOCKET DISCONNECT ERROR #1: User must connect before disconnecting."});

@@ -42,7 +42,8 @@ export default class Chatroom extends React.Component {
             socket.on("connect",function() {
                 const data = {
                     username: temp.state.username,
-                    roomId: roomId
+                    roomId: parseInt(roomId), // user input should be validated to be a number before this
+                    auth: sessionStorage.getItem("token"),
                 }
                 socket.emit("new-user", data);
             });
