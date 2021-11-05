@@ -217,7 +217,7 @@ class Server {
                         socket.emil('error', {message:errString});
                     }else{
                         // broadcast message for our room
-                        console.log("Users: ", ourUserId + " is sending: " + msg + " for room: " + ourRoomId);
+                        console.log("Users: ", ourUsername + " is sending: " + msg + " for room: " + ourRoomId);
                         sendStr = `${user}:  ${data}`
                         socket.to(ourRoomId.toString()).emit("new-message", {message: sendStr})
                     }
