@@ -80,6 +80,10 @@ class Server {
      *      If invalid, will return -1
      */
     validateSocketToken(token_data){
+        if(!token_data){
+            return -1;
+        }
+
         const token = token_data.split(" ")[1];
         try{
             const data = jwt.verify(token, process.env.TOKEN_SECRET);
@@ -201,15 +205,22 @@ class Server {
             * Otherwise will trigger error event with error message.
             */
             socket.on('new-message', function (data)  {
-                const { msg } = data;
+                const { auth, msg } = data;    
                 // start by checking the userId and roomId are set (user has connected)
                 if(ourRoomId === -1 || ourUserId === -1){
                     socket.emit('error', {message:"SOCKET NEW-MESSAGE ERROR #1: User trying to relay message when they are not connected to a room."});
                 }else{
-                    // broadcast message for our room
-                    console.log("Users: ", ourUserId + " is sending: " + msg + " for room: " + ourRoomId);
-                    sendStr = `${user}:  ${data}`
-                    socket.to(ourRoomId.toString()).emit("new-message", {message: sendStr})
+                    const temp = validateSocketToken(auth);
+                    if (temp < 0 || temp !== ourUserId){
+                        errString = "SOCKET NEW-MESSAGE ERROR #2: Access Denied";
+                        console.log(errString);
+                        socket.emil('error', {message:errString});
+                    }else{
+                        // broadcast message for our room
+                        console.log("Users: ", ourUserId + " is sending: " + msg + " for room: " + ourRoomId);
+                        sendStr = `${user}:  ${data}`
+                        socket.to(ourRoomId.toString()).emit("new-message", {message: sendStr})
+                    }
                 }
             });
 
@@ -224,6 +235,10 @@ class Server {
                 if(ourRoomId === -1 || ourUserId === -1){
                     socket.emit('error', {message:"SOCKET DISCONNECT ERROR #1: User must connect before disconnecting."});
                 }else{
+                    // TODO: Want to use token validation to ensure that a user cannot close a connection for someone else,
+                    //       But worried that this might prevent someone with an expired token from disconnecting.
+                    //       Can we force someone to disconnect as their token expires?
+                    
                     // make db connection and remove the user from the room
                     try{
                         const client = await DbUtil.connect_client();
