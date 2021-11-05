@@ -3,6 +3,7 @@ import socketIO from "socket.io";
 import { createServer } from "http";
 import path from "path";
 import bodyParser from "body-parser";
+import jwt from "jasonwebtoken";
 
 import authRouter from "./routes/auth";
 import usersRouter from "./routes/users";
@@ -69,15 +70,38 @@ class Server {
     });*/
   }
 
-  /*
-     * Function that will handle DB issues regarding leaving a room. 
+    /*
+     * Function to validate the tocken passed to socket connection.
+     * Parameters:
+     *      token_data: token passed from socket function in the same way it is passed to backened routes from frontend.
+     *                  This means that it will be "bearer <token data>"
+     * Returns:
+     *      If valid, will return the userId
+     *      If invalid, will return -1
+     */
+    validateSocketToken(token_data){
+        if(!token_data){
+            return -1;
+        }
+
+        const token = token_data.split(" ")[1];
+        try{
+            const data = jwt.verify(token, process.env.TOKEN_SECRET);
+            const retVal = data.userId;
+        } catch (err){
+            return -1;
+        }
+    }
+
+    /*
+     * Function that will handle DB issues regarding leaving a room.
      * Very similar to the /leaveRoom backend route
-     * Parameters: 
+     * Parameters:
      *   client: client object connected to the database
      *   userId: user_id DB value for the user trying to leave a room
-     * 
+     *
      * Returns:    A Promise which wiil
-     *             Resolve with userId when a user leaves a room correctly 
+     *             Resolve with userId when a user leaves a room correctly
      *             Reject with error message if there is any error
      */
     async handleLeaveRoom(client, userId) {
@@ -120,18 +144,25 @@ class Server {
             * Otherwise will trigger error event with error message.
             */
             socket.on("new-user", function (data) {
-                // TODO: validate token, get userId from token
-                const {token, roomId} = data.body //should we be getting the token from the header?
-                // TODO: set our_userId based on the packet
-
-                // connect a client to the database
+                const {auth, roomId} = data.body //should we be getting the token from the header?
                 let client;
-                try{
-                    client = await DbUtil.connect_client()
-                } catch (err){
-                    errString = "SOCKET NEW-USER ERROR #1: Couldn't connect to database: " + err;
-                    console.log(errString)
-                    socket.emit('error', {message:errString})
+
+                const temp = validateSocketToken(auth);
+                if (temp < 0){
+                    errString = "SOCKET NEW-USER ERROR #0: Access Denied";
+                    console.log(errString);
+                    socket.emil('error', {message:errString});
+                }else{
+                    // set our_userId based on the packet
+                    ourUserId = temp;
+                    // connect a client to the database
+                    try{
+                        client = await DbUtil.connect_client()
+                    } catch (err){
+                        errString = "SOCKET NEW-USER ERROR #1: Couldn't connect to database: " + err;
+                        console.log(errString)
+                        socket.emit('error', {message:errString})
+                    }
                 }
 
                 // if we connected, check that the room exists
@@ -174,15 +205,22 @@ class Server {
             * Otherwise will trigger error event with error message.
             */
             socket.on('new-message', function (data)  {
-                const { msg } = data;
+                const { auth, msg } = data;
                 // start by checking the userId and roomId are set (user has connected)
                 if(ourRoomId === -1 || ourUserId === -1){
                     socket.emit('error', {message:"SOCKET NEW-MESSAGE ERROR #1: User trying to relay message when they are not connected to a room."});
                 }else{
-                    // broadcast message for our room
-                    console.log("Users: ", ourUserId + " is sending: " + msg + " for room: " + ourRoomId);
-                    sendStr = `${user}:  ${data}`
-                    socket.to(ourRoomId.toString()).emit("new-message", {message: sendStr})
+                    const temp = validateSocketToken(auth);
+                    if (temp < 0 || temp !== ourUserId){
+                        errString = "SOCKET NEW-MESSAGE ERROR #2: Access Denied";
+                        console.log(errString);
+                        socket.emil('error', {message:errString});
+                    }else{
+                        // broadcast message for our room
+                        console.log("Users: ", ourUsername + " is sending: " + msg + " for room: " + ourRoomId);
+                        sendStr = `${ourUsername}:  ${msg}`;
+                        socket.to(ourRoomId.toString()).emit("new-message", {message: sendStr})
+                    }
                 }
             });
 
@@ -197,6 +235,10 @@ class Server {
                 if(ourRoomId === -1 || ourUserId === -1){
                     socket.emit('error', {message:"SOCKET DISCONNECT ERROR #1: User must connect before disconnecting."});
                 }else{
+                    // TODO: Want to use token validation to ensure that a user cannot close a connection for someone else,
+                    //       But worried that this might prevent someone with an expired token from disconnecting.
+                    //       Can we force someone to disconnect as their token expires?
+
                     // make db connection and remove the user from the room
                     try{
                         const client = await DbUtil.connect_client();
