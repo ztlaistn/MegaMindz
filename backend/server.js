@@ -73,7 +73,7 @@ class Server {
     });*/
     }
 
-    
+
     handleSocketConnection() {
         const io = this.io;
         this.io.on("connection", async function (socket) {
