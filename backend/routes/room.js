@@ -1,7 +1,7 @@
 import express, { Router } from "express";
 import DbUtil from "../../database/utils/user_database_utils";
 import DbRoll from "../../database/utils/room_role_database_utils";
-import tokenAuthorization from "../middleware/tokenAuth";
+import {tokenAuthorization} from "../middleware/tokenAuth";
 
 const router = express.Router();
 
@@ -133,7 +133,7 @@ export default (app) => {
     try{
       const exists = await DbRoll.room_exists(client, roomId);
       if(!exists){
-        const errString = "ENTER ROOM CLIENT ERROR #2:" + err
+        const errString = "ENTER ROOM CLIENT ERROR #2: Noo room exists with that room code"
         client.end()
         console.log(errString);
         return res.status(400).json({message: "No room exists with that room code."});

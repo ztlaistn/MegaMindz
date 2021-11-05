@@ -16,17 +16,21 @@ export default function Chat({socket, username}) {
         console.log(currentMessage)
         if (currentMessage!== "") {
 
-            console.log(currentMessage)
+            const sendData = {
+                auth: "Bearer " + sessionStorage.getItem("token"),
+                msg: currentMessage
+            }
 
-            await socket.emit("new-message", currentMessage)
+            await socket.emit("new-message", sendData)
         }
     }
 
     useEffect(() => {
-
+        
         socket.on("new-message",(data)=>{
-
-            setMessages((list) =>[...list,data])
+            console.log(data)
+            const {message} = data
+            setMessages((list) =>[...list,message])
         })
     },[socket]);
 

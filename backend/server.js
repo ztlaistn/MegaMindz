@@ -12,6 +12,9 @@ import roomRouter from "./routes/room";
 import DbUtil from "../database/utils/user_database_utils";
 import DbRoll from "../database/utils/room_role_database_utils";
 
+import {validateSocketToken} from "./middleware/tokenAuth";
+import roomFuncs from "./roomFuncs";
+
 class Server {
     httpServer;
     app;
@@ -68,60 +71,9 @@ class Server {
     /*this.app.get("/chat/:room", (req, res) => {
       res.render("chatroom" , {roomId: req.param.room});
     });*/
-  }
-
-    /*
-     * Function to validate the tocken passed to socket connection.
-     * Parameters:
-     *      token_data: token passed from socket function in the same way it is passed to backened routes from frontend.
-     *                  This means that it will be "bearer <token data>"
-     * Returns:
-     *      If valid, will return the userId
-     *      If invalid, will return -1
-     */
-    validateSocketToken(token_data){
-        if(!token_data){
-            return -1;
-        }
-
-        const token = token_data.split(" ")[1];
-        try{
-            const data = jwt.verify(token, process.env.TOKEN_SECRET);
-            const retVal = data.userId;
-        } catch (err){
-            return -1;
-        }
     }
 
-    /*
-     * Function that will handle DB issues regarding leaving a room.
-     * Very similar to the /leaveRoom backend route
-     * Parameters:
-     *   client: client object connected to the database
-     *   userId: user_id DB value for the user trying to leave a room
-     *
-     * Returns:    A Promise which wiil
-     *             Resolve with userId when a user leaves a room correctly
-     *             Reject with error message if there is any error
-     */
-    async handleLeaveRoom(client, userId) {
-        // remove them from the room
-        try{
-            await DbUtil.set_field_for_user_id(client, userId, "curr_room", null);
-            client.end();
-            return new Promise((resolve, reject) => {
-                resolve(userId);
-            });
-        } catch (err){
-            const errString = "LEAVE ROOM CLIENT ERROR #2:" + err
-            client.end()
-            console.log(errString);
-            return new Promise((resolve, reject)=>{
-                reject(errString);
-            });
-        }
-    }
-
+    
     handleSocketConnection() {
         const io = this.io;
         this.io.on("connection", async function (socket) {
@@ -131,8 +83,7 @@ class Server {
             let ourRoomId = -1;
 
             console.log("Socket connected.");
-            console.log("custom message.");
-            socket.emit('new-message', 'Connection established with server');
+            socket.emit('new-message', {message:'Connection established with server'});
 
             /*
             * Handler function that will handle a new user event.
@@ -143,56 +94,61 @@ class Server {
             * Will emit a new user new-message to the room if success.
             * Otherwise will trigger error event with error message.
             */
+            // io.to = broadcast to everyone in room including self
+            // socket.to = broadcast to everyone in room except self
             socket.on("new-user", async function (data) {
                 const {auth, roomId} = data //should we be getting the token from the header?
-                let client;
-                let errString;
+                let socClient = null;
 
-                const tokenUID = 1; //this.validateSocketToken(auth);
+                const tokenUID = validateSocketToken(auth);
                 if (tokenUID < 0){
-                    errString = "SOCKET NEW-USER ERROR #0: Access Denied";
+                    const errString = "SOCKET NEW-USER ERROR #0: Access Denied";
                     console.log(errString);
-                    socket.emil('error', {message:errString});
+                    socket.emit('error', {message:errString});
                 }else{
                     // set our_userId based on the packet
                     ourUserId = tokenUID;
                     // connect a client to the database
                     try{
-                        client = await DbUtil.connect_client()
+                        socClient = await DbUtil.connect_client()
                     } catch (err){
-                        errString = "SOCKET NEW-USER ERROR #1: Couldn't connect to database: " + err;
+                        socClient = null
+                        const errString = "SOCKET NEW-USER ERROR #1: Couldn't connect to database: " + err;
                         console.log(errString)
                         socket.emit('error', {message:errString})
                     }
                 }
 
                 // if we connected, check that the room exists
-                if (client){
+                if (socClient){
                     try{
-                        const flag = await DbRoll.room_exists(client, roomId);
+                        const flag = await DbRoll.room_exists(socClient, roomId);
                         if(flag){
-                            row = await DbUtil.select_user_with_id(client, ourUserId)
-                            if(row.roomId === roomId){
+                            const row = await DbUtil.select_user_with_id(socClient, ourUserId);
+                            socClient.end();
+                            if(row.curr_room === roomId){
                                 // Everything was correct, set the variables and connect them to the room
-                                console.log(`${username} has connected`);
                                 ourUsername = row.username;
                                 ourRoomId = roomId;
-                                socket.to(roomId.toString()).emit('new-message', `${username} has connected`);
+                                console.log(`${ourUsername} has connected to room ${ourRoomId}`);
+                                socket.join(roomId.toString());
+                                io.to(roomId.toString()).emit('new-message', {message:`${ourUsername} has connected`});
                             }else{
-                                client.end()
-                                errString = "SOCKET NEW-USER ERROR #2: User trying to connect to socket for room they are not in.";
+                                socClient.end()
+                                let errString = "SOCKET NEW-USER ERROR #2: User trying to connect to socket for room they are not in.";
+                                errString = errString + "\nGot :" + row.curr_room + " but expecte: " + roomId;
                                 console.log(errString);
-                                socket.emil('error', {message:errString});
+                                socket.emit('error', {message:errString});
                             }
                         }else{
-                            client.end()
-                            errString = "SOCKET NEW-USER ERROR #3: User trying to connect to socket for room that doesn't exist.";
+                            socClient.end()
+                            const errString = "SOCKET NEW-USER ERROR #3: User trying to connect to socket for room that doesn't exist.";
                             console.log(errString);
                             socket.emit('error', {message:errString})
                         }
                     } catch (err){
-                        client.end()
-                        errString = "SOCKET NEW-USER ERROR #4: DB Error: " + err;
+                        socClient.end()
+                        const errString = "SOCKET NEW-USER ERROR #4: DB Error: " + err;
                         console.log(errString);
                         socket.emit('error', {message:errString})
                     }
@@ -207,20 +163,24 @@ class Server {
             */
             socket.on('new-message', async function (data)  {
                 const { auth, msg } = data;
+                console.log(auth)
+                console.log(msg)
+
                 // start by checking the userId and roomId are set (user has connected)
                 if(ourRoomId === -1 || ourUserId === -1){
                     socket.emit('error', {message:"SOCKET NEW-MESSAGE ERROR #1: User trying to relay message when they are not connected to a room."});
                 }else{
                     const tokenUID = validateSocketToken(auth);
                     if (tokenUID < 0 || tokenUID !== ourUserId){
-                        errString = "SOCKET NEW-MESSAGE ERROR #2: Access Denied";
+                        console.log(ourUserId + " not equal to " + tokenUID)
+                        const errString = "SOCKET NEW-MESSAGE ERROR #2: Access Denied";
                         console.log(errString);
-                        socket.emil('error', {message:errString});
+                        socket.emit('error', {message:errString});
                     }else{
                         // broadcast message for our room
                         console.log("Users: ", ourUsername + " is sending: " + msg + " for room: " + ourRoomId);
-                        sendStr = `${ourUsername}:  ${msg}`;
-                        socket.to(ourRoomId.toString()).emit("new-message", {message: sendStr})
+                        const sendStr = `${ourUsername}:  ${msg}`;
+                        io.to(ourRoomId.toString()).emit("new-message", {message: sendStr})
                     }
                 }
             });
@@ -241,17 +201,19 @@ class Server {
                     //       Can we force someone to disconnect as their token expires?
 
                     // make db connection and remove the user from the room
+                    let socClient;
                     try{
-                        const client = await DbUtil.connect_client();
-                        await handleLeaveRoom(client, ourUserId);
-                        client.end();
+                        socClient = await DbUtil.connect_client();
+                        await roomFuncs.handleLeaveRoom(socClient, ourUserId);
+                        socClient.end();
                         console.log(`User with id ${ourUserId} has disconnected`);
-                        socket.to(ourRoomId.toString()).emit({message:`User with id ${ourUserId} has disconnected`})
+                        io.to(ourRoomId.toString()).emit({message:`User with id ${ourUserId} has disconnected`})
                     } catch (err){
-                        client.end();
-                        errString = "SOCKET DISCONNECT ERROR #2: err";
+                        const errString = "SOCKET DISCONNECT ERROR #2: err";
+                        console.log(errString)
                         socket.emit('error', {message:errString});
                     }
+
                 }
             });
 

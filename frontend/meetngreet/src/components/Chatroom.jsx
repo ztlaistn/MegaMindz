@@ -7,6 +7,7 @@ import chatroom_character from "../assets/chatroom-character.gif";
 import Gamified from "./Gamified.jsx";
 import io from "socket.io-client";
 import Chat from "./EnterChat"
+
 let socket = io.connect("/")
 export default class Chatroom extends React.Component {
     constructor(props) {
@@ -15,6 +16,7 @@ export default class Chatroom extends React.Component {
           username: "",
           roomId: null,
           noRoomError: false,
+          ourRole: -1,
         };
     }
 
@@ -26,28 +28,68 @@ export default class Chatroom extends React.Component {
         } else {
             temp.setState({
                   username: sessionStorage.getItem("username")
-
             });
         }
+
+        const oldThis = this
 
         // get roomId
         const roomId = sessionStorage.getItem("roomId");
-
         // if no roomId, show error message to user
         if (!roomId) {
             this.setState({noRoomError: true});
-        } else {
-            this.setState({roomId: roomId});
-            // send socket new-user event only if we have both token and roomId
-            socket.on("connect",function() {
-                const data = {
-                    username: temp.state.username,
-                    roomId: parseInt(roomId), // user input should be validated to be a number before this
-                    auth: sessionStorage.getItem("token"),
+            window.alert("Error: Failed to join room, no roomID");
+        }else{
+            // oldThis.ourRole = 0
+            // console.log("Connecting to socket for room " + roomId)
+            // oldThis.setState({roomId: roomId});
+            // // send socket new-user event only if we have both token and roomId
+            // socket.on("connect",function() {
+            //     const connData = {
+            //         auth: "Bearer " + sessionStorage.getItem("token"),
+            //         roomId: parseInt(roomId) 
+            //     };
+            //     socket.emit("new-user", connData);
+            // });
+            console.log(parseInt(roomId))
+            fetch('/room/joinRoom', {
+                method: 'POST', 
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer '+ sessionStorage.getItem("token")
+                },
+                body: JSON.stringify({roomId: parseInt(roomId)})
+            }).then(
+                function(response){
+                    if(response.status !== 200){
+                        response.json().then(function(data){
+                            console.log(data);
+                            window.alert("Error: Failed to join room: " + data.message);
+                        });
+                    }else{
+                        response.json().then(function(data){
+                            oldThis.setState({ourRole: data.role, roomId: roomId});
+                            console.log("Connecting to socket for room " + roomId)
+                            // send socket new-user event only if we have both token and roomId
+                            socket.on("connect", function() {
+                                const connData = {
+                                    auth: "Bearer " + sessionStorage.getItem("token"),
+                                    roomId: parseInt(roomId) 
+                                };
+                                socket.emit("new-user", connData);
+                            });
+                        });
+                    }
                 }
-                socket.emit("new-user", data);
+            ).catch(function(err){
+                console.log('Fetch Error: -S', err);
+                oldThis.setState({ourRole: -1, roomId: null})
+                window.location.href = "/";
             });
         }
+        
+
+        
     }
 
     toHome = () => {
