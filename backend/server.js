@@ -94,14 +94,14 @@ class Server {
     }
 
     /*
-     * Function that will handle DB issues regarding leaving a room. 
+     * Function that will handle DB issues regarding leaving a room.
      * Very similar to the /leaveRoom backend route
-     * Parameters: 
+     * Parameters:
      *   client: client object connected to the database
      *   userId: user_id DB value for the user trying to leave a room
-     * 
+     *
      * Returns:    A Promise which wiil
-     *             Resolve with userId when a user leaves a room correctly 
+     *             Resolve with userId when a user leaves a room correctly
      *             Reject with error message if there is any error
      */
     async handleLeaveRoom(client, userId) {
@@ -146,7 +146,7 @@ class Server {
             socket.on("new-user", function (data) {
                 const {auth, roomId} = data.body //should we be getting the token from the header?
                 let client;
-                
+
                 const temp = validateSocketToken(auth);
                 if (temp < 0){
                     errString = "SOCKET NEW-USER ERROR #0: Access Denied";
@@ -163,7 +163,7 @@ class Server {
                         console.log(errString)
                         socket.emit('error', {message:errString})
                     }
-                }                
+                }
 
                 // if we connected, check that the room exists
                 if (client){
@@ -205,7 +205,7 @@ class Server {
             * Otherwise will trigger error event with error message.
             */
             socket.on('new-message', function (data)  {
-                const { auth, msg } = data;    
+                const { auth, msg } = data;
                 // start by checking the userId and roomId are set (user has connected)
                 if(ourRoomId === -1 || ourUserId === -1){
                     socket.emit('error', {message:"SOCKET NEW-MESSAGE ERROR #1: User trying to relay message when they are not connected to a room."});
@@ -238,7 +238,7 @@ class Server {
                     // TODO: Want to use token validation to ensure that a user cannot close a connection for someone else,
                     //       But worried that this might prevent someone with an expired token from disconnecting.
                     //       Can we force someone to disconnect as their token expires?
-                    
+
                     // make db connection and remove the user from the room
                     try{
                         const client = await DbUtil.connect_client();

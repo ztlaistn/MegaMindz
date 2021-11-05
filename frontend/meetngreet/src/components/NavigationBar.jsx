@@ -19,6 +19,7 @@ class NavigationBar extends React.Component {
     logout = () => {
         sessionStorage.removeItem("token");
         sessionStorage.removeItem("username");
+        sessionStorage.removeItem("roomId");
         window.location.href = "login";
     }
 
