@@ -66,6 +66,8 @@ class Server {
     });*/
   }
 
+  // io.to = broadcast to everyone including self
+  // socket.to = send to everyone except self
   handleSocketConnection() {
       const io = this.io;
       this.io.on("connection", function (socket) {
