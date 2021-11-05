@@ -66,10 +66,13 @@ class Server {
     });*/
   }
 
+  // io.to = broadcast to everyone including self
+  // socket.to = send to everyone except self
   handleSocketConnection() {
       const io = this.io;
       this.io.on("connection", function (socket) {
-          let user;
+          let ourUsername;
+          let roomId;
 
           //TODO: any call: validate token, get user_id from it (or maybe from the socket itself)
 
@@ -83,26 +86,31 @@ class Server {
           socket.emit('new-message', 'Connection established with server');
 
           socket.on("new-user", function (data) {
-              // save username for future use
-              user = data.username;
-              io.emit('new-message', `${user} has connected`);
-              console.log(`${user} has connected`)
+              // save Username and Room ID for future use
+              ourUsername = data.username;
+              roomId = data.roomId;
+
+              // put that socket in a specific room
+              socket.join(roomId);
+
+              // broadcast to room that this user has joined
+              io.to(roomId).emit('new-message', `${ourUsername} has connected`);
+              console.log(`${ourUsername} has connected`);
           });
 
           socket.on('new-message', function (data)  {
             const { msg } = data;
-              console.log(data);
             console.log("server received:" + data);
-            io.emit("new-message", `${user}:  ${data}`);
-          });
-          socket.on('disconnect',function(){
-            console.log('Client has disconnected');
-            io.emit("new-message", `${user} has disconnected`);
+
+            // broadcast to room user's message
+            io.to(roomId).emit("new-message", `${ourUsername}:  ${data}`);
           });
 
-     /*socket.on("join-room", (roomId, userId) => {
-       socket.join(roomId);
-       socket.emit("")});*/
+          socket.on('disconnect',function(){
+            console.log('Client has disconnected');
+            // broadcast to room that this user has left
+            io.to(roomId).emit("new-message", `${ourUsername} has disconnected`);
+          });
    });
   }
 
