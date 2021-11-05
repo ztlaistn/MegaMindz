@@ -3,6 +3,7 @@ import socketIO from "socket.io";
 import { createServer } from "http";
 import path from "path";
 import bodyParser from "body-parser";
+import jwt from "jasonwebtoken";
 
 import authRouter from "./routes/auth";
 import usersRouter from "./routes/users";
@@ -69,7 +70,26 @@ class Server {
     });*/
   }
 
-  /*
+    /*
+     * Function to validate the tocken passed to socket connection.
+     * Parameters:
+     *      token_data: token passed from socket function in the same way it is passed to backened routes from frontend.
+     *                  This means that it will be "bearer <token data>"
+     * Returns:
+     *      If valid, will return the userId
+     *      If invalid, will return -1
+     */
+    validateSocketToken(token_data){
+        const token = token_data.split(" ")[1];
+        try{
+            const data = jwt.verify(token, process.env.TOKEN_SECRET);
+            const retVal = data.userId;
+        } catch (err){
+            return -1;
+        }
+    }
+
+    /*
      * Function that will handle DB issues regarding leaving a room. 
      * Very similar to the /leaveRoom backend route
      * Parameters: 
@@ -120,19 +140,26 @@ class Server {
             * Otherwise will trigger error event with error message.
             */
             socket.on("new-user", function (data) {
-                // TODO: validate token, get userId from token
-                const {token, roomId} = data.body //should we be getting the token from the header?
-                // TODO: set our_userId based on the packet
-
-                // connect a client to the database
+                const {auth, roomId} = data.body //should we be getting the token from the header?
                 let client;
-                try{
-                    client = await DbUtil.connect_client()
-                } catch (err){
-                    errString = "SOCKET NEW-USER ERROR #1: Couldn't connect to database: " + err;
-                    console.log(errString)
-                    socket.emit('error', {message:errString})
-                }
+                
+                const temp = validateSocketToken(auth);
+                if (temp < 0){
+                    errString = "SOCKET NEW-USER ERROR #0: Access Denied";
+                    console.log(errString);
+                    socket.emil('error', {message:errString});
+                }else{
+                    // set our_userId based on the packet
+                    ourUserId = temp;
+                    // connect a client to the database
+                    try{
+                        client = await DbUtil.connect_client()
+                    } catch (err){
+                        errString = "SOCKET NEW-USER ERROR #1: Couldn't connect to database: " + err;
+                        console.log(errString)
+                        socket.emit('error', {message:errString})
+                    }
+                }                
 
                 // if we connected, check that the room exists
                 if (client){
