@@ -218,7 +218,7 @@ class Server {
                     }else{
                         // broadcast message for our room
                         console.log("Users: ", ourUsername + " is sending: " + msg + " for room: " + ourRoomId);
-                        sendStr = `${user}:  ${data}`
+                        sendStr = `${ourUsername}:  ${msg}`;
                         socket.to(ourRoomId.toString()).emit("new-message", {message: sendStr})
                     }
                 }
