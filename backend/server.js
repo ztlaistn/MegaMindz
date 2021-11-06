@@ -83,7 +83,7 @@ class Server {
             let ourRoomId = -1;
 
             console.log("Socket connected.");
-            socket.emit('new-message', {message:'Connection established with server'});
+            socket.emit('new-message', {message:'Trying to connect user to room.'});
 
             /*
             * Handler function that will handle a new user event.
@@ -99,6 +99,8 @@ class Server {
             socket.on("new-user", async function (data) {
                 const {auth, roomId} = data //should we be getting the token from the header?
                 let socClient = null;
+                console.log("in new user")
+                console.log(data)
 
                 const tokenUID = validateSocketToken(auth);
                 if (tokenUID < 0){
@@ -193,8 +195,11 @@ class Server {
             */
             socket.on('disconnect', async function(){
                 // start by checking the userId and roomId are set (user has connected)
+                console.log("trying to disconnect")
                 if(ourRoomId === -1 || ourUserId === -1){
-                    socket.emit('error', {message:"SOCKET DISCONNECT ERROR #1: User must connect before disconnecting."});
+                    const errString = "SOCKET DISCONNECT ERROR #1: User must connect before disconnecting.";
+                    console.log(errString)
+                    socket.emit('error', {message:errString});
                 }else{
                     // TODO: Want to use token validation to ensure that a user cannot close a connection for someone else,
                     //       But worried that this might prevent someone with an expired token from disconnecting.
@@ -206,8 +211,10 @@ class Server {
                         socClient = await DbUtil.connect_client();
                         await roomFuncs.handleLeaveRoom(socClient, ourUserId);
                         socClient.end();
-                        console.log(`User with id ${ourUserId} has disconnected`);
-                        io.to(ourRoomId.toString()).emit({message:`User with id ${ourUserId} has disconnected`})
+                        const endStr = `${ourUsername} has disconnected`;
+                        console.log(endStr);
+                        io.to(ourRoomId.toString()).emit("new-message",{message:endStr})
+                        socket.removeAllListeners();
                     } catch (err){
                         const errString = "SOCKET DISCONNECT ERROR #2: err";
                         console.log(errString)

@@ -1,7 +1,7 @@
 import React, {useState,useEffect} from "react";
 import "./styles/Input.css";
 import "./styles/Chatroom.css";
-import socketIOClient from "socket.io-client";
+import socketIOClient from "socket.io-client"; 
 
 import chatroom_background from "../assets/chatroom-background.jpg";
 import chatroom_character from "../assets/chatroom-character.gif";
