@@ -26,12 +26,13 @@ export default function Chat({socket, username}) {
     }
 
     useEffect(() => {
-        
-        socket.on("new-message",(data)=>{
-            console.log(data)
-            const {message} = data
-            setMessages((list) =>[...list,message])
-        })
+        if(socket){
+            socket.on("new-message",(data)=>{
+                console.log(data)
+                const {message} = data
+                setMessages((list) =>[...list,message])
+            })
+        }
     },[socket]);
 
 

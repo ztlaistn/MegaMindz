@@ -12,12 +12,14 @@ import Chat from "./EnterChat"
 export default class Chatroom extends React.Component {
     constructor(props) {
         super(props);
+        console.log("In the constructor")
         this.state = {
-            socket: io.connect("/", {forceNew: true}),
+            socket: null,
             username: "",
             roomId: null,
             noRoomError: false,
             ourRole: 0,
+            setup: false
         };
     }
 
@@ -71,6 +73,11 @@ export default class Chatroom extends React.Component {
                         });
                     }else{
                         response.json().then(function(data){
+                            if (!oldThis.state.setup){
+                                oldThis.state.socket = io.connect("/")
+                                oldThis.state.setup = true
+                            }
+
                             let socket = oldThis.state.socket;
                             console.log("socket in func: \n");
                             console.log(socket);
@@ -85,11 +92,19 @@ export default class Chatroom extends React.Component {
                                 console.log("we are connecting")
                                 socket.emit("new-user", connData);
                             });
+                            socket.on("reconnect", function() {
+                                const connData = {
+                                    auth: "Bearer " + sessionStorage.getItem("token"),
+                                    roomId: parseInt(roomId) 
+                                };
+                                console.log("we are reconnecting")
+                                socket.emit("new-user", connData);
+                            });
 
                             oldThis.setState({
                                 ourRole: data.role,
                                 username: sessionStorage.getItem("username"),
-                                roomId: roomId
+                                roomId: roomId,
                             });
                         });
                     }
@@ -100,8 +115,6 @@ export default class Chatroom extends React.Component {
                 window.location.href = "/";
             });
         }
-        
-
         
     }
 
