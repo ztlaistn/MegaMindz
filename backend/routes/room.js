@@ -14,6 +14,9 @@ export default (app) => {
   /* ---------------------------- LIST ROOM ---------------------------- */
   // Lists all the usernames of people in the given room
   // This one doesn't need to validate a login, as it doesn't really matter.
+  // This will take a room ID and return a list of users in this format: [[username, global user id, role in this room],[username, global user id, role in this room]]
+  //
+  //add auth
   router.post('/listRoom', async function (req, res) {
     const { roomId } = req.body;
     let client;
@@ -28,11 +31,20 @@ export default (app) => {
     }
 
     try{
-	  const user_list = await DbUtil.get_rows_in_room(client, roomId, "username");
+	  const user_list = await DbUtil.get_rows_in_room(client, roomId, "user_id");
+    var listOfUsers = [];
+    //console.log(user_list);
+    for (var user of user_list) {
+      const username = await DbUtil.select_user_with_id(client, user);
+      const role = await DbRoll.find_user_in_room_roll(client,user,roomId);
+      listOfUsers.push([user, username.username, role.role]);
+    }
+    //console.log(listOfUsers);
+    //const user_id = await DbUtil.get_rows_in_room(client, roomId, "user_id");
       //Note: this user_list could be empty
-	  console.log("Number of users in room " + roomId + " is " + user_list.length);
+	  //console.log("Number of users in room " + roomId + " is " + user_list.length);
 	  client.end();
-	  return res.status(200).json({user_list: user_list});
+	  return res.status(200).json({user_list: listOfUsers});
     } catch(err){
       const errString = "LIST ROOM CLIENT ERROR #2: " + err;
       client.end();
