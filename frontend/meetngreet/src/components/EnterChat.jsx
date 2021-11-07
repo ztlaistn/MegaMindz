@@ -6,7 +6,7 @@ import socketIOClient from "socket.io-client";
 import chatroom_background from "../assets/chatroom-background.jpg";
 import chatroom_character from "../assets/chatroom-character.gif";
 
-export default function Chat({socket, username}) {
+export default function Chat({socket, username, handleSocketError}) {
 
     const [connected, setConnected] = useState(false);
     const [currentMessage, setCurrentMessage] = useState("")
@@ -23,11 +23,15 @@ export default function Chat({socket, username}) {
     }
 
     useEffect(() => {
-
         socket.on("new-message",(data)=>{
-
             setMessages((list) =>[...list,data])
-        })
+        });
+
+        socket.on("error", (data)=>{
+            // update state in parent component
+            const msg = "An error occured with the chatroom";
+            handleSocketError(msg);
+        });
     },[socket]);
 
 
