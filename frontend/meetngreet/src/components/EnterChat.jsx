@@ -13,7 +13,6 @@ export default function Chat({socket, username}) {
     const [messages, setMessages] = useState([])
 
     const sendMessage = async () =>{
-        console.log(currentMessage)
         if (currentMessage!== "") {
 
             const sendData = {
@@ -22,13 +21,13 @@ export default function Chat({socket, username}) {
             }
 
             await socket.emit("new-message", sendData)
+            document.getElementById("message").value = ""
         }
     }
 
     useEffect(() => {
         if(socket){
             socket.on("new-message",(data)=>{
-                console.log(data)
                 const {message} = data
                 setMessages((list) =>[...list,message])
             })

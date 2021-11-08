@@ -99,8 +99,6 @@ class Server {
             socket.on("new-user", async function (data) {
                 const {auth, roomId} = data //should we be getting the token from the header?
                 let socClient = null;
-                console.log("in new user")
-                console.log(data)
 
                 const tokenUID = validateSocketToken(auth);
                 if (tokenUID < 0){
@@ -165,8 +163,6 @@ class Server {
             */
             socket.on('new-message', async function (data)  {
                 const { auth, msg } = data;
-                console.log(auth)
-                console.log(msg)
 
                 // start by checking the userId and roomId are set (user has connected)
                 if(ourRoomId === -1 || ourUserId === -1){

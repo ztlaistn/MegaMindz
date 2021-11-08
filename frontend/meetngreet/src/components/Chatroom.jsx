@@ -12,7 +12,6 @@ import Chat from "./EnterChat"
 export default class Chatroom extends React.Component {
     constructor(props) {
         super(props);
-        console.log("In the constructor")
         this.state = {
             socket: null,
             username: "",
@@ -34,15 +33,10 @@ export default class Chatroom extends React.Component {
         // get roomId
         const roomId = sessionStorage.getItem("roomId");
 
-        console.log("Socket before fetch")
-        console.log(oldThis.state.socket)
-
-        console.log(roomId)
-
         // if no roomId (or roomId is not number), show error message to user
         if (!roomId || !(+roomId)) {
             this.setState({noRoomError: true});
-            window.alert("Error: Failed to join room, no roomID");
+            //window.alert("Error: Failed to join room, no roomID");
         }else{
             // console.log("Connecting to socket for room " + roomId)
             // oldThis.setState({roomId: roomId});
@@ -79,8 +73,6 @@ export default class Chatroom extends React.Component {
                             }
 
                             let socket = oldThis.state.socket;
-                            console.log("socket in func: \n");
-                            console.log(socket);
 
                             console.log("Connecting to socket for room " + roomId)
                             // send socket new-user event only if we have both token and roomId
@@ -92,14 +84,15 @@ export default class Chatroom extends React.Component {
                                 console.log("we are connecting")
                                 socket.emit("new-user", connData);
                             });
-                            socket.on("reconnect", function() {
-                                const connData = {
-                                    auth: "Bearer " + sessionStorage.getItem("token"),
-                                    roomId: parseInt(roomId) 
-                                };
-                                console.log("we are reconnecting")
-                                socket.emit("new-user", connData);
-                            });
+                            
+                            // socket.on("reconnect", function() {
+                            //     const connData = {
+                            //         auth: "Bearer " + sessionStorage.getItem("token"),
+                            //         roomId: parseInt(roomId) 
+                            //     };
+                            //     console.log("we are reconnecting")
+                            //     socket.emit("new-user", connData);
+                            // });
 
                             oldThis.setState({
                                 ourRole: data.role,
@@ -138,8 +131,6 @@ export default class Chatroom extends React.Component {
                 </div>
             )
         }
-        console.log("socket in render: \n");
-        console.log(this.state.socket);
                 
         return (
             <div class="chatroom-container">
