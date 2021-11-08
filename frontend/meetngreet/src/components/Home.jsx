@@ -11,7 +11,7 @@ export default class Home extends React.Component {
         super(props);
         this.state = {
           username: "",
-            roomId:0
+            roomId: ""
         };
     }
     change_Handler(field, e) {
@@ -89,45 +89,50 @@ export default class Home extends React.Component {
         event.preventDefault();
         let temp = this
         console.log(temp.state.roomId)
-        if(sessionStorage.getItem("token") == null){
-            window.location.href = "login";
-        } else {
-            console.log(sessionStorage)
-            //console.log("This is us2: ", this)
-            fetch("/room/joinRoom", {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + sessionStorage.getItem("token")
-                },
-                body: JSON.stringify({
-                       roomId:temp.state.roomId
-                })
-            }).then(
-                function(response){
-
-                    if(response.status !== 200){
-                        response.json().then(function(data) {
-                            console.log(data);
-                            window.alert("Error: Failed to Create Room : " + data.message);
-                        });
-                    }else{
-                        //console.log("This is us4: ", this);
-                        response.json().then(function(data) {
-                            console.log(temp.state.roomId);
-                            console.log(data);
-                            sessionStorage.setItem("roomId", temp.state.roomId);
-                            window.location.href = "/chatroom";
-
-                        });
+        if (!(+temp.state.roomId)){
+            window.alert("Error: Room number entered is not a valid number (digits 0-9)");
+            window.location.href = "/";
+        }else{
+            if(sessionStorage.getItem("token") == null){
+                window.location.href = "login";
+            } else {
+                console.log(sessionStorage)
+                //console.log("This is us2: ", this)
+                fetch("/room/joinRoom", {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+                    },
+                    body: JSON.stringify({
+                           roomId:parseInt(temp.state.roomId)
+                    })
+                }).then(
+                    function(response){
+    
+                        if(response.status !== 200){
+                            response.json().then(function(data) {
+                                console.log(data);
+                                window.alert("Error: Failed to Join Room : " + data.message);
+                            });
+                        }else{
+                            //console.log("This is us4: ", this);
+                            response.json().then(function(data) {
+                                console.log(temp.state.roomId);
+                                console.log(data);
+                                sessionStorage.setItem("roomId", temp.state.roomId);
+                                window.location.href = "/chatroom";
+    
+                            });
+                        }
                     }
-                }
-            ).catch(function(err) {
-                console.log('Fetch Error :-S', err);
-                window.location.href = "/";
-            });
+                ).catch(function(err) {
+                    console.log('Fetch Error :-S', err);
+                    window.location.href = "/";
+                });
+            }
         }
-
+        
     };
 
 

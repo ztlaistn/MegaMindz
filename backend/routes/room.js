@@ -1,7 +1,7 @@
 import express, { Router } from "express";
 import DbUtil from "../../database/utils/user_database_utils";
 import DbRoll from "../../database/utils/room_role_database_utils";
-import tokenAuthorization from "../middleware/tokenAuth";
+import {tokenAuthorization} from "../middleware/tokenAuth";
 
 const router = express.Router();
 
@@ -115,7 +115,6 @@ export default (app) => {
     /* When this returns, we expect the user to call connect and join on our socket conenction for this room.
       They will have to pass their token so that we can look them up, and verify that they are in that room.
       Then they will be calling our socket function whenever they want to send a message.
-      This will also require the token.
       */
 
     // if all else passed and we got here, return to frontend
@@ -146,7 +145,7 @@ export default (app) => {
     try{
       const exists = await DbRoll.room_exists(client, roomId);
       if(!exists){
-        const errString = "ENTER ROOM CLIENT ERROR #2:" + err
+        const errString = "ENTER ROOM CLIENT ERROR #2: No room exists with that room code"
         client.end()
         console.log(errString);
         return res.status(400).json({message: "No room exists with that room code."});
@@ -199,7 +198,6 @@ export default (app) => {
     /* When this returns, we expect the user to call connect and join on our socket conenction for this room.
        They will have to pass their token so that we can look them up, and verify that they are in that room.
        Then they will be calling our socket function whenever they want to send a message.
-       This will also require the token.
        */
 
     client.end();
@@ -207,6 +205,8 @@ export default (app) => {
   });
 
 
+  /* This is also very similar to a function that will be called in socket disconnect.  
+     So this backend route will probably not be used much.  But there is no reason to remove it */
   /* ---------------------------- LEAVE ROOM ---------------------------- */
   // handle leaveRoom request
   router.post('/leaveRoom', tokenAuthorization, async function (req, res) {
@@ -230,13 +230,11 @@ export default (app) => {
       await DbUtil.set_field_for_user_id(client, userId, "curr_room", null);
 
     } catch (err){
-      const errString = "ENTER ROOM CLIENT ERROR #2:" + err
+      const errString = "LEAVE ROOM CLIENT ERROR #2:" + err
         client.end()
         console.log(errString);
-        return res.status(400).json({message:"Unable to add user to this room"});
+        return res.status(400).json({message:"Unable to remove user from this room"});
     }
-
-    // TODO: For our socket connection, this will be turned into a function and inserted into the disconnect call, rather than being an endpoint
 
     client.end();
     return res.status(200).json({message: "User removed from room"});
