@@ -28,14 +28,15 @@ export default class ChatroomUsers extends React.Component {
             });
         }
 
+        const oldThis = this;
         // get roomId
         const roomId = sessionStorage.getItem("roomId");
 
         // if no roomId, show error message to user
         if (!roomId || !(+roomId)) {
-            this.setState({noRoomError: true});
+            oldThis.setState({noRoomError: true});
         } else {
-            this.setState({roomId: roomId});
+            oldThis.setState({roomId: roomId});
             fetch('/room/listRoomAdmin', {
                 method: 'POST', // or 'PUT'
                 headers: {
@@ -53,7 +54,7 @@ export default class ChatroomUsers extends React.Component {
                 }else{
                     response.json().then(function(data){
                         console.log(data)
-                        this.setState({
+                        oldThis.setState({
                             users: data,
                             usersLoaded: true
                         });
@@ -86,14 +87,14 @@ export default class ChatroomUsers extends React.Component {
             )
         }
         if (!usersLoaded) {
-        return (
-            
-            <div class="chatroom-container">
-                <div class="chatroom">
-                    Please wait...
+            return (
+                
+                <div class="chatroom-container">
+                    <div class="chatroom">
+                        Please wait...
+                    </div>
                 </div>
-            </div>
-        );
+            );
         }
         else {
             return (
