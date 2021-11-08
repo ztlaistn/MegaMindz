@@ -6,7 +6,7 @@ import {Link} from 'react-router-dom';
 class NavigationBar extends React.Component {
     constructor(props) {
         super(props);
-    }
+    };
 
     toLogin = () => {
         window.location.href = "login";
@@ -14,6 +14,10 @@ class NavigationBar extends React.Component {
 
     toHome = () => {
         window.location.href = "/";
+    };
+
+    toChatroom = () => {
+        window.location.href = "/chatroom";
     };
 
     logout = () => {
@@ -27,12 +31,64 @@ class NavigationBar extends React.Component {
         window.location.href = "/";
     };
 
+    userSettings = () => {
+        window.location.href = "/user-account";
+    };
+
+    callMeeting = () => {
+        window.location.href = "/";
+    };
+
+    chatroomUsers = () => {
+        window.location.href = "/chatroom-users";
+    };
+
+    toggleAudio = () => {
+        window.location.href = "/";
+    };
+
     openRoomMenu = () => {
         window.location.href = "/";
     };
 
     leaveRoom = () => {
         window.location.href = "/";
+    };
+
+    listUsersInRoom = () => {
+        const data = { roomId: sessionStorage.getItem("roomId")};
+        fetch('/room/listRoom', {
+            method: 'POST', // or 'PUT'
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+            }).then(
+                function(response) {
+                  if (response.status !== 200) {
+                    console.log('Looks like there was a problem. Status Code: ' +
+                      response.status);
+                      response.json().then(function(data) {
+                        console.log(data);
+                        window.alert("Error: Something went wrong " + response.status);
+                      });
+                    return;
+                  }
+                  // Examine the text in the response
+                  response.json().then(function(data) {
+                    window.alert(data.user_list);
+                    //document.getElementById("testy").onclick = window.alert("test");
+                    //document.getElementById("testy").onclick = function() {
+                    //    {this.callMeeting}
+                    //}
+
+                  });
+                }
+              )
+              .catch(function(err) {
+                console.log('Fetch Error :-S', err);
+              });
+        
     };
 
     showLogin = () => {
@@ -47,17 +103,37 @@ class NavigationBar extends React.Component {
                     </li>
                 </div>
             );
-        }else if(window.location.pathname === "/chatroom2"){
+        }else if(window.location.pathname === "/chatroom"){
             return(
                 <div className="chatroom-bar">
                     <li>
-                        <input type="button" value="Room Code: ABC123" className="button-primary"/>
+                        <input type="button" value={"Room Code: " + sessionStorage.getItem("roomId")} className="button-primary"/>
                     </li>
                     <li>
                         <input type="button" value="Toggle Mute" className="button-chatroom" onClick={this.toggleMute}/>
                     </li>
                     <li>
-                        <input type="button" value="Menu" className="button-chatroom" onClick={this.openRoomMenu}/>
+                        <input type="button" value="Menu" class="button-chatroom-dropdown"/>
+                        <div class="dropdown-content">
+                            <div class="dropdown-option" onClick={this.userSettings}>User Settings</div>
+                            <div class="dropdown-option" onClick={this.callMeeting}>Call a Meeting</div>
+                            <div class="dropdown-option" onClick={this.toggleMute}>Toggle Audio</div>
+                            <div class="dropdown-option" onClick={this.chatroomUsers}>Chatroom Users</div>
+                        </div>
+                    </li>
+                    <li>
+                        <input type="button" value="Leave Room" className="button-chatroom-leave" onClick={this.leaveRoom}/>
+                    </li>
+                </div>
+            );
+        }else if(window.location.pathname === "/chatroom-users"){
+            return(
+                <div className="chatroom-bar">
+                    <li>
+                        <input type="button" value={"Room Code: " + sessionStorage.getItem("roomId")} className="button-primary"/>
+                    </li>
+                    <li>
+                        <input type="button" value="Return to Room" className="button-chatroom" onClick={this.toChatroom}/>
                     </li>
                     <li>
                         <input type="button" value="Leave Room" className="button-chatroom-leave" onClick={this.leaveRoom}/>
@@ -89,27 +165,18 @@ class NavigationBar extends React.Component {
     }
 
     render() {
-        if(window.location.pathname === "/chatroom2"){
-            return (
-                <div className="navigation-bar">
-                    {this.showLogin()}
+        return (
+            <div className="navigation-bar">
+                <div className="logo-bar">
+                    <li>
+                        <Link to="/" >
+                            <img src={logo} title="Home" className="logo"/>
+                        </Link>
+                    </li>
                 </div>
-            );
-        }
-        else {
-            return (
-                <div className="navigation-bar">
-                    <div className="logo-bar">
-                        <li>
-                            <Link to="/" >
-                                <img src={logo} title="Home" className="logo"/>
-                            </Link>
-                        </li>
-                    </div>
-                    {this.showLogin()}
-                </div>
-            );
-        }
+                {this.showLogin()}
+            </div>
+        );
     }
 }
 export default NavigationBar;
