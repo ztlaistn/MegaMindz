@@ -1,8 +1,6 @@
 // Functions for creating a user in the database (and looking one up)
 const {Pool, Client} = require('pg');
 
-/* TODO: At the moment, these functions return specific values on failure.  It might be better to have them throw an error and call them with try/catches.
-
 /**
 * Function makes a client to our database with our given enviroment variables.  
 * Then connects it and returns the client object.
