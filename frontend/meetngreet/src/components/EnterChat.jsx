@@ -10,21 +10,19 @@ export default function Chat({socket, username, handleSocketError}) {
 
     const [connected, setConnected] = useState(false);
     const [currentMessage, setCurrentMessage] = useState("")
-    const [messages, setMessages] = useState([])
+    const [messages, setMessages] = useState([]);
 
     const sendMessage = async () =>{
-        console.log(currentMessage)
         if (currentMessage!== "") {
-
-            console.log(currentMessage)
-
-            await socket.emit("new-message", currentMessage)
+            await socket.emit("new-message", currentMessage);
         }
     }
 
     useEffect(() => {
         socket.on("new-message",(data)=>{
-            setMessages((list) =>[...list,data])
+            setMessages((list) =>[...list,data]);
+            const msgView = document.getElementById("chat-messages");
+            msgView.scrollTop = msgView.scrollHeight;
         });
 
         socket.on("error", (data)=>{
@@ -42,9 +40,8 @@ export default function Chat({socket, username, handleSocketError}) {
                 <div class="chatroom-card-frame">
                     <div id="chat-messages" className="chat-messages">
                         {messages.map((message_data)=>{
-                            return <p>{message_data}</p>
+                            return <p class="m" >{message_data}</p>
                         })}
-
                     </div>
 
                     <input type="text" required id="message" name="message" placeholder="Start Chatting..." onChange={(event)=>
