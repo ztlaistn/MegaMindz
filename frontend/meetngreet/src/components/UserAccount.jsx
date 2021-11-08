@@ -59,8 +59,9 @@ export default class UserAccount extends React.Component {
                     });
                 }else{
                     response.json().then(function(data) {
-                        window.alert("Changes have been saved!");
                         console.log(data);
+                        window.alert("Changes have been saved!");
+                        window.location.href = "/";
                     });
                 }
             }
@@ -97,9 +98,10 @@ export default class UserAccount extends React.Component {
                         //console.log("This is us4: ", this);
                         response.json().then(function(data) {
                             console.log(data);
+                            var trimmedDOB = data.dob.substring(0, 10);
                             temp_this.setState({
                                 full_name: data.full_name,
-                                dob: data.dob,
+                                dob: trimmedDOB,
                                 location: data.location,
                                 status: data.status,
                                 skills: data.skills

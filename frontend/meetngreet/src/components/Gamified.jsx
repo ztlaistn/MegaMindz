@@ -32,12 +32,6 @@ const game = {
             //Add character
             this.character = this.add.sprite(window.innerWidth / 2, window.innerHeight / 2, 'character');
 
-            //character movement detection (debug)
-            this.key_W = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
-            this.key_A = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
-            this.key_S = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
-            this.key_D = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
-
             //Event listener for clicking on background to move
             //ensures that clicking outside the game doesn't move the character
             this.background.on('pointerdown', function () {
@@ -45,20 +39,6 @@ const game = {
             });
         },
         update: function() {
-            //Defines character movement (debug)
-            if(this.key_W.isDown){
-                this.character.y -= 5;
-            }
-            if(this.key_A.isDown){
-                this.character.x -= 5;
-            }
-            if(this.key_S.isDown){
-                this.character.y += 5;
-            }
-            if(this.key_D.isDown){
-                this.character.x += 5;
-            }
-
             //Define character movement (click to move)
             //Check if mouse pointer was clicked or screen was tapped
             if(!this.input.activePointer.isDown && isClicking == true) {
