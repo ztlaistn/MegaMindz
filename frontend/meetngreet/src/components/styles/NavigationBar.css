@@ -105,6 +105,23 @@
     background-color: #173D9F;
 }
 
+.button-chatroom-dropdown {
+    width: fit-content;
+    background-color: #58cfea;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: 1px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: Work Sans;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 21px;
+    line-height: 25px;
+    transition-duration: 0.4s;
+}
+
 .dropdown-content .dropdown-option {
     color: white;
     padding: 12px 16px;
