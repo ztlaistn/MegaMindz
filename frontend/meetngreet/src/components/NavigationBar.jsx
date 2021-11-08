@@ -28,7 +28,8 @@ class NavigationBar extends React.Component {
     }
 
     toggleMute = () => {
-        window.location.href = "/";
+        //TODO: placeholder
+        window.alert("Not currently supported.");
     };
 
     userSettings = () => {
@@ -36,7 +37,8 @@ class NavigationBar extends React.Component {
     };
 
     callMeeting = () => {
-        window.location.href = "/";
+        //TODO: placeholder
+        window.alert("Not currently supported.");
     };
 
     chatroomUsers = () => {
@@ -44,11 +46,13 @@ class NavigationBar extends React.Component {
     };
 
     toggleAudio = () => {
-        window.location.href = "/";
+        //TODO: placeholder
+        window.alert("Not currently supported.");
     };
 
     openRoomMenu = () => {
-        window.location.href = "/";
+        //TODO: placeholder
+        window.alert("Not currently supported.");
     };
 
     leaveRoom = () => {
@@ -118,7 +122,8 @@ class NavigationBar extends React.Component {
                             <div class="dropdown-option" onClick={this.userSettings}>User Settings</div>
                             <div class="dropdown-option" onClick={this.callMeeting}>Call a Meeting</div>
                             <div class="dropdown-option" onClick={this.toggleMute}>Toggle Audio</div>
-                            <div class="dropdown-option" onClick={this.chatroomUsers}>Chatroom Users</div>
+                            <div class="dropdown-option" onClick={this.listUsersInRoom}>Users in Room</div>
+                            <div class="dropdown-option" onClick={this.chatroomUsers}>Admin Options</div>
                         </div>
                     </li>
                     <li>
