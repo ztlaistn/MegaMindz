@@ -14,9 +14,6 @@ export default (app) => {
   /* ---------------------------- LIST ROOM ---------------------------- */
   // Lists all the usernames of people in the given room
   // This one doesn't need to validate a login, as it doesn't really matter.
-  // This will take a room ID and return a list of users in this format: [[username, global user id, role in this room],[username, global user id, role in this room]]
-  //
-  //add auth
   router.post('/listRoom', async function (req, res) {
     const { roomId } = req.body;
     let client;
@@ -31,22 +28,59 @@ export default (app) => {
     }
 
     try{
-	  const user_list = await DbUtil.get_rows_in_room(client, roomId, "user_id");
-    var listOfUsers = [];
-    //console.log(user_list);
-    for (var user of user_list) {
-      const username = await DbUtil.select_user_with_id(client, user);
-      const role = await DbRoll.find_user_in_room_roll(client,user,roomId);
-      listOfUsers.push([user, username.username, role.role]);
-    }
-    //console.log(listOfUsers);
-    //const user_id = await DbUtil.get_rows_in_room(client, roomId, "user_id");
-      //Note: this user_list could be empty
-	  //console.log("Number of users in room " + roomId + " is " + user_list.length);
-	  client.end();
-	  return res.status(200).json({user_list: listOfUsers});
+      const user_list = await DbUtil.get_rows_in_room(client, roomId, "username");
+        //Note: this user_list could be empty
+      console.log("Number of users in room " + roomId + " is " + user_list.length);
+      client.end();
+      return res.status(200).json({user_list: user_list});
     } catch(err){
       const errString = "LIST ROOM CLIENT ERROR #2: " + err;
+      client.end();
+      return res.status(400).json({message: errString});
+    }
+  });
+
+  /* ---------------------------- LIST ROOM ADMIN ---------------------------- */
+  // Returns a list of users in the room by username, userId, and role in that room
+  router.post('/listRoomAdmin', tokenAuthorization, async function (req, res) {
+    const { userId, roomId } = req.body;
+    let client;
+
+    try {
+      // connect client
+      client = await DbUtil.connect_client();
+    }catch (err) {
+      const errString = "LIST ROOM ADMIN CLIENT ERROR #1:" + err
+      console.log(errString);
+      return res.status(400).json({message: errString});
+    }
+
+    // make sure this user is moderator or higher in the room
+    try{
+      const roleRow = await DbRoll.find_user_in_room_roll(client, userId, roomId)
+      if (roleRow.role < 2){
+        const errString = "LIST ROOM ADMIN ERROR #2: Not authorized for these actions.";
+        client.end();
+        return res.status(400).json({message: errString});
+      }
+    } catch (err){
+      const errString = "LIST ROOM ADMIN ERROR #3: " + err;
+      client.end();
+      return res.status(400).json({message: errString});
+    }
+
+    try{
+	    const user_list = await DbUtil.get_rows_in_room(client, roomId, "user_id");
+      var listOfUsers = [];
+      for (var user of user_list) {
+        const username = await DbUtil.select_user_with_id(client, user);
+        const role = await DbRoll.find_user_in_room_roll(client,user,roomId);
+        listOfUsers.push([user, username.username, role.role]);
+      }
+	    client.end();
+	    return res.status(200).json({user_list: listOfUsers});
+    } catch(err){
+      const errString = "LIST ROOM CLIENT ERROR #3: " + err;
       client.end();
       return res.status(400).json({message: errString});
     }

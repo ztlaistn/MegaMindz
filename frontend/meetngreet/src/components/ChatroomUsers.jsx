@@ -28,35 +28,43 @@ export default class ChatroomUsers extends React.Component {
             });
         }
 
+        const oldThis = this;
         // get roomId
         const roomId = sessionStorage.getItem("roomId");
 
         // if no roomId, show error message to user
-        if (!roomId) {
-            this.setState({noRoomError: true});
+        if (!roomId || !(+roomId)) {
+            oldThis.setState({noRoomError: true});
         } else {
-            this.setState({roomId: roomId});
-            fetch('/room/listRoom', {
+            oldThis.setState({roomId: roomId});
+            fetch('/room/listRoomAdmin', {
                 method: 'POST', // or 'PUT'
                 headers: {
                 'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + sessionStorage.getItem("token")
                 },
                 body: JSON.stringify({ roomId: sessionStorage.getItem("roomId")}),
-                })
-                                .then((res) => res.json())
-                                .then((data) => {
-                                    console.log(data);
-                                    this.setState({
-                                        users: data,
-                                        usersLoaded: true
-                                    });
-                                }).catch(function(err) {
-                                    console.log('Fetch Error :-S', err);
-                                  });
+            }).then(function(response){
+                if(response.status !== 200){
+                    response.json().then(function(data) {
+                        console.log(data);
+                        window.alert("Error: Failed to Enter Admin Options Page : " + data.message);
+                        window.location.href = "/chatroom";
+                    });
+                }else{
+                    response.json().then(function(data){
+                        console.log(data)
+                        oldThis.setState({
+                            users: data,
+                            usersLoaded: true
+                        });
+                    });
+                }
+            }).catch(function(err) {
+                console.log('Fetch Error :-S', err);
+            });
         }
 
-        
-        
     }
 
     toHome = () => {
@@ -79,14 +87,14 @@ export default class ChatroomUsers extends React.Component {
             )
         }
         if (!usersLoaded) {
-        return (
-            
-            <div class="chatroom-container">
-                <div class="chatroom">
-                    Please wait...
+            return (
+                
+                <div class="chatroom-container">
+                    <div class="chatroom">
+                        Please wait...
+                    </div>
                 </div>
-            </div>
-        );
+            );
         }
         else {
             return (
