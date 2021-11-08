@@ -73,6 +73,7 @@ class Server {
       this.io.on("connection", function (socket) {
           let ourUsername;
           let roomId;
+          var players = {};
 
           //TODO: any call: validate token, get user_id from it (or maybe from the socket itself)
 
@@ -96,12 +97,26 @@ class Server {
               // broadcast to room that this user has joined
               io.to(roomId).emit('new-message', `${ourUsername} has connected`);
               console.log(`${ourUsername} has connected`);
+
+              //Phaser Sockets
+              // create a new user and add it to our users object
+              let playerInfo = {
+                x: 0,
+                y: 150,
+                playerId: ourUsername
+              };
+              players[data.roomID] = {
+                ourUsername: playerInfo
+              };
+              // send the users object to the new player
+              io.emit('currentUsers', players[data.roomID]);
+              // update all other users of the new user
+              io.emit('newUser', players[data.roomID][ourUsername]);
           });
 
           socket.on('new-message', function (data)  {
             const { msg } = data;
             console.log("server received:" + data);
-
             // broadcast to room user's message
             io.to(roomId).emit("new-message", `${ourUsername}:  ${data}`);
           });
