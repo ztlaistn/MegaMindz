@@ -17,9 +17,13 @@ export default class Chatroom extends React.Component {
             username: "",
             roomId: null,
             noRoomError: false,
+            socketError: false,
+            socketErrorMsg: "",
             ourRole: 0,
             setup: false
         };
+        // do not let scoping in function to change
+        this.handleSocketError = this.handleSocketError.bind(this);
     }
 
     componentDidMount() {
@@ -111,33 +115,39 @@ export default class Chatroom extends React.Component {
         
     }
 
-    toHome = () => {
-        window.location.href = "home";
+    handleSocketError(msg) {
+        this.setState({
+            socketError: true,
+            socketErrorMsg: msg
+        });
     };
 
-
+    toHome = () => {
+        window.location.href = "/home";
+    };
 
     sendMessage = () => {
         window.location.href = "/";
     };
 
     render() {
-        console.log(this.state.noRoomError);
-        if (this.state.noRoomError) {
+        const isError = this.state.noRoomError || this.state.socketError;
+        if (isError) {
+            // to do: plug in socket error to second msg
+            const errorMsg = this.state.noRoomError ? 'Error: You have not joined a valid room' : this.state.socketErrorMsg;
             return (
                 <div class="chatroom-container">
-                    <h1 class="title-font">Error: You have not joined a valid room</h1>
+                    <h1 class="title-font">{errorMsg}</h1>
                     <input type="button" value="Return to Home" className="button-primary" onClick={this.toHome}/>
                 </div>
-            )
+            );
         }
                 
         return (
             <div class="chatroom-container">
-                <h1 class="title-font">Room Code:  <b>{this.state.roomId}</b></h1>
                 <div class="chatroom">
                     <Gamified/>
-                    <Chat socket={this.state.socket} username={this.username} />
+                    <Chat socket={this.state.socket} username={this.username} handleSocketError={this.handleSocketError} />
                 </div>
             </div>
         );
