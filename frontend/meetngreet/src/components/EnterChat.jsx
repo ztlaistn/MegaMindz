@@ -1,7 +1,7 @@
 import React, {useState,useEffect} from "react";
 import "./styles/Input.css";
 import "./styles/Chatroom.css";
-import socketIOClient from "socket.io-client";
+import socketIOClient from "socket.io-client"; 
 
 import chatroom_background from "../assets/chatroom-background.jpg";
 import chatroom_character from "../assets/chatroom-character.gif";
@@ -13,21 +13,25 @@ export default function Chat({socket, username}) {
     const [messages, setMessages] = useState([])
 
     const sendMessage = async () =>{
-        console.log(currentMessage)
         if (currentMessage!== "") {
 
-            console.log(currentMessage)
+            const sendData = {
+                auth: "Bearer " + sessionStorage.getItem("token"),
+                msg: currentMessage
+            }
 
-            await socket.emit("new-message", currentMessage)
+            await socket.emit("new-message", sendData)
+            document.getElementById("message").value = ""
         }
     }
 
     useEffect(() => {
-
-        socket.on("new-message",(data)=>{
-
-            setMessages((list) =>[...list,data])
-        })
+        if(socket){
+            socket.on("new-message",(data)=>{
+                const {message} = data
+                setMessages((list) =>[...list,message])
+            })
+        }
     },[socket]);
 
 
