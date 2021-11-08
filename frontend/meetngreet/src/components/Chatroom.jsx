@@ -50,7 +50,7 @@ export default class Chatroom extends React.Component {
     }
 
     toHome = () => {
-        window.location.href = "home";
+        window.location.href = "/home";
     };
 
 
@@ -72,7 +72,6 @@ export default class Chatroom extends React.Component {
 
         return (
             <div class="chatroom-container">
-                <h1 class="title-font">Room Code:  <b>{this.state.roomId}</b></h1>
                 <div class="chatroom">
                     <Gamified/>
                     <Chat socket={socket} username={this.username} />
