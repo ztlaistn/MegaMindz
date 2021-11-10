@@ -23,7 +23,7 @@ class roomPosition{
      *  Position objects that are returned do not contain visable status, since they will always be visable after this.
      */
     newPlayer(uid){
-        const temp_pos = this.pos_dict[uid];
+        let temp_pos = this.pos_dict[uid];
         if(temp_pos){
             temp_pos.visable = true;
             return {x:temp_pos.x, y:temp_pos.y};
@@ -45,7 +45,7 @@ class roomPosition{
      *  If they are not in the room, or not visable, returns null
      */
     movePlayer(uid, movementData){
-        const temp_pos = this.pos_dict[uid];
+        let temp_pos = this.pos_dict[uid];
         if(temp_pos && temp_pos.visable){
             const new_pos_obj = {x:movementData.x, y:movementData.y, visable:true};
             temp_pos = new_pos_obj;
@@ -67,7 +67,7 @@ class roomPosition{
      *  If they didn't have any data in the room, returns false
      */
     leftRoom(uid){
-        const temp_pos = this.pos_dict[uid];
+        let temp_pos = this.pos_dict[uid];
         if(temp_pos){
             temp_pos.visable = false;
             return true;
@@ -79,12 +79,14 @@ class roomPosition{
     /**
      * Returns a list of object with all the visable users in the room.
      * Since they are all visable, will be returned as objects that are just x and y position
+     * Also returns the user Id as part of this data.  So the final objects in the list are:
+     * {userId, x, y}
      */
     returnVisable(){
         let temp_list = [];
         for(key in this.pos_dict){
             if (this.pos_dict[key].visable){
-                temp_list.push({x:this.pos_dict[key].x, y:this.pos_dict[key].y})
+                temp_list.push({userId:key, x:this.pos_dict[key].x, y:this.pos_dict[key].y})
             }
         }
         return temp_list;

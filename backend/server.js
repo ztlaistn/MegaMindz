@@ -81,6 +81,8 @@ class Server {
 
     handleSocketConnection() {
         const io = this.io;
+        const oldThis = this
+
         this.io.on("connection", async function (socket) {
             // variables for this connection
             let ourUsername;
@@ -89,6 +91,7 @@ class Server {
 
             console.log("Socket connected.");
             socket.emit('new-message', {message:'Trying to connect user to room.'});
+
 
             /*
             * Handler function that will handle a new user event.
@@ -119,7 +122,7 @@ class Server {
                 if (setupFlag){
                     // If we are here, we can assume we setup correctly
                     // Can do any actions needed for once a user connects to a room
-                    roomFuncs.newUserRoomPosition(io, socket, ourRoomId, ourUserId, positionDict)
+                    roomFuncs.newUserRoomPosition(io, socket, ourRoomId, ourUserId, ourUsername, oldThis.positionDict)
                 }
             });
 
@@ -140,7 +143,7 @@ class Server {
             */
             socket.on('new-move', function(data){
                 const {auth, move} = data;
-                roomFuncs.relayPositionMove(io, socket, ourRoomId, ourUserId, ourUsername, positionDict, move);
+                roomFuncs.relayPositionMove(io, socket, ourRoomId, ourUserId, ourUsername, oldThis.positionDict, move, auth);
             });
 
             /*
@@ -159,7 +162,7 @@ class Server {
 
                 // if we got here, we removed the user from the room in the database just fine
                 // now we can remove (make not visible) them from the position dict and let everyone else in the room know.
-                roomFuncs.disconnectRoomPosition(io, socket, ourUserId, ourRoomId, ourUsername, positionDict);
+                roomFuncs.disconnectRoomPosition(io, socket, ourUserId, ourRoomId, ourUsername, oldThis.positionDict);
             });
 
         });
