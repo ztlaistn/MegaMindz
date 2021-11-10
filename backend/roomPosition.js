@@ -20,36 +20,36 @@ class roomPosition{
      *  Returns:
      *  If they are already in the room, simply returns their current position and sets their visable to true.
      *  If they are new, returns thier new position which will be the starting values
+     *  Position objects that are returned do not contain visable status, since they will always be visable after this.
      */
     newPlayer(uid){
         const temp_pos = this.pos_dict[uid];
         if(temp_pos){
             temp_pos.visable = true;
-            return temp_pos;
+            return {x:temp_pos.x, y:temp_pos.y};
         }else{
             const new_pos_obj = {x:START_X, y:START_Y, visable:true};
             temp_pos = new_pos_obj;
-            return new_pos_obj;
+            return {x:new_pos_obj.x, y:new_pos_obj.y};
         }
     }
 
     /**
      *  Updates the position value for a player in the room
      *  Parameters:
-     *      uid:    The userId of the player being moved
-     *      new_x:  Their new x value
-     *      new_y:  Their new y value
+     *      uid:            The userId of the player being moved
+     *      movementData:   Object with x and y value denoting user's new position
      *  
      *  Returns:
-     *  Then returns their new position object
-     *  If they are not in the room, returns null
+     *  Then returns their new position object (minus the visable, since they will always be visable if they are moving)
+     *  If they are not in the room, or not visable, returns null
      */
-    movePlayer(uid, new_x, new_y){
+    movePlayer(uid, movementData){
         const temp_pos = this.pos_dict[uid];
-        if(temp_pos){
-            const new_pos_obj = {x:new_x, y:new_y, visable:true};
+        if(temp_pos && temp_pos.visable){
+            const new_pos_obj = {x:movementData.x, y:movementData.y, visable:true};
             temp_pos = new_pos_obj;
-            return new_pos_obj;
+            return {x:new_pos_obj.x, y:new_pos_obj.y};
         }else{
             console.log("Trying to move player that is not in the room");
             return null;
@@ -63,27 +63,28 @@ class roomPosition{
      *      uid:        The userId for the player being modified
      *  
      *  Returns:
-     *  Their position object after modification if success.
-     *  If they didn't have any data in the room, returns null
+     *  true after modification if success.
+     *  If they didn't have any data in the room, returns false
      */
     leftRoom(uid){
         const temp_pos = this.pos_dict[uid];
         if(temp_pos){
             temp_pos.visable = false;
-            return temp_pos;
+            return true;
         }else{
-            return null;
+            return false;
         }
     }
 
     /**
-     * Returns a list of object with all the visable users in the room
+     * Returns a list of object with all the visable users in the room.
+     * Since they are all visable, will be returned as objects that are just x and y position
      */
     returnVisable(){
         let temp_list = [];
         for(key in this.pos_dict){
             if (this.pos_dict[key].visable){
-                temp_list.push(this.pos_dict[key])
+                temp_list.push({x:this.pos_dict[key].x, y:this.pos_dict[key].y})
             }
         }
         return temp_list;

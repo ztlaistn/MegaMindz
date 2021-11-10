@@ -50,7 +50,7 @@ async function handleLeaveRoom(client, userId) {
  */
 function newChatMessageEvent(io, socket, ourUserId, ourRoomId, ourUsername, auth, msg){
     // start by checking the userId and roomId are set (user has connected)
-    if(ourRoomId === -1 || ourUserId === -1){
+    if(ourRoomId < 0 || ourUserId < 0){
         socket.emit('error', {message:"SOCKET NEW-MESSAGE ERROR #1: User trying to relay message when they are not connected to a room."});
     }else{
         const tokenUID = validateSocketToken(auth);
@@ -84,7 +84,7 @@ function newChatMessageEvent(io, socket, ourUserId, ourRoomId, ourUsername, auth
 async function socketDisconnectEvent(io, socket, ourUserId, ourRoomId, ourUsername){
     // start by checking the userId and roomId are set (user has connected)
     console.log("trying to disconnect")
-    if(ourRoomId === -1 || ourUserId === -1){
+    if(ourRoomId < 0 || ourUserId < 0){
         const errString = "SOCKET DISCONNECT ERROR #1: User must connect before disconnecting.";
         return new Promise((resolve, reject) =>{
             reject(errString);
@@ -217,14 +217,19 @@ async function handleNewChatSocketUser(io, socket, auth, roomId){
  *      posDict:    position dictionary object for the server
  */
 function newUserRoomPosition(io, socket, roomId, userId, username, posDict){
-    if(position_dict[roomId]){
+    if(posDict[roomId]){
         console.log("UserId: " + userId + " adding position to room " + roomId);
         const pos_obj = posDict[roomId].newPlayer(ourUserId);
+        const out_pos_obj = {x:pos_obj.x, y:pos_obj.y}
 
         //TODO: change the name of the evenet once we coordinate with frontend
         //TODO: might want to change pos_obj so that it isn't storing the userId, or maybe its time to stop caring about giving the user the ID
         //TODO: in the future, we will want to look up that user in the database and send their avatar selection as well
-        io.to(roomId.toString()).emit('new-charater-event', pos_obj)
+        
+        // Note: This is a socket emit since we want the message to not go back to the sender.
+        // This is because we will have an update all event made for them.
+        socket.to(roomId.toString()).emit('new-charater-event', out_pos_obj)
+        socket.emit('update-all-positions', posDict[roomId].returnVisable())
     }else{
         // This is the first person to join this room 
         console.log("UserId: " + userId + " first person to add position to room " + roomId);
@@ -235,9 +240,47 @@ function newUserRoomPosition(io, socket, roomId, userId, username, posDict){
         //TODO: change the name of the evenet once we coordinate with frontend
         //TODO: might want to change pos_obj so that it isn't storing the userId, or maybe its time to stop caring about giving the user the ID
         //TODO: in the future, we will want to look up that user in the database and send their avatar selection as well
-        io.to(roomId.toString()).emit('new-charater-event', pos_obj)
+        
+        // Note: This is a socket emit since we want the message to not go back to the sender.
+        // This is because we will have an update all event made for them.
+        socket.to(roomId.toString()).emit('new-charater-event', pos_obj)
+        socket.emit('update-all-positions', posDict[roomId].returnVisable())
     }
 }
+
+
+/**
+ * Function that will handle relaying a movement update to all other users in the room
+ * Parameters:
+ *      io:             io object the client connected on 
+ *      socket:         socket object they are sending the movement over
+ *      ourRoomId:      the room they are broadcasting their send to 
+ *      ourUsername:    the username of the sender
+ *      positionDict:   the server position dict keeping track of player locations
+ *      movementData:   Object with x and y value denoting user's new position
+ */
+function relayPositionMove(io, socket, ourRoomId, ourUserID, ourUsername, positionDict, movementData, auth){
+    // start by checking the userId and roomId are set (user has connected)
+    if(ourRoomId < 0 || ourUserId < 0){
+        socket.emit('error', {message:"SOCKET NEW-MOVE ERROR #1: User trying to relay movement data when they are not connected to a room."});
+    }else if(!movementData || !(+movementData.x) || !(+movementData.y)){
+        socket.emit('error', {message:"SOCKET NEW-MOVE ERROR #2: Impropper move data sent.  Should be obj with x and y value."})
+    }else{
+        // Make sure they are who they claim to be 
+        const tokenUID = validateSocketToken(auth);
+        if (tokenUID < 0 || tokenUID !== ourUserId){
+            console.log(ourUserId + " not equal to " + tokenUID + " in new move")
+            const errString = "SOCKET NEW-MOVE ERROR #3: Access Denied";
+            console.log(errString);
+            socket.emit('error', {message:errString});
+        }else{
+            // update this move in the position dict
+            positionDict[ourRoomId].movePlayer(ourUserID, movementData)
+
+            // broadcast message for our room, not back to the sender though
+            socket.to(ourRoomId.toString()).emit("new-move", movementData)
+        }    
+    }
 
 
 module.exports = {
