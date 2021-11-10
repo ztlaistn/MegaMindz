@@ -292,5 +292,6 @@ module.exports = {
     newChatMessageEvent,
     socketDisconnectEvent,
     handleNewChatSocketUser,
-    newUserRoomPosition
+    newUserRoomPosition,
+    relayPositionMove
 };

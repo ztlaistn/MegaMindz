@@ -134,6 +134,14 @@ class Server {
                 roomFuncs.newChatMessageEvent(io, socket, ourUserId, ourRoomId, ourUsername, auth, msg);
             });
 
+            /*
+            * Handler that will handle a new move relay event
+            * Will emit this data to others in the room 
+            */
+            socket.on('new-move', function(data){
+                const {auth, move} = data;
+                roomFuncs.relayPositionMove(io, socket, ourRoomId, ourUserId, ourUsername, positionDict, move);
+            });
 
             /*
             * Handler function that will handle a disconnect event.
