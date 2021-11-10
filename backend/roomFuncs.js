@@ -112,7 +112,7 @@ async function socketDisconnectEvent(io, socket, ourUserId, ourRoomId, ourUserna
             const endStr = `${ourUsername} has disconnected`;
             console.log(endStr);
             io.to(ourRoomId.toString()).emit("new-message",{message:endStr})
-            socket.removeAllListeners();
+            //socket.removeAllListeners();
             return new Promise((resolve, reject) =>{
                 resolve();
             })
@@ -287,11 +287,35 @@ function relayPositionMove(io, socket, ourRoomId, ourUserID, ourUsername, positi
     }
 }
 
+
+/**
+ * Function handles a user's position data when they disconnect
+ * Doesn't actually remove their data from the roomPosition object, changes it to not visible
+ * This function assumes that we have already called socketDiconnectEvent, and thus, this function
+ * doesn't do the normal error checking, since it is already done in that function
+ * 
+ * Parameters:
+ *      io:             io object they are connected to 
+ *      socket:         socket that is being disconnected from 
+ *      ourUserId:      User Id of the user who disconnected
+ *      ourRoomId:      Room Id the user was in before they disconnected
+ *      ourUsername:    Username of the user who is disconnecting
+ *      positionDict:   The server position dictionary that keeps track of everyone's positions
+ */
+function disconnectRoomPosition(io, socket, ourUserID, ourRoomId, ourUsername, positionDict){
+    positionDict[ourRoomId].leftRoom();
+
+    //TODO: Figure out the actual name for this event on client side
+    // This is only a socket emit rather than an io because it doesn't go back to the sender
+    socket.to(ourRoomId.toString()).emit('member-left-room', {userId:ourUserID})
+}
+
 module.exports = {
     handleLeaveRoom,
     newChatMessageEvent,
     socketDisconnectEvent,
     handleNewChatSocketUser,
     newUserRoomPosition,
-    relayPositionMove
+    relayPositionMove,
+    disconnectRoomPosition
 };

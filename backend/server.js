@@ -156,6 +156,10 @@ class Server {
                     console.log(err);
                     socket.emit('error', {message:err})
                 }
+
+                // if we got here, we removed the user from the room in the database just fine
+                // now we can remove (make not visible) them from the position dict and let everyone else in the room know.
+                roomFuncs.disconnectRoomPosition(io, socket, ourUserId, ourRoomId, ourUsername, positionDict);
             });
 
         });
