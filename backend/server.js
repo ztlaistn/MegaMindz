@@ -14,6 +14,7 @@ import DbRoll from "../database/utils/room_role_database_utils";
 
 import {validateSocketToken} from "./middleware/tokenAuth";
 import roomFuncs from "./roomFuncs";
+import roomPosition from "./roomPosition";
 
 class Server {
     httpServer;
@@ -22,6 +23,10 @@ class Server {
 
     PORT = process.env.PORT || 5001;
     HOST = '0.0.0.0';
+
+    // Initializes a dictionary to keep track of player positions in the rooms
+    // Dict will hold key value pairs where the key is the roomId and the value is a roomPosition object
+    positionDict = {}
 
     constructor() {
         this.initialize();
@@ -112,8 +117,9 @@ class Server {
                 }
 
                 if (setupFlag){
-                    // TODO: if we are here, we can assume we setup correctly
-                    // Can put any code here for future functions on socket connection
+                    // If we are here, we can assume we setup correctly
+                    // Can do any actions needed for once a user connects to a room
+                    roomFuncs.newUserRoomPosition(io, socket, ourRoomId, ourUserId, positionDict)
                 }
             });
 

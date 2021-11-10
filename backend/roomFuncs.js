@@ -3,6 +3,8 @@
 const DbUtil = require("../database/utils/user_database_utils");
 const DbRoll = require("../database/utils/room_role_database_utils");
 const {tokenAuthorization, validateSocketToken} =  require("./middleware/tokenAuth");
+const {roomPosition} = require("./roomPosition");
+
 
 /*
 * Function that will handle DB issues regarding leaving a room.
@@ -199,9 +201,49 @@ async function handleNewChatSocketUser(io, socket, auth, roomId){
 }
 
 
+/**
+ * Function handles adding a new user too the room position dict.
+ * Will also handle any socket emits needed for this, including errors.
+ * This function also assumes they have been connected to the text chat socket already,
+ * This means that this function will not do error checking regarding if the user is actually in the room,
+ * since this is expected of the text chat socet funtion.
+ * 
+ * Parameters:
+ *      io:         io object for this connection
+ *      socket:     socket the user has connected on 
+ *      roomId:     room number that the user has joined
+ *      userId:     User Id of ther user that is joining
+ *      username:   username of the user that has joined
+ *      posDict:    position dictionary object for the server
+ */
+function newUserRoomPosition(io, socket, roomId, userId, username, posDict){
+    if(position_dict[roomId]){
+        console.log("UserId: " + userId + " adding position to room " + roomId);
+        const pos_obj = position_dict[roomId].newPlayer(ourUserId);
+
+        //TODO: change the name of the evenet once we coordinate with frontend
+        //TODO: might want to change pos_obj so that it isn't storing the userId, or maybe its time to stop caring about giving the user the ID
+        //TODO: in the future, we will want to look up that user in the database and send their avatar selection as well
+        io.to(roomId.toString()).emit('new-charater-event', pos_obj)
+    }else{
+        // This is the first person to join this room 
+        console.log("UserId: " + userId + " first person to add position to room " + roomId);
+
+        position_dict[roomId] = new roomPosition();
+        const pos_obj = position_dict[roomId].newPlayer(userId);
+
+        //TODO: change the name of the evenet once we coordinate with frontend
+        //TODO: might want to change pos_obj so that it isn't storing the userId, or maybe its time to stop caring about giving the user the ID
+        //TODO: in the future, we will want to look up that user in the database and send their avatar selection as well
+        io.to(roomId.toString()).emit('new-charater-event', pos_obj)
+    }
+}
+
+
 module.exports = {
     handleLeaveRoom,
     newChatMessageEvent,
     socketDisconnectEvent,
-    handleNewChatSocketUser
+    handleNewChatSocketUser,
+    newUserRoomPosition
 };
