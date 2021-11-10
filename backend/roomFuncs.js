@@ -279,13 +279,13 @@ function relayPositionMove(io, socket, ourRoomId, ourUserID, ourUsername, positi
             socket.emit('error', {message:errString});
         }else{
             // update this move in the position dict
-            positionDict[ourRoomId].movePlayer(ourUserID, movementData)
+            positionDict[ourRoomId].movePlayer(ourUserID, movementData);
 
             // broadcast message for our room, not back to the sender though
-            socket.to(ourRoomId.toString()).emit("new-move", movementData)
+            socket.to(ourRoomId.toString()).emit("new-move", movementData);
         }    
     }
-
+}
 
 module.exports = {
     handleLeaveRoom,
