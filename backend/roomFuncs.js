@@ -262,9 +262,13 @@ function newUserRoomPosition(io, socket, roomId, userId, username, posDict){
 function relayPositionMove(io, socket, ourRoomId, ourUserID, ourUsername, positionDict, movementData, auth){
     // start by checking the userId and roomId are set (user has connected)
     if(ourRoomId < 0 || ourUserId < 0){
-        socket.emit('error', {message:"SOCKET NEW-MOVE ERROR #1: User trying to relay movement data when they are not connected to a room."});
+        const errString = "SOCKET NEW-MOVE ERROR #1: User trying to relay movement data when they are not connected to a room.";
+        console.log(errString);
+        socket.emit('error', {message:errString});
     }else if(!movementData || !(+movementData.x) || !(+movementData.y)){
-        socket.emit('error', {message:"SOCKET NEW-MOVE ERROR #2: Impropper move data sent.  Should be obj with x and y value."})
+        const errString = "SOCKET NEW-MOVE ERROR #2: Impropper move data sent.  Should be obj with x and y value.";
+        console.log(errString);
+        socket.emit('error', {message:errString});
     }else{
         // Make sure they are who they claim to be 
         const tokenUID = validateSocketToken(auth);
