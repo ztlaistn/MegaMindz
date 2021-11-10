@@ -219,7 +219,7 @@ async function handleNewChatSocketUser(io, socket, auth, roomId){
 function newUserRoomPosition(io, socket, roomId, userId, username, posDict){
     if(position_dict[roomId]){
         console.log("UserId: " + userId + " adding position to room " + roomId);
-        const pos_obj = position_dict[roomId].newPlayer(ourUserId);
+        const pos_obj = posDict[roomId].newPlayer(ourUserId);
 
         //TODO: change the name of the evenet once we coordinate with frontend
         //TODO: might want to change pos_obj so that it isn't storing the userId, or maybe its time to stop caring about giving the user the ID
@@ -229,8 +229,8 @@ function newUserRoomPosition(io, socket, roomId, userId, username, posDict){
         // This is the first person to join this room 
         console.log("UserId: " + userId + " first person to add position to room " + roomId);
 
-        position_dict[roomId] = new roomPosition();
-        const pos_obj = position_dict[roomId].newPlayer(userId);
+        posDict[roomId] = new roomPosition();
+        const pos_obj = posDict[roomId].newPlayer(userId);
 
         //TODO: change the name of the evenet once we coordinate with frontend
         //TODO: might want to change pos_obj so that it isn't storing the userId, or maybe its time to stop caring about giving the user the ID
