@@ -14,6 +14,7 @@ import DbRoll from "../database/utils/room_role_database_utils";
 
 import {validateSocketToken} from "./middleware/tokenAuth";
 import roomFuncs from "./roomFuncs";
+import roomPosition from "./roomPosition";
 
 class Server {
     httpServer;
@@ -22,6 +23,10 @@ class Server {
 
     PORT = process.env.PORT || 5001;
     HOST = '0.0.0.0';
+
+    // Initializes a dictionary to keep track of player positions in the rooms
+    // Dict will hold key value pairs where the key is the roomId and the value is a roomPosition object
+    positionDict = {}
 
     constructor() {
         this.initialize();
@@ -76,6 +81,8 @@ class Server {
 
     handleSocketConnection() {
         const io = this.io;
+        const oldThis = this
+
         this.io.on("connection", async function (socket) {
             // variables for this connection
             let ourUsername;
@@ -84,6 +91,7 @@ class Server {
 
             console.log("Socket connected.");
             socket.emit('new-message', {message:'Trying to connect user to room.'});
+
 
             /*
             * Handler function that will handle a new user event.
@@ -112,8 +120,9 @@ class Server {
                 }
 
                 if (setupFlag){
-                    // TODO: if we are here, we can assume we setup correctly
-                    // Can put any code here for future functions on socket connection
+                    // If we are here, we can assume we setup correctly
+                    // Can do any actions needed for once a user connects to a room
+                    roomFuncs.newUserRoomPosition(io, socket, ourRoomId, ourUserId, ourUsername, oldThis.positionDict)
                 }
             });
 
@@ -128,6 +137,14 @@ class Server {
                 roomFuncs.newChatMessageEvent(io, socket, ourUserId, ourRoomId, ourUsername, auth, msg);
             });
 
+            /*
+            * Handler that will handle a new move relay event
+            * Will emit this data to others in the room 
+            */
+            socket.on('new-move', function(data){
+                const {auth, move} = data;
+                roomFuncs.relayPositionMove(io, socket, ourRoomId, ourUserId, ourUsername, oldThis.positionDict, move, auth);
+            });
 
             /*
             * Handler function that will handle a disconnect event.
@@ -142,6 +159,10 @@ class Server {
                     console.log(err);
                     socket.emit('error', {message:err})
                 }
+
+                // if we got here, we removed the user from the room in the database just fine
+                // now we can remove (make not visible) them from the position dict and let everyone else in the room know.
+                roomFuncs.disconnectRoomPosition(io, socket, ourUserId, ourRoomId, ourUsername, oldThis.positionDict);
             });
 
         });
