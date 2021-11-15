@@ -265,7 +265,6 @@ function relayPositionMove(io, socket, ourUserId, ourRoomId, ourUsername, posDic
         console.log(errString);
         socket.emit('error', {message:errString});
     }else if(!movementData || !(+movementData.x) || !(+movementData.y)){
-        console.log("movement data: ", movementData)
         const errString = "SOCKET NEW-MOVE ERROR #2: Impropper move data sent.  Should be obj with x and y value.";
         console.log(errString);
         socket.emit('error', {message:errString});

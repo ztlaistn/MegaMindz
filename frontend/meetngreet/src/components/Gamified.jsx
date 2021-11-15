@@ -106,7 +106,7 @@ export default function Gamified({socket, username}) {
                 var x = this.character.x;
                 var y = this.character.y;
                 if (this.character.oldPosition && (x !== this.character.oldPosition.x || y !== this.character.oldPosition.y)) {
-                  socket.emit('new-move', { x: this.character.x, y: this.character.y});
+                  socket.emit('new-move', {auth: "Bearer " + sessionStorage.getItem("token"), move: { x: this.character.x, y: this.character.y}});
                 }
             }
         }
