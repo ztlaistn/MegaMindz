@@ -2,8 +2,8 @@
 
 
 // Start positions for the characters when they join the room
-START_X = 10
-START_Y = 10
+START_X = 200
+START_Y = 200
 
 class roomPosition{
     // This dict will keep track of the positions of the people in this room
