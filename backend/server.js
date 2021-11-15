@@ -143,7 +143,7 @@ class Server {
             */
             socket.on('new-move', function(data){
                 const {auth, move} = data;
-                roomFuncs.relayPositionMove(io, socket, ourRoomId, ourUserId, ourUsername, oldThis.positionDict, move, auth);
+                roomFuncs.relayPositionMove(io, socket, ourUserId, ourRoomId, ourUsername, oldThis.positionDict, move, auth);
             });
 
             /*

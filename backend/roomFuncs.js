@@ -83,7 +83,6 @@ function newChatMessageEvent(io, socket, ourUserId, ourRoomId, ourUsername, auth
  */
 async function socketDisconnectEvent(io, socket, ourUserId, ourRoomId, ourUsername){
     // start by checking the userId and roomId are set (user has connected)
-    console.log("trying to disconnect")
     if(ourRoomId < 0 || ourUserId < 0){
         const errString = "SOCKET DISCONNECT ERROR #1: User must connect before disconnecting.";
         return new Promise((resolve, reject) =>{
@@ -219,30 +218,31 @@ async function handleNewChatSocketUser(io, socket, auth, roomId){
 function newUserRoomPosition(io, socket, roomId, userId, username, posDict){
     if(posDict[roomId]){
         console.log("UserId: " + userId + " adding position to room " + roomId);
-        const pos_obj = posDict[roomId].newPlayer(userId);
-        const out_pos_obj = {x:pos_obj.x, y:pos_obj.y}
+        const out_pos_obj = posDict[roomId].newPlayer(userId, username);
 
         //TODO: change the name of the evenet once we coordinate with frontend
         //TODO: in the future, we will want to look up that user in the database and send their avatar selection as well
         
         // Note: This is a socket emit since we want the message to not go back to the sender.
         // This is because we will have an update all event made for them.
-        socket.to(roomId.toString()).emit('new-charater-event', out_pos_obj)
-        socket.emit('update-all-positions', posDict[roomId].returnVisable())
+        socket.to(roomId.toString()).emit('new-character-event', out_pos_obj);
+        // Note: this WILL inlcude the user that just joined
+        socket.emit('update-all-positions', posDict[roomId].returnVisable());
     }else{
         // This is the first person to join this room 
         console.log("UserId: " + userId + " first person to add position to room " + roomId);
 
         posDict[roomId] = new roomPosition();
-        const pos_obj = posDict[roomId].newPlayer(userId);
+        const out_pos_obj = posDict[roomId].newPlayer(userId, username);
 
         //TODO: change the name of the evenet once we coordinate with frontend
         //TODO: in the future, we will want to look up that user in the database and send their avatar selection as well
         
         // Note: This is a socket emit since we want the message to not go back to the sender.
         // This is because we will have an update all event made for them.
-        socket.to(roomId.toString()).emit('new-charater-event', pos_obj)
-        socket.emit('update-all-positions', posDict[roomId].returnVisable())
+        socket.to(roomId.toString()).emit('new-charater-event', out_pos_obj);
+        // Note: this WILL inlcude the user that just joined
+        socket.emit('update-all-positions', posDict[roomId].returnVisable());
     }
 }
 
@@ -252,23 +252,25 @@ function newUserRoomPosition(io, socket, roomId, userId, username, posDict){
  * Parameters:
  *      io:             io object the client connected on 
  *      socket:         socket object they are sending the movement over
+ *      ourUserId:      UserId of the player moving
  *      ourRoomId:      the room they are broadcasting their send to 
  *      ourUsername:    the username of the sender
- *      posDict:   the server position dict keeping track of player locations
+ *      posDict:        the server position dict keeping track of player locations
  *      movementData:   Object with x and y value denoting user's new position
  */
-function relayPositionMove(io, socket, ourRoomId, ourUserID, ourUsername, posDict, movementData, auth){
+function relayPositionMove(io, socket, ourUserId, ourRoomId, ourUsername, posDict, movementData, auth){
     // start by checking the userId and roomId are set (user has connected)
     if(ourRoomId < 0 || ourUserId < 0){
         const errString = "SOCKET NEW-MOVE ERROR #1: User trying to relay movement data when they are not connected to a room.";
         console.log(errString);
         socket.emit('error', {message:errString});
     }else if(!movementData || !(+movementData.x) || !(+movementData.y)){
+        console.log("movement data: ", movementData)
         const errString = "SOCKET NEW-MOVE ERROR #2: Impropper move data sent.  Should be obj with x and y value.";
         console.log(errString);
         socket.emit('error', {message:errString});
     }else{
-        const moveDataOut = {s:movementData.x, y:movementData.y, userId: ourUserID}
+        const moveDataOut = {s:movementData.x, y:movementData.y, userId:ourUserId, username:ourUsername}
         // Make sure they are who they claim to be 
         const tokenUID = validateSocketToken(auth);
         if (tokenUID < 0 || tokenUID !== ourUserId){
@@ -278,7 +280,7 @@ function relayPositionMove(io, socket, ourRoomId, ourUserID, ourUsername, posDic
             socket.emit('error', {message:errString});
         }else{
             // update this move in the position dict
-            posDict[ourRoomId].movePlayer(ourUserID, moveDataOut);
+            posDict[ourRoomId].movePlayer(ourUserId, moveDataOut);
 
             // broadcast message for our room, not back to the sender though
             socket.to(ourRoomId.toString()).emit("new-move", moveDataOut);
@@ -301,12 +303,12 @@ function relayPositionMove(io, socket, ourRoomId, ourUserID, ourUsername, posDic
  *      ourUsername:    Username of the user who is disconnecting
  *      posDict:   The server position dictionary that keeps track of everyone's positions
  */
-function disconnectRoomPosition(io, socket, ourUserID, ourRoomId, ourUsername, posDict){
-    posDict[ourRoomId].leftRoom();
+function disconnectRoomPosition(io, socket, ourUserId, ourRoomId, ourUsername, posDict){
+    posDict[ourRoomId].leftRoom(ourUserId);
 
     //TODO: Figure out the actual name for this event on client side
     // This is only a socket emit rather than an io because it doesn't go back to the sender
-    socket.to(ourRoomId.toString()).emit('member-left-room', {userId:ourUserID})
+    socket.to(ourRoomId.toString()).emit('member-left-room', {userId:ourUserId, username:ourUsername});
 }
 
 module.exports = {
