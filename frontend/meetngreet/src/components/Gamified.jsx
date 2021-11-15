@@ -53,6 +53,10 @@ export default function Gamified({socket, username}) {
                     })
                 });
 
+                socket.on('update-all-positions', function(player) {
+                    console.log(player);
+                });
+
                 //Updates the movement of characters on the local screen
                 socket.on('new-move', function(player) {
                     console.log(player);
