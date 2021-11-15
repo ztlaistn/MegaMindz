@@ -83,7 +83,47 @@ class Server {
         const io = this.io;
         const oldThis = this
 
+        const users = {};
+        const socketToRoom = {};
+
         this.io.on("connection", async function (socket) {
+            
+        socket.on("join room", roomID => {
+            if (users[roomID]) {
+                /*
+                const length = users[roomID].length;
+                if (length === 4) {
+                    socket.emit("room full");
+                    return;
+                }
+                */
+                users[roomID].push(socket.id);
+            } else {
+                users[roomID] = [socket.id];
+            }
+            socketToRoom[socket.id] = roomID;
+            const usersInThisRoom = users[roomID].filter(id => id !== socket.id);
+
+            socket.emit("all users", usersInThisRoom);
+        });
+
+        socket.on("sending signal", payload => {
+            io.to(payload.userToSignal).emit('user joined', { signal: payload.signal, callerID: payload.callerID });
+        });
+
+        socket.on("returning signal", payload => {
+            io.to(payload.callerID).emit('receiving returned signal', { signal: payload.signal, id: socket.id });
+        });
+
+        socket.on('disconnect', () => {
+            const roomID = socketToRoom[socket.id];
+            let room = users[roomID];
+            if (room) {
+                room = room.filter(id => id !== socket.id);
+                users[roomID] = room;
+            }
+        });
+            /*
             // variables for this connection
             let ourUsername;
             let ourUserId = -1;
@@ -92,7 +132,7 @@ class Server {
             console.log("Socket connected.");
             socket.emit('new-message', {message:'Trying to connect user to room.'});
 
-
+            */
             /*
             * Handler function that will handle a new user event.
             * Parameters:
@@ -104,6 +144,7 @@ class Server {
             */
             // io.to = broadcast to everyone in room including self
             // socket.to = broadcast to everyone in room except self
+            /*
             socket.on("new-user", async function (data) {
                 const {auth, roomId} = data //should we be getting the token from the header?
 
@@ -125,6 +166,7 @@ class Server {
                     roomFuncs.newUserRoomPosition(io, socket, ourRoomId, ourUserId, ourUsername, oldThis.positionDict)
                 }
             });
+            */
 
 
             /*
@@ -132,25 +174,30 @@ class Server {
             * Will emit the message to everyone in the room if the user is in a room.
             * Otherwise will trigger error event with error message.
             */
+           /*
             socket.on('new-message', function (data)  {
                 const { auth, msg } = data;
                 roomFuncs.newChatMessageEvent(io, socket, ourUserId, ourRoomId, ourUsername, auth, msg);
             });
+            */
 
             /*
             * Handler that will handle a new move relay event
             * Will emit this data to others in the room 
             */
+           /*
             socket.on('new-move', function(data){
                 const {auth, move} = data;
                 roomFuncs.relayPositionMove(io, socket, ourUserId, ourRoomId, ourUsername, oldThis.positionDict, move, auth);
             });
+            */
 
             /*
             * Handler function that will handle a disconnect event.
             * Will emit a disconnect new-message to the room if success.
             * Otherwise will trigger error event with error message.
             */
+            /*
             socket.on('disconnect', async function(){
                 // start by checking the userId and roomId are set (user has connected)
                 try{
@@ -164,7 +211,7 @@ class Server {
                 // now we can remove (make not visible) them from the position dict and let everyone else in the room know.
                 roomFuncs.disconnectRoomPosition(io, socket, ourUserId, ourRoomId, ourUsername, oldThis.positionDict);
             });
-
+            */
         });
     }
 
