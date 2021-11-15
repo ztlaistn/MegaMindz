@@ -7,7 +7,7 @@ START_Y = 200
 
 class roomPosition{
     // This dict will keep track of the positions of the people in this room
-    // The key will be a userId, the value will be an object ({x: something, y: something, username: something,visable: T/F})
+    // The key will be a userId, the value will be an object ({x: something, y: something, username: something, visable: T/F})
     // The visable value denotes if they are currently in the room.  This way, we can store players positions even when the leave
     // So that when they join back, they are in the same position
     pos_dict = {}
@@ -29,8 +29,8 @@ class roomPosition{
             temp_pos.visable = true;
             return {userId:uid, x:temp_pos.x, y:temp_pos.y, username:user};
         }else{
-            const new_pos_obj = {x:START_X, y:START_Y, visable:true};
-            temp_pos = new_pos_obj;
+            const new_pos_obj = {x:START_X, y:START_Y, username:user, visable:true};
+            this.pos_dict[uid] = new_pos_obj;
             return {userId:uid, x:new_pos_obj.x, y:new_pos_obj.y, username:user};
         }
     }
@@ -85,7 +85,7 @@ class roomPosition{
      */
     returnVisable(){
         let temp_list = [];
-        for(key in this.pos_dict){
+        for(let key in this.pos_dict){
             let temp_pos = this.pos_dict[key];
             if (temp_pos.visable){
                 temp_list.push({userId:key, x:temp_pos.x, y:temp_pos.y, username:temp_pos.username})

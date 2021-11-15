@@ -83,7 +83,6 @@ function newChatMessageEvent(io, socket, ourUserId, ourRoomId, ourUsername, auth
  */
 async function socketDisconnectEvent(io, socket, ourUserId, ourRoomId, ourUsername){
     // start by checking the userId and roomId are set (user has connected)
-    console.log("trying to disconnect")
     if(ourRoomId < 0 || ourUserId < 0){
         const errString = "SOCKET DISCONNECT ERROR #1: User must connect before disconnecting.";
         return new Promise((resolve, reject) =>{
@@ -227,6 +226,7 @@ function newUserRoomPosition(io, socket, roomId, userId, username, posDict){
         // Note: This is a socket emit since we want the message to not go back to the sender.
         // This is because we will have an update all event made for them.
         socket.to(roomId.toString()).emit('new-character-event', out_pos_obj);
+        // Note: this WILL inlcude the user that just joined
         socket.emit('update-all-positions', posDict[roomId].returnVisable());
     }else{
         // This is the first person to join this room 
@@ -241,6 +241,7 @@ function newUserRoomPosition(io, socket, roomId, userId, username, posDict){
         // Note: This is a socket emit since we want the message to not go back to the sender.
         // This is because we will have an update all event made for them.
         socket.to(roomId.toString()).emit('new-charater-event', out_pos_obj);
+        // Note: this WILL inlcude the user that just joined
         socket.emit('update-all-positions', posDict[roomId].returnVisable());
     }
 }
@@ -264,6 +265,7 @@ function relayPositionMove(io, socket, ourUserId, ourRoomId, ourUsername, posDic
         console.log(errString);
         socket.emit('error', {message:errString});
     }else if(!movementData || !(+movementData.x) || !(+movementData.y)){
+        console.log("movement data: ", movementData)
         const errString = "SOCKET NEW-MOVE ERROR #2: Impropper move data sent.  Should be obj with x and y value.";
         console.log(errString);
         socket.emit('error', {message:errString});
@@ -302,7 +304,7 @@ function relayPositionMove(io, socket, ourUserId, ourRoomId, ourUsername, posDic
  *      posDict:   The server position dictionary that keeps track of everyone's positions
  */
 function disconnectRoomPosition(io, socket, ourUserId, ourRoomId, ourUsername, posDict){
-    posDict[ourRoomId].leftRoom();
+    posDict[ourRoomId].leftRoom(ourUserId);
 
     //TODO: Figure out the actual name for this event on client side
     // This is only a socket emit rather than an io because it doesn't go back to the sender
