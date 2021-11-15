@@ -220,7 +220,7 @@ function newUserRoomPosition(io, socket, roomId, userId, username, posDict){
     if(posDict[roomId]){
         console.log("UserId: " + userId + " adding position to room " + roomId);
         const pos_obj = posDict[roomId].newPlayer(userId);
-        const out_pos_obj = {x:pos_obj.x, y:pos_obj.y}
+        const out_pos_obj = {x:pos_obj.x, y:pos_obj.y, username:username}
 
         //TODO: change the name of the evenet once we coordinate with frontend
         //TODO: in the future, we will want to look up that user in the database and send their avatar selection as well
@@ -268,7 +268,7 @@ function relayPositionMove(io, socket, ourRoomId, ourUserID, ourUsername, posDic
         console.log(errString);
         socket.emit('error', {message:errString});
     }else{
-        const moveDataOut = {s:movementData.x, y:movementData.y, userId: ourUserID}
+        const moveDataOut = {s:movementData.x, y:movementData.y, userId: ourUserID, username:username}
         // Make sure they are who they claim to be 
         const tokenUID = validateSocketToken(auth);
         if (tokenUID < 0 || tokenUID !== ourUserId){

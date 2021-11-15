@@ -9,10 +9,11 @@ import chatroom_background from "../assets/chatroom-background.jpg";
 import chatroom_character from "../assets/chatroom-character.gif";
 
 //Initialize game as HTML component
-export default function Gamified({socket}) {
+export default function Gamified({socket, username}) {
     var isClicking = false;
+    console.log(socket);
     return(
-    //<GameComponent
+    <GameComponent
     config={{
         //Define game element
         width: "70%",
@@ -35,19 +36,13 @@ export default function Gamified({socket}) {
                 //Add other online characters
                 this.otherPlayers = this.add.group();
                 let self = this;
-                //Populate the room with all characters
-                socket.on('new-character-event', function(players){
-                    console.log("currentUsers");
-                    Object.keys(players).forEach(function (id){
-                    if (players[id].playerId === sessionStorage.getItem("username")) {
-                        self.character = self.add.sprite(players[id].x, players[id].y, 'character');
-                    } else {
-                        const otherPlayer = self.add.sprite(players[id].x, players[id].y, 'character');
-                        otherPlayer.playerId = players[id].playerId;
-                        self.otherPlayers.add(otherPlayer);
-                    }
-                    })
+                //Populate the room with other characters
+                socket.on('new-character-event', function(player){
+                    const otherPlayer = self.add.sprite(player.x, player.y, 'character');
+                    otherPlayer.playerId = player.username;
+                    self.otherPlayers.add(otherPlayer);
                 });
+                this.character = this.add.sprite(100, 200, 'character');
 
                 //Removes the character locally and in other games upon disconnect
                 socket.on('disconnect', function(playerId) {
@@ -59,10 +54,11 @@ export default function Gamified({socket}) {
                 });
 
                 //Updates the movement of characters on the local screen
-                socket.on('new-move', function(playerInfo) {
+                socket.on('new-move', function(player) {
+                    console.log(player);
                     self.otherPlayers.getChildren().forEach(function(otherPlayer) {
-                        if (playerInfo.playerId === otherPlayer.playerId) {
-                            otherPlayer.setPosition(playerInfo.x, playerInfo.y);
+                        if (player.username === otherPlayer.playerId) {
+                            otherPlayer.setPosition(player.x, player.y);
                         }
                     })
                 });
@@ -74,6 +70,11 @@ export default function Gamified({socket}) {
                 });
             },
             update: function() {
+                // save old position data
+                this.character.oldPosition = {
+                  x: this.character.x,
+                  y: this.character.y,
+                };
                 //Define character movement (click to move)
                 //Check if mouse pointer was clicked or screen was tapped
                 if(!this.input.activePointer.isDown && isClicking === true) {
@@ -82,10 +83,30 @@ export default function Gamified({socket}) {
                     isClicking = false;
                 }
 
+                //Perform movement calculations
+                if(Math.abs(this.character.x - this.character.getData("positionX")) <= 10) {
+                    this.character.x = this.character.getData("positionX");
+                } else if(this.character.x < this.character.getData("positionX")) {
+                    this.character.x += 5;
+                } else if(this.character.x > this.character.getData("positionX")) {
+                    this.character.x -= 5;
+                }
+                if(Math.abs(this.character.y - this.character.getData("positionY")) <= 10) {
+                    this.character.y = this.character.getData("positionY");
+                } else if(this.character.y < this.character.getData("positionY")) {
+                    this.character.y += 5;
+                } else if(this.character.y > this.character.getData("positionY")) {
+                    this.character.y -= 5;
+                }
 
+                var x = this.character.x;
+                var y = this.character.y;
+                if (this.character.oldPosition && (x !== this.character.oldPosition.x || y !== this.character.oldPosition.y)) {
+                  socket.emit('new-move', { x: this.character.x, y: this.character.y, username: username });
+                }
             }
         }
     }}
-    ///>
+    />
     )
 }

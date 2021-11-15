@@ -29,6 +29,7 @@
     "test": "mocha backend/test/**/*.js -r esm",
     "dev": "nodemon --watch 'backend/**/*.js' -r esm backend/index.js",
     "start": "nodemon --watch 'backend/**/*.js' -r esm backend/index.js",
+    "quickbuild": "cd frontend/meetngreet && npm run build",
     "heroku-postbuild": "cd frontend/meetngreet && npm install && npm run build"
   },
   "repository": {
