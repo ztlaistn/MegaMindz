@@ -142,11 +142,11 @@ export default class Chatroom extends React.Component {
                 </div>
             );
         }
-                
+
         return (
             <div class="chatroom-container">
                 <div class="chatroom">
-                    <Gamified/>
+                    <Gamified socket={this.state.socket}/>
                     <Chat socket={this.state.socket} username={this.username} handleSocketError={this.handleSocketError} />
                 </div>
             </div>

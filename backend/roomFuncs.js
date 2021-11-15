@@ -227,7 +227,7 @@ function newUserRoomPosition(io, socket, roomId, userId, username, posDict){
         
         // Note: This is a socket emit since we want the message to not go back to the sender.
         // This is because we will have an update all event made for them.
-        socket.to(roomId.toString()).emit('new-charater-event', out_pos_obj)
+        socket.to(roomId.toString()).emit('new-character-event', out_pos_obj)
         socket.emit('update-all-positions', posDict[roomId].returnVisable())
     }else{
         // This is the first person to join this room 

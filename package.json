@@ -20,9 +20,10 @@
     "peer": "^0.6.1",
     "pg": "^8.7.1",
     "phaser": "^3.55.2",
+    "phaser-react-tools": "^1.0.4",
     "socket.io": "^4.3.1",
-    "uuid": "^8.3.2",
-    "socket.io-client": "^4.3.2"
+    "socket.io-client": "^4.3.2",
+    "uuid": "^8.3.2"
   },
   "scripts": {
     "test": "mocha backend/test/**/*.js -r esm",
