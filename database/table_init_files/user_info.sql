@@ -23,13 +23,15 @@ user_info (
 	status			VARCHAR(200) NOT NULL DEFAULT '',
 	skills			VARCHAR(200) NOT NULL DEFAULT '',
 	curr_room		INT DEFAULT NULL,
+	sprite			INT DEFAULT 0,
 -- Might want to just disable row, rather than delete entry when account is removed
 	enabled			SMALLINT NOT NULL DEFAULT 1
 );
 
 CREATE INDEX index1 ON user_info(enabled, user_id, hash);
 CREATE INDEX index2 ON user_info(enabled, curr_room, user_id);
-CREATE INDEX index3 On user_info(enabled, email, user_id)
+CREATE INDEX index3 On user_info(enabled, email, user_id);
+CREATE INDEX index4 On user_info(enabled, user_id, sprite);
 	
 -- Will print table structure when created
 -- DESCRIBE user_info;
