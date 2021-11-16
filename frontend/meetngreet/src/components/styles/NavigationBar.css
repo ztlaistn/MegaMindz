@@ -61,6 +61,95 @@
     height: 50px;
 }
 
+.logo-mobile{
+    height: 50px;
+    margin: auto;
+    display: flex;
+}
+
+.button-hamburger {
+    position:fixed;
+    left:0px;
+    top:5px;
+    width: fit-content;
+    background-color: #FFFFFF;
+    color: black;
+    padding: 14px 14px;
+    border: none;
+    border-radius: 8px;
+    font-family: Work Sans;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 40px;
+    line-height: 25px;
+}
+
+.hamburger-item {
+    width: 100%;
+    background-color: #1D4FB4;
+    color: white;
+    padding: 14px 20px;
+    margin: auto;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: Work Sans;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 21px;
+    line-height: 25px;
+    transition-duration: 0.4s;
+}
+
+.hamburger-item:hover {
+    background-color: #173D9F;
+}
+
+.button-chatroom-dropdown {
+    width: fit-content;
+    background-color: #58cfea;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: 1px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: Work Sans;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 21px;
+    line-height: 25px;
+    transition-duration: 0.4s;
+}
+
+.dropdown-content .dropdown-option {
+    color: white;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    cursor: pointer;
+}
+
+.dropdown-option:hover {
+    background-color: #1d68b4;
+}
+
+.button-chatroom-dropdown:hover {
+    background-color: #58e8ea;
+}
+
+.dropdown-content {
+    visibility: hidden;
+    position: absolute;
+    background-color: #1D4FB4;
+    min-width: 160px;
+    flex-direction: column;
+}
+.button-chatroom-dropdown + .dropdown-content:active,
+.button-chatroom-dropdown:focus + .dropdown-content {
+    visibility: visible;
+}
+
 /* Small devices (landscape phones, 576px and up) */
 @media only screen and (max-width: 768px) {
     .logo-bar {

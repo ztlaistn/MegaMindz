@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import DbUtil from "../../database/utils/user_database_utils";
 import bycrpt from "bcrypt";
-import tokenAuthorization from "../middleware/tokenAuth";
+import {tokenAuthorization} from "../middleware/tokenAuth";
 
 const router = express.Router();
 

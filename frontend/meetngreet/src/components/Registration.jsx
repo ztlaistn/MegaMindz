@@ -1,6 +1,7 @@
 import React from "react";
 import "./styles/Registration.css";
 import "./styles/Input.css";
+import "./styles/Text.css";
 import { Link } from "react-router-dom";
 import registration_icon from "../assets/registration_icon.png";
 
@@ -8,12 +9,14 @@ export default class Registration extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            empty_email: false,
-            empty_password: false
+          errorMsg: "",
         };
     }
 
-    process_registration() {
+    process_registration = () => {
+        // reference to this class 
+        const registerClass = this;
+        console.log(registerClass);
         //implement registration handler here
         if(((document.getElementById("email").validity.valid) && (document.getElementById("username").value.length !== 0) && (document.getElementById("password").value === document.getElementById("password-confirmation").value) && (document.getElementById("password").value.length > 7)) && ((document.getElementById("email").value.includes("@")) && (document.getElementById("email").value.includes(".")))){
             const data = { email: document.getElementById("email").value, password1: document.getElementById("password").value, password2: document.getElementById("password-confirmation").value, username: document.getElementById("username").value };
@@ -24,12 +27,13 @@ export default class Registration extends React.Component {
             },
             body: JSON.stringify(data),
             }).then(
-                function(response) {
+                (response) => {
                   if (response.status !== 200) {
                     console.log('Looks like there was a problem. Status Code: ' + response.status);
-                    response.json().then(function(data) {
-                      console.log(data);
-                      window.alert("Error: On User account creation: " + data.message)
+                    response.json().then((data)=>{
+                      registerClass.setState({
+                        errorMsg: data.message
+                      });
                     });
                     return;
                   }
@@ -46,7 +50,9 @@ export default class Registration extends React.Component {
                 console.log('Fetch Error :-S', err);
               });
         } else {
-            window.alert("Error: Missing one or more required fields.")
+          registerClass.setState({
+            errorMsg: "Error: Missing one or more required fields."
+          });
         }
     }
 
@@ -65,7 +71,7 @@ export default class Registration extends React.Component {
                         <label for="password-confirmation">Confirm Password</label>
                         <input type="password" required id="password-confirmation" name="password-confirmation" placeholder="Password" onChange={this.check_credentials}/>
                         <br/>
-                        <br/>
+                        <aside class="error-text">{this.state.errorMsg}</aside>
                         <input type="button" value="Register" className="button-primary" onClick={this.process_registration}/>
                     </form>
                 </div>

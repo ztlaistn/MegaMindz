@@ -3,10 +3,18 @@ import socketIO from "socket.io";
 import { createServer } from "http";
 import path from "path";
 import bodyParser from "body-parser";
+import jwt from "jsonwebtoken";
 
 import authRouter from "./routes/auth";
 import usersRouter from "./routes/users";
 import roomRouter from "./routes/room";
+
+import DbUtil from "../database/utils/user_database_utils";
+import DbRoll from "../database/utils/room_role_database_utils";
+
+import {validateSocketToken} from "./middleware/tokenAuth";
+import roomFuncs from "./roomFuncs";
+import roomPosition from "./roomPosition";
 
 class Server {
     httpServer;
@@ -15,6 +23,10 @@ class Server {
 
     PORT = process.env.PORT || 5001;
     HOST = '0.0.0.0';
+
+    // Initializes a dictionary to keep track of player positions in the rooms
+    // Dict will hold key value pairs where the key is the roomId and the value is a roomPosition object
+    positionDict = {}
 
     constructor() {
         this.initialize();
@@ -64,60 +76,188 @@ class Server {
     /*this.app.get("/chat/:room", (req, res) => {
       res.render("chatroom" , {roomId: req.param.room});
     });*/
-  }
+    }
 
-  // io.to = broadcast to everyone including self
-  // socket.to = send to everyone except self
-  handleSocketConnection() {
-      const io = this.io;
-      this.io.on("connection", function (socket) {
-          let ourUsername;
-          let roomId;
 
-          //TODO: any call: validate token, get user_id from it (or maybe from the socket itself)
+    handleSocketConnection() {
+        const io = this.io;
+        const oldThis = this
 
-          //TODO: On join: db call to make sure room_exists
-          //TODO: On join: db call to make sure user is in that room
+        let videoRoom = false;
+        const users = {};
+        const socketToRoom = {};
 
-          //TODO: message send and disconnect only on the room (as string)
-          
-          console.log("Socket connected.");
-          console.log("custom message.");
-          socket.emit('new-message', 'Connection established with server');
+        this.io.on("connection", async function (socket) {
 
-          socket.on("new-user", function (data) {
-              // save Username and Room ID for future use
-              ourUsername = data.username;
-              roomId = data.roomId;
+            /* START SIGNALING SERVER FUNCTIONS */
+            socket.on("video room", () => {
+                console.log("The user entered the video room")
+                videoRoom = true;
+            });
 
-              // put that socket in a specific room
-              socket.join(roomId);
+            socket.on("join room", roomID => {
+                console.log("video room value:")
+                console.log(videoRoom)
+                if (users[roomID]) {
+                    /*
+                    const length = users[roomID].length;
+                    if (length === 4) {
+                        socket.emit("room full");
+                        return;
+                    }
+                    */
+                    users[roomID].push(socket.id);
+                    console.log("Adding a non-first user {" +socket.id + "} to the room: "+roomID);
+                } else {
+                    users[roomID] = [socket.id];
+                    console.log("Adding a first user {" +socket.id + "} to the room: "+roomID);
+                }
+                socketToRoom[socket.id] = roomID;
+                const usersInThisRoom = users[roomID].filter(id => id !== socket.id);
 
-              // broadcast to room that this user has joined
-              io.to(roomId).emit('new-message', `${ourUsername} has connected`);
-              console.log(`${ourUsername} has connected`);
-          });
+                console.log("Sending this user {"+socket.id+"} the list of all users:");
+                usersInThisRoom.forEach( user => console.log(user));
 
-          socket.on('new-message', function (data)  {
-            const { msg } = data;
-            console.log("server received:" + data);
+                socket.emit("all users", usersInThisRoom);
+            });
 
-            // broadcast to room user's message
-            io.to(roomId).emit("new-message", `${ourUsername}:  ${data}`);
-          });
+            socket.on("sending signal", payload => {
+                console.log("Original sender: {"+ payload.callerID + "} sending a signal to: {" + payload.userToSignal + "}");
+                io.to(payload.userToSignal).emit('user joined', { signal: payload.signal, callerID: payload.callerID });
+            });
 
-          socket.on('disconnect',function(){
-            console.log('Client has disconnected');
-            // broadcast to room that this user has left
-            io.to(roomId).emit("new-message", `${ourUsername} has disconnected`);
-          });
-   });
-  }
+            socket.on("returning signal", payload => {
+                console.log("Another peer {" + socket.id + "} is returning their signal to: {" + payload.callerID + "}");
+                io.to(payload.callerID).emit('receiving returned signal', { signal: payload.signal, id: socket.id });
+            });
+
+            socket.on('disconnect', () => {
+                console.log("Socket {"+socket.id + "} disconnected");
+                const roomID = socketToRoom[socket.id];
+                let room = users[roomID];
+                if (room) {
+                    room = room.filter(id => id !== socket.id);
+                    users[roomID] = room;
+                }
+            });
+            /* END SIGNALING SERVER EVENTS */
+
+
+            /* START EVENTS FOR CHATROOM */
+
+            // variables for this connection
+            let ourUsername;
+            let ourUserId = -1;
+            let ourRoomId = -1;
+
+            console.log("Socket connected.");
+            socket.emit('new-message', {message:'Trying to connect user to room.'});
+
+            /*
+            * Handler function that will handle a new user event.
+            * Parameters:
+            *   - data object includes
+            *       - token: user's session token
+            *       - roomId: room they are trying to connect to (this must be a number)
+            * Will emit a new user new-message to the room if success.
+            * Otherwise will trigger error event with error message.
+            */
+            // io.to = broadcast to everyone in room including self
+            // socket.to = broadcast to everyone in room except self
+            socket.on("new-user", async function (data) {
+                const {auth, roomId} = data //should we be getting the token from the header?
+
+                let setupFlag = false;
+                try{
+                    const retData = await roomFuncs.handleNewChatSocketUser(io, socket, auth, roomId);
+                    ourUserId = retData.userId;
+                    ourRoomId = retData.roomId;
+                    ourUsername = retData.username;
+                    setupFlag = true;
+                } catch (err){
+                    console.log(err);
+                    socket.emit('error', {message:errString});
+                }
+
+                if (setupFlag){
+                    // If we are here, we can assume we setup correctly
+                    // Can do any actions needed for once a user connects to a room
+                    roomFuncs.newUserRoomPosition(io, socket, ourRoomId, ourUserId, ourUsername, oldThis.positionDict)
+                }
+            });
+
+
+            /*
+            * Handler function that will handle a room message relay events.
+            * Will emit the message to everyone in the room if the user is in a room.
+            * Otherwise will trigger error event with error message.
+            */
+            socket.on('new-message', function (data)  {
+                const { auth, msg } = data;
+                roomFuncs.newChatMessageEvent(io, socket, ourUserId, ourRoomId, ourUsername, auth, msg);
+            });
+
+            /*
+            * Handler that will handle a new move relay event
+            * Will emit this data to others in the room 
+            */
+            socket.on('new-move', function(data){
+                const {auth, move} = data;
+                roomFuncs.relayPositionMove(io, socket, ourUserId, ourRoomId, ourUsername, oldThis.positionDict, move, auth);
+            });
+
+            /*
+            * Handler function that will handle a disconnect event.
+            * Will emit a disconnect new-message to the room if success.
+            * Otherwise will trigger error event with error message.
+            */
+            socket.on('disconnect', async function(){
+                if (!videoRoom) {
+                // start by checking the userId and roomId are set (user has connected)
+                try{
+                    await roomFuncs.socketDisconnectEvent(io, socket, ourUserId, ourRoomId, ourUsername);
+                } catch (err){
+                    console.log(err);
+                    socket.emit('error', {message:err})
+                }
+
+                // if we got here, we removed the user from the room in the database just fine
+                // now we can remove (make not visible) them from the position dict and let everyone else in the room know.
+                roomFuncs.disconnectRoomPosition(io, socket, ourUserId, ourRoomId, ourUsername, oldThis.positionDict);
+                }
+            });
+            /*
+             * Handler that will end a meeting.
+             */
+            socket.on('end-meeting', async function (data) {
+                //find if the user is the host if yes then emit force-end.
+                //else throw error
+                let client = await DbUtil.connect_client();
+                const {role,roomId} = data;
+                try {
+                    if (role < 2){
+                        const errString = "LIST ROOM ADMIN ERROR #2: Not authorized for these actions.";
+                        client.end();
+                        socket.emit('error-permissions', {message:errString})
+                    }
+                    else{
+                        await DbRoll.close_room(client,roomId)
+                        io.to(roomId.toString()).emit('force-end', {message:'force end'})
+                    }
+
+                } catch (err) {
+                    console.log(err);
+                    socket.emit('error', {message:err})
+                }
+            });
+
+        });
+    }
 
     // pass in a callback function that returns port number
     listen(callbackFunction) {
-        this.httpServer.listen(this.PORT,this.HOST);
-        callbackFunction(this.PORT);
+	    this.httpServer.listen(this.PORT,this.HOST);
+	    callbackFunction(this.PORT);
     }
 }
 export {Server};
