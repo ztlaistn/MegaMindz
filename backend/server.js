@@ -83,7 +83,68 @@ class Server {
         const io = this.io;
         const oldThis = this
 
+        let videoRoom = false;
+        const users = {};
+        const socketToRoom = {};
+
         this.io.on("connection", async function (socket) {
+
+            /* START SIGNALING SERVER FUNCTIONS */
+            socket.on("video room", () => {
+                console.log("The user entered the video room")
+                videoRoom = true;
+            });
+
+            socket.on("join room", roomID => {
+                console.log("video room value:")
+                console.log(videoRoom)
+                if (users[roomID]) {
+                    /*
+                    const length = users[roomID].length;
+                    if (length === 4) {
+                        socket.emit("room full");
+                        return;
+                    }
+                    */
+                    users[roomID].push(socket.id);
+                    console.log("Adding a non-first user {" +socket.id + "} to the room: "+roomID);
+                } else {
+                    users[roomID] = [socket.id];
+                    console.log("Adding a first user {" +socket.id + "} to the room: "+roomID);
+                }
+                socketToRoom[socket.id] = roomID;
+                const usersInThisRoom = users[roomID].filter(id => id !== socket.id);
+
+                console.log("Sending this user {"+socket.id+"} the list of all users:");
+                usersInThisRoom.forEach( user => console.log(user));
+
+                socket.emit("all users", usersInThisRoom);
+            });
+
+            socket.on("sending signal", payload => {
+                console.log("Original sender: {"+ payload.callerID + "} sending a signal to: {" + payload.userToSignal + "}");
+                io.to(payload.userToSignal).emit('user joined', { signal: payload.signal, callerID: payload.callerID });
+            });
+
+            socket.on("returning signal", payload => {
+                console.log("Another peer {" + socket.id + "} is returning their signal to: {" + payload.callerID + "}");
+                io.to(payload.callerID).emit('receiving returned signal', { signal: payload.signal, id: socket.id });
+            });
+
+            socket.on('disconnect', () => {
+                console.log("Socket {"+socket.id + "} disconnected");
+                const roomID = socketToRoom[socket.id];
+                let room = users[roomID];
+                if (room) {
+                    room = room.filter(id => id !== socket.id);
+                    users[roomID] = room;
+                }
+            });
+            /* END SIGNALING SERVER EVENTS */
+
+
+            /* START EVENTS FOR CHATROOM */
+
             // variables for this connection
             let ourUsername;
             let ourUserId = -1;
@@ -91,7 +152,6 @@ class Server {
 
             console.log("Socket connected.");
             socket.emit('new-message', {message:'Trying to connect user to room.'});
-
 
             /*
             * Handler function that will handle a new user event.
@@ -152,6 +212,7 @@ class Server {
             * Otherwise will trigger error event with error message.
             */
             socket.on('disconnect', async function(){
+                if (!videoRoom) {
                 // start by checking the userId and roomId are set (user has connected)
                 try{
                     await roomFuncs.socketDisconnectEvent(io, socket, ourUserId, ourRoomId, ourUsername);
@@ -163,6 +224,7 @@ class Server {
                 // if we got here, we removed the user from the room in the database just fine
                 // now we can remove (make not visible) them from the position dict and let everyone else in the room know.
                 roomFuncs.disconnectRoomPosition(io, socket, ourUserId, ourRoomId, ourUsername, oldThis.positionDict);
+                }
             });
             /*
              * Handler that will end a meeting.
