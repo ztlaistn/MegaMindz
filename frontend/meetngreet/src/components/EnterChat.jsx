@@ -25,10 +25,10 @@ export default function Chat({socket, username, handleSocketError,role,roomId}) 
     }
     const endMeeting = async () =>{
         const sendData = {
-            role:role,
-            roomId:roomId
+            auth: "Bearer " + sessionStorage.getItem("token"),
+            roomId: parseInt(roomId)
         }
-        console.log(role)
+        console.log("role: " + role)
         await socket.emit("end-meeting", sendData)
     }
 
@@ -45,6 +45,7 @@ export default function Chat({socket, username, handleSocketError,role,roomId}) 
             socket.on("error", (data)=>{
                 // update state in parent component
                 const msg = "An error occured with the chatroom";
+                console.log(data);
                 handleSocketError(msg);
             });
             //TO FORCE END THE ROOM
@@ -53,12 +54,11 @@ export default function Chat({socket, username, handleSocketError,role,roomId}) 
                 window.location.href = "/";
             });
             // ERROR EVENT DUE TO PERMISSIONS
-            socket.on("error-permissions",()=>{
+            socket.on("error-permissions",(data)=>{
+                console.log(data);
                 window.alert("You are not allowed to do that.");
 
             });
-
-
         }
     },[socket]);
     // to check if the end meeting button should be showed or not.

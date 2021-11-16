@@ -114,7 +114,7 @@ async function socketDisconnectEvent(io, socket, ourUserId, ourRoomId, ourUserna
             //socket.removeAllListeners();
             return new Promise((resolve, reject) =>{
                 resolve();
-            })
+            });
         } catch (err){
             socClient.end();
             const errString = "SOCKET DISCONNECT ERROR #3: " + err;
@@ -124,6 +124,90 @@ async function socketDisconnectEvent(io, socket, ourUserId, ourRoomId, ourUserna
         }
     }
 }
+
+/**
+ *  Function that will handle ending the meeting if someone clicks the end meeting button in the chat room
+ *  Parameters:
+ *      io:             server io that this socket was connected on
+ *      socket:         socket that the event was on 
+ *      ourUserId:      User Id of the user who is ending the meeting
+ *      ourRoomId:      Current room id this socket is on
+ *      ourUserName:    username of the user trying to end the room
+ *      auth:           Auth token string of the user trying to end the room
+ *      endRoom:        Room the user is trying to end
+ * 
+ *  Returns:            A promise that will
+ *                      Resolve on success
+ *                      Reject with error message on failure
+ */
+async function endMeetingHandler(io, socket, ourUserId, ourRoomId, ourUsername, auth, endRoom){
+    // Start by making sure the user is in a room
+    if(ourRoomId < 0 || ourUserId < 0){
+        const errString = "SOCKET END-MEETING ERROR #1: User trying to end room when they are not connected to a room.";
+        console.log(errString);
+        socket.emit('error', errString);
+        return new Promise((resolve, reject) =>{
+            reject(errString);
+        });
+    }else{
+        const tokenUID = validateSocketToken(auth);
+        if (tokenUID < 0 || tokenUID !== ourUserId){
+            console.log(ourUserId + " not equal to " + tokenUID)
+            const errString = "SOCKET END-MEETING ERROR #2: Access Denied";
+            console.log(errString);
+            socket.emit('error', {message:errString});
+            return new Promise((resolve, reject) =>{
+                reject(errString);
+            });
+        }else{
+            // Figure out if they are the owner of the room
+            if(ourRoomId !== endRoom){
+                console.log(ourRoomId + " not equal to " + endRoom);
+                const errString = "SOCKET END-MEETING ERROR #3: Ending room not in."
+                console.log(errString);
+                socket.emit('error', {message:errString});
+                return new Promise((resolve, reject) =>{
+                    reject(errString);
+                });
+            }else{
+                let client;
+                try{
+                    client = await DbUtil.connect_client();
+                    const row = await DbRoll.find_user_in_room_roll(client, tokenUID, endRoom);
+                    if(row.role < DbRoll.ROLE_OWNER){
+                        const errString = "SOCKET END-MEETING ERROR #4: Current Role: " + row.role + " is not high enough to end meeting.  Must be room owner.";
+                        console.log(errString);
+                        client.end();
+                        socket.emit('error-permissions', {message:errString});
+                        return new Promise((resolve, reject) =>{
+                            reject(errString);
+                        });
+                    }else{
+                        // we are good to end the meeting
+                        await DbRoll.close_room(client, endRoom);
+                        io.to(endRoom.toString()).emit('force-end');
+                        client.end();
+                        return new Promise((resolve, reject) =>{
+                            resolve();
+                        });
+                    }
+                } catch(err){
+                    if(client){
+                        client.end();
+                    }
+                    const errString = "SOCKET END-MEETING ERROR #5: " + err;
+                    console.log(errString);
+                    socket.emit('error', {message:errString});
+                    return new Promise((resolve, reject) =>{
+                        reject(errString);
+                    });
+                }
+            }
+            
+        }
+    }
+}
+
 
 
 /**
@@ -303,11 +387,12 @@ function relayPositionMove(io, socket, ourUserId, ourRoomId, ourUsername, posDic
  *      posDict:   The server position dictionary that keeps track of everyone's positions
  */
 function disconnectRoomPosition(io, socket, ourUserId, ourRoomId, ourUsername, posDict){
-    posDict[ourRoomId].leftRoom(ourUserId);
+    let wasInRoom = posDict[ourRoomId].leftRoom(ourUserId);
 
-    //TODO: Figure out the actual name for this event on client side
     // This is only a socket emit rather than an io because it doesn't go back to the sender
-    socket.to(ourRoomId.toString()).emit('member-left-room', {userId:ourUserId, username:ourUsername});
+    if (wasInRoom){
+        socket.to(ourRoomId.toString()).emit('member-left-room', {userId:ourUserId, username:ourUsername});
+    }
 }
 
 module.exports = {
@@ -317,5 +402,6 @@ module.exports = {
     handleNewChatSocketUser,
     newUserRoomPosition,
     relayPositionMove,
-    disconnectRoomPosition
+    disconnectRoomPosition,
+    endMeetingHandler
 };

@@ -82,14 +82,15 @@ class Server {
     handleSocketConnection() {
         const io = this.io;
         const oldThis = this
-
-        let videoRoom = false;
+        
+        // Variables for video room
         const users = {};
         const socketToRoom = {};
 
         this.io.on("connection", async function (socket) {
+            let videoRoom = false;
 
-            /* START SIGNALING SERVER FUNCTIONS */
+            /* ------------------ START SIGNALING SERVER FUNCTIONS ------------------*/
             socket.on("video room", () => {
                 console.log("The user entered the video room")
                 videoRoom = true;
@@ -131,19 +132,12 @@ class Server {
                 io.to(payload.callerID).emit('receiving returned signal', { signal: payload.signal, id: socket.id });
             });
 
-            socket.on('disconnect', () => {
-                console.log("Socket {"+socket.id + "} disconnected");
-                const roomID = socketToRoom[socket.id];
-                let room = users[roomID];
-                if (room) {
-                    room = room.filter(id => id !== socket.id);
-                    users[roomID] = room;
-                }
-            });
-            /* END SIGNALING SERVER EVENTS */
+            // Disconnect for video room, mixed with disconnect for chat room (with conditional check)
+
+            /* ------------------ END SIGNALING SERVER EVENTS ------------------ */
 
 
-            /* START EVENTS FOR CHATROOM */
+            /* ------------------ START EVENTS FOR CHATROOM ------------------ */
 
             // variables for this connection
             let ourUsername;
@@ -176,7 +170,7 @@ class Server {
                     setupFlag = true;
                 } catch (err){
                     console.log(err);
-                    socket.emit('error', {message:errString});
+                    socket.emit('error', {message:err});
                 }
 
                 if (setupFlag){
@@ -213,41 +207,41 @@ class Server {
             */
             socket.on('disconnect', async function(){
                 if (!videoRoom) {
-                // start by checking the userId and roomId are set (user has connected)
-                try{
-                    await roomFuncs.socketDisconnectEvent(io, socket, ourUserId, ourRoomId, ourUsername);
-                } catch (err){
-                    console.log(err);
-                    socket.emit('error', {message:err})
-                }
+                    // start by checking the userId and roomId are set (user has connected)
+                    try{
+                        await roomFuncs.socketDisconnectEvent(io, socket, ourUserId, ourRoomId, ourUsername);
+                    } catch (err){
+                        console.log(err);
+                        socket.emit('error', {message:err})
+                    }
 
-                // if we got here, we removed the user from the room in the database just fine
-                // now we can remove (make not visible) them from the position dict and let everyone else in the room know.
-                roomFuncs.disconnectRoomPosition(io, socket, ourUserId, ourRoomId, ourUsername, oldThis.positionDict);
+                    // if we got here, we removed the user from the room in the database just fine
+                    // now we can remove (make not visible) them from the position dict and let everyone else in the room know.
+                    roomFuncs.disconnectRoomPosition(io, socket, ourUserId, ourRoomId, ourUsername, oldThis.positionDict);
+                }else{
+                    //disconnect for video room
+                    console.log("Socket {"+socket.id + "} disconnected");
+                    const roomID = socketToRoom[socket.id];
+                    let room = users[roomID];
+                    if (room) {
+                        room = room.filter(id => id !== socket.id);
+                        users[roomID] = room;
+                    }
+                    videoRoom = false;
                 }
             });
+
             /*
-             * Handler that will end a meeting.
+             * Handler that will end a meeting for everyone in the room, if request sent from room owner
              */
             socket.on('end-meeting', async function (data) {
-                //find if the user is the host if yes then emit force-end.
-                //else throw error
-                let client = await DbUtil.connect_client();
-                const {role,roomId} = data;
-                try {
-                    if (role < 2){
-                        const errString = "LIST ROOM ADMIN ERROR #2: Not authorized for these actions.";
-                        client.end();
-                        socket.emit('error-permissions', {message:errString})
-                    }
-                    else{
-                        await DbRoll.close_room(client,roomId)
-                        io.to(roomId.toString()).emit('force-end', {message:'force end'})
-                    }
-
-                } catch (err) {
-                    console.log(err);
-                    socket.emit('error', {message:err})
+                const {auth,roomId} = data;
+                try{
+                    await roomFuncs.endMeetingHandler(io, socket, ourUserId, ourRoomId, ourUsername, auth, roomId);
+                } catch (err){
+                    //errors are already handled in the endMeetingHandler Function
+                    console.log(err)
+                    console.log("error in end meeting, handled in function");
                 }
             });
 
