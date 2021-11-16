@@ -265,12 +265,11 @@ function relayPositionMove(io, socket, ourUserId, ourRoomId, ourUsername, posDic
         console.log(errString);
         socket.emit('error', {message:errString});
     }else if(!movementData || !(+movementData.x) || !(+movementData.y)){
-        console.log("movement data: ", movementData)
         const errString = "SOCKET NEW-MOVE ERROR #2: Impropper move data sent.  Should be obj with x and y value.";
         console.log(errString);
         socket.emit('error', {message:errString});
     }else{
-        const moveDataOut = {s:movementData.x, y:movementData.y, userId:ourUserId, username:ourUsername}
+        const moveDataOut = {x:movementData.x, y:movementData.y, userId:ourUserId, username:ourUsername}
         // Make sure they are who they claim to be 
         const tokenUID = validateSocketToken(auth);
         if (tokenUID < 0 || tokenUID !== ourUserId){

@@ -38,23 +38,34 @@ export default function Gamified({socket, username}) {
                 let self = this;
                 //Populate the room with other characters
                 socket.on('new-character-event', function(player){
-                    const otherPlayer = self.add.sprite(player.x, player.y, 'character');
-                    otherPlayer.playerId = player.username;
-                    self.otherPlayers.add(otherPlayer);
+                    if(player.username !== sessionStorage.getItem("username")){
+                        const otherPlayer = self.add.sprite(player.x, player.y, 'character');
+                        otherPlayer.playerId = player.username;
+                        self.otherPlayers.add(otherPlayer);
+                    }
                 });
-                this.character = this.add.sprite(100, 200, 'character');
+                this.character = this.add.sprite(200, 200, 'character');
 
                 //Removes the character locally and in other games upon disconnect
-                socket.on('disconnect', function(playerId) {
+                socket.on('member-left-room', function(player) {
                     self.otherPlayers.getChildren().forEach(function(otherPlayer) {
-                        if (playerId === otherPlayer.playerId) {
+                        if (player.username === otherPlayer.playerId) {
                             otherPlayer.destroy();
                         }
                     })
                 });
 
-                socket.on('update-all-positions', function(player) {
-                    console.log(player);
+                socket.on('update-all-positions', function(players) {
+                    console.log(players);
+                    players.forEach(function(player){
+                        if(player.username !== sessionStorage.getItem("username")){
+                            if(!self.otherPlayers.getChildren().includes(player.username)){
+                                const otherPlayer = self.add.sprite(player.x, player.y, 'character');
+                                otherPlayer.playerId = player.username;
+                                self.otherPlayers.add(otherPlayer);
+                            }
+                        }
+                    })
                 });
 
                 //Updates the movement of characters on the local screen
@@ -106,7 +117,7 @@ export default function Gamified({socket, username}) {
                 var x = this.character.x;
                 var y = this.character.y;
                 if (this.character.oldPosition && (x !== this.character.oldPosition.x || y !== this.character.oldPosition.y)) {
-                  socket.emit('new-move', { x: this.character.x, y: this.character.y});
+                  socket.emit('new-move', {auth: "Bearer " + sessionStorage.getItem("token"), move: { x: this.character.x, y: this.character.y}});
                 }
             }
         }
