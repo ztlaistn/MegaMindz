@@ -11,7 +11,8 @@ export default class Home extends React.Component {
         super(props);
         this.state = {
           username: "",
-            roomId: ""
+            roomId: "",
+            videoRoomId: ""
         };
     }
     change_Handler(field, e) {
@@ -42,6 +43,11 @@ export default class Home extends React.Component {
             //Send to chat room with specified code
             window.location.href = "chatroom/" + document.getElementById("code").value;
         }
+    };
+
+    toVideoRoom = () => {
+        sessionStorage.setItem("roomId", this.state.videoRoomId);
+        window.location.href = "/videoroom";
     };
 
 
@@ -157,6 +163,18 @@ export default class Home extends React.Component {
                     />
                 </label>
                 <input type="button" value="Join Chat Room" className="button-primary" onClick={this.join_room}/>
+
+                <br />
+
+                <label className="Enter VIDEO room code">
+                    Enter room code
+                    <input
+                        type="text"
+                        onChange={e => this.change_Handler("videoRoomId", e)}
+                        value={this.state.videoRoomId}
+                    />
+                </label>
+                <input type="button" value="Join Video Room" className="button-primary" onClick={this.toVideoRoom}/>
             </div>
         );
     }
