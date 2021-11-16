@@ -74,6 +74,89 @@ export default class ChatroomUsers extends React.Component {
     testAlert(username, userId ,roleNumber) {
         window.alert("Hi "+username+" your role number is "+roleNumber+ " and ur user id is "+userId)
     }
+
+    demoteUser(user_Id) {
+        fetch('/users/demoteUser', {
+            method: 'POST', // or 'PUT'
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+            },
+            body: JSON.stringify({ roomId: sessionStorage.getItem("roomId"), user_Id: user_Id, auth: sessionStorage.getItem("token")}),
+        }).then(function(response){
+            if(response.status !== 200){
+                response.json().then(function(data) {
+                    console.log(data);
+                    window.alert("Error: Failed to Demote User : " + data.message);
+                    window.location.href = "/chatroom";
+                });
+            }else{
+                response.json().then(function(data){
+                    console.log(data);
+                    window.alert("" + data.message);
+                });
+            }
+        }).catch(function(err) {
+            console.log('Fetch Error :-S', err);
+        });
+    }
+
+    makeUserVIP(user_Id) {
+        fetch('/users/makeUserVIP', {
+            method: 'POST', // or 'PUT'
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+            },
+            body: JSON.stringify({ roomId: sessionStorage.getItem("roomId"), user_Id: user_Id, auth: sessionStorage.getItem("token")}),
+        }).then(function(response){
+            if(response.status !== 200){
+                response.json().then(function(data) {
+                    console.log(data);
+                    window.alert("Error: Failed to Make User VIP : " + data.message);
+                    window.location.href = "/chatroom";
+                });
+            }else{
+                response.json().then(function(data){
+                    console.log(data);
+                    window.alert("" + data.message);
+                });
+            }
+        }).catch(function(err) {
+            console.log('Fetch Error :-S', err);
+        });
+    }
+
+    makeUserModerator(user_Id) {
+        fetch('/users/makeUserModerator', {
+            method: 'POST', // or 'PUT'
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+            },
+            body: JSON.stringify({ roomId: sessionStorage.getItem("roomId"), user_Id: user_Id, auth: sessionStorage.getItem("token")}),
+        }).then(function(response){
+            if(response.status !== 200){
+                response.json().then(function(data) {
+                    console.log(data);
+                    window.alert("Error: Failed to Make User Moderator : " + data.message);
+                    window.location.href = "/chatroom";
+                });
+            }else{
+                response.json().then(function(data){
+                    console.log(data);
+                    window.alert("" + data.message);
+                });
+            }
+        }).catch(function(err) {
+            console.log('Fetch Error :-S', err);
+        });
+    }
+
+    removeUserFromRoom(userId2) {
+        
+
+    }
     
     render() {
         const {usersLoaded, users} = this.state;
@@ -100,15 +183,21 @@ export default class ChatroomUsers extends React.Component {
             return (
                 <div class="chatroom-container">
                     <div class="chatroom">
+                    Demote User
+                    {users.user_list.map((user) => ( 
+                    <input type="button" value={user[1]} className="button-primary" onClick={() => this.demoteUser(user[0])}/>
+                    ))}
+                    </div>
+                    <div class="chatroom">
                     Make User VIP
                     {users.user_list.map((user) => ( 
-                    <input type="button" value={user[1]} className="button-primary" onClick={() => this.testAlert(user[1],user[0],user[2])}/>
+                    <input type="button" value={user[1]} className="button-primary" onClick={() => this.makeUserVIP(user[0])}/>
                     ))}
                     </div>
                     <div class="chatroom">
                     Make User Moderator
                     {users.user_list.map((user) => ( 
-                    <input type="button" value={user[1]} className="button-primary" onClick={() => this.testAlert(user[1],user[0],user[2])}/>
+                    <input type="button" value={user[1]} className="button-primary" onClick={() => this.makeUserModerator(user[0])}/>
                     ))}
                     </div>
                     <div class="chatroom">

@@ -18,7 +18,7 @@ export default class Registration extends React.Component {
         const registerClass = this;
         console.log(registerClass);
         //implement registration handler here
-        if(((document.getElementById("email").validity.valid) && (document.getElementById("username").value.length !== 0) && (document.getElementById("password").value === document.getElementById("password-confirmation").value) && (document.getElementById("password").value.length > 7)) && ((document.getElementById("email").value.includes("@")) && (document.getElementById("email").value.includes(".")))){
+        if(((document.querySelector('.eula').checked == true) && (document.getElementById("email").validity.valid) && (document.getElementById("username").value.length !== 0) && (document.getElementById("password").value === document.getElementById("password-confirmation").value) && (document.getElementById("password").value.length > 7)) && ((document.getElementById("email").value.includes("@")) && (document.getElementById("email").value.includes(".")))){
             const data = { email: document.getElementById("email").value, password1: document.getElementById("password").value, password2: document.getElementById("password-confirmation").value, username: document.getElementById("username").value };
             fetch('/auth/register', {
             method: 'POST', // or 'PUT'
@@ -70,6 +70,7 @@ export default class Registration extends React.Component {
                         <input type="password" required id="password" name="password" placeholder="Password" onChange={this.check_credentials}/>
                         <label for="password-confirmation">Confirm Password</label>
                         <input type="password" required id="password-confirmation" name="password-confirmation" placeholder="Password" onChange={this.check_credentials}/>
+                        <label>Accept our <a href="user-agreement">User Agreement?</a> <input type="checkbox" class="eula" id="eula" name="eula" value="EULA"/></label>
                         <br/>
                         <aside class="error-text">{this.state.errorMsg}</aside>
                         <input type="button" value="Register" className="button-primary" onClick={this.process_registration}/>
