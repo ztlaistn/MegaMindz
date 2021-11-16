@@ -164,6 +164,30 @@ class Server {
                 // now we can remove (make not visible) them from the position dict and let everyone else in the room know.
                 roomFuncs.disconnectRoomPosition(io, socket, ourUserId, ourRoomId, ourUsername, oldThis.positionDict);
             });
+            /*
+             * Handler that will end a meeting.
+             */
+            socket.on('end-meeting', async function (data) {
+                //find if the user is the host if yes then emit force-end.
+                //else throw error
+                let client = await DbUtil.connect_client();
+                const {role,roomId} = data;
+                try {
+                    if (role < 2){
+                        const errString = "LIST ROOM ADMIN ERROR #2: Not authorized for these actions.";
+                        client.end();
+                        socket.emit('error-permissions', {message:errString})
+                    }
+                    else{
+                        await DbRoll.close_room(client,roomId)
+                        io.to(roomId.toString()).emit('force-end', {message:'force end'})
+                    }
+
+                } catch (err) {
+                    console.log(err);
+                    socket.emit('error', {message:err})
+                }
+            });
 
         });
     }

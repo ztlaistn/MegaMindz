@@ -6,12 +6,12 @@ import socketIOClient from "socket.io-client";
 import chatroom_background from "../assets/chatroom-background.jpg";
 import chatroom_character from "../assets/chatroom-character.gif";
 
-export default function Chat({socket, username, handleSocketError}) {
+export default function Chat({socket, username, handleSocketError,role,roomId}) {
 
     const [connected, setConnected] = useState(false);
     const [currentMessage, setCurrentMessage] = useState("")
     const [messages, setMessages] = useState([]);
-
+    let end_meeting;
     const sendMessage = async () =>{
         if (currentMessage!== "") {
             const sendData = {
@@ -22,6 +22,14 @@ export default function Chat({socket, username, handleSocketError}) {
             await socket.emit("new-message", sendData)
             document.getElementById("message").value = ""
         }
+    }
+    const endMeeting = async () =>{
+        const sendData = {
+            role:role,
+            roomId:roomId
+        }
+        console.log(role)
+        await socket.emit("end-meeting", sendData)
     }
 
     useEffect(() => {
@@ -39,13 +47,31 @@ export default function Chat({socket, username, handleSocketError}) {
                 const msg = "An error occured with the chatroom";
                 handleSocketError(msg);
             });
+            //TO FORCE END THE ROOM
+            socket.on("force-end",()=>{
+                sessionStorage.setItem("roomId", "");
+                window.location.href = "/";
+            });
+            // ERROR EVENT DUE TO PERMISSIONS
+            socket.on("error-permissions",()=>{
+                window.alert("You are not allowed to do that.");
+
+            });
+
+
         }
     },[socket]);
+    // to check if the end meeting button should be showed or not.
+    if (role>2) {
+        end_meeting =  <input type="button" value="End Meeting" className="button-primary" onClick={endMeeting}/>;
 
+    } else {
+        end_meeting = "";
+    }
 
     return (
         <div>
-            {/*{joinRoom}*/}
+
 
                 <div class="chatroom-card-frame">
                     <div id="chat-messages" className="chat-messages">
@@ -58,6 +84,10 @@ export default function Chat({socket, username, handleSocketError}) {
                         setCurrentMessage(event.target.value)
                     }/>
                     <input type="button" value="Send Message" className="button-primary" onClick={sendMessage}/>
+
+                    {end_meeting}
+
+
                 </div>
 
         </div>
