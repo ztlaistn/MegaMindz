@@ -94,7 +94,7 @@ class Server {
                 console.log("The user entered the video room")
                 videoRoom = true;
             });
-                
+
             socket.on("join room", roomID => {
                 console.log("video room value:")
                 console.log(videoRoom)
@@ -117,7 +117,7 @@ class Server {
 
                 console.log("Sending this user {"+socket.id+"} the list of all users:");
                 usersInThisRoom.forEach( user => console.log(user));
-                
+
                 socket.emit("all users", usersInThisRoom);
             });
 
@@ -142,7 +142,7 @@ class Server {
             });
             /* END SIGNALING SERVER EVENTS */
 
-            
+
             /* START EVENTS FOR CHATROOM */
 
             // variables for this connection
@@ -226,6 +226,31 @@ class Server {
                 roomFuncs.disconnectRoomPosition(io, socket, ourUserId, ourRoomId, ourUsername, oldThis.positionDict);
                 }
             });
+            /*
+             * Handler that will end a meeting.
+             */
+            socket.on('end-meeting', async function (data) {
+                //find if the user is the host if yes then emit force-end.
+                //else throw error
+                let client = await DbUtil.connect_client();
+                const {role,roomId} = data;
+                try {
+                    if (role < 2){
+                        const errString = "LIST ROOM ADMIN ERROR #2: Not authorized for these actions.";
+                        client.end();
+                        socket.emit('error-permissions', {message:errString})
+                    }
+                    else{
+                        await DbRoll.close_room(client,roomId)
+                        io.to(roomId.toString()).emit('force-end', {message:'force end'})
+                    }
+
+                } catch (err) {
+                    console.log(err);
+                    socket.emit('error', {message:err})
+                }
+            });
+
         });
     }
 
