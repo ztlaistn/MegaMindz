@@ -71,8 +71,6 @@ export default function Chat({socket, username, handleSocketError,role,roomId}) 
 
     return (
         <div>
-
-
                 <div class="chatroom-card-frame">
                     <div id="chat-messages" className="chat-messages">
                         {messages.map((message_data)=>{
