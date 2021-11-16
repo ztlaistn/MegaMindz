@@ -40,3 +40,17 @@ export function validateSocketToken(token_data){
         return -1;
     }
 };
+
+export function validateToken(token){
+  if(!token){
+    return -1;
+  }
+
+  try{
+      const data = jwt.verify(token, process.env.TOKEN_SECRET);
+      const retVal = data.userId;
+      return retVal;
+  } catch (err){
+      return -1;
+  }
+};
