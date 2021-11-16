@@ -48,7 +48,7 @@ class roomPosition{
     movePlayer(uid, movementData){
         let temp_pos = this.pos_dict[uid];
         if(temp_pos && temp_pos.visable){
-            const new_pos_obj = {x:movementData.x, y:movementData.y, username:user, visable:true};
+            const new_pos_obj = {x:movementData.x, y:movementData.y, username:temp_pos.username, visable:true};
             temp_pos = new_pos_obj;
             return {userId:uid, x:new_pos_obj.x, y:new_pos_obj.y, username:temp_pos.username};
         }else{
