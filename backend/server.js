@@ -13,8 +13,8 @@ import DbUtil from "../database/utils/user_database_utils";
 import DbRoll from "../database/utils/room_role_database_utils";
 
 import {validateSocketToken} from "./middleware/tokenAuth";
-import roomFuncs from "./roomFuncs";
-import roomPosition from "./roomPosition";
+import roomFuncs from "./services/roomFuncs";
+import roomPosition from "./services/roomPosition";
 
 class Server {
     httpServer;
