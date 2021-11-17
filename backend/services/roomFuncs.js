@@ -1,8 +1,8 @@
 // This file is for functions that refer to rooms, but are not strictly routes
 // This includes things relating the the sockets for those rooms
-const DbUtil = require("../database/utils/user_database_utils");
-const DbRoll = require("../database/utils/room_role_database_utils");
-const {tokenAuthorization, validateSocketToken} =  require("./middleware/tokenAuth");
+const DbUtil = require("../../database/utils/user_database_utils");
+const DbRoll = require("../../database/utils/room_role_database_utils");
+const {validateSocketToken} =  require("../middleware/tokenAuth");
 const {roomPosition} = require("./roomPosition");
 
 
