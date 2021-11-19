@@ -53,7 +53,7 @@ export default (app) => {
     } catch (err) {
         let errString;
       if(err === "Account info already exists"){
-        errString = "Email already in use for other account";
+        errString = "Email or Username already in use for other account";
         client.end();
         console.log(errString);
         return res.status(400).json({message: errString});

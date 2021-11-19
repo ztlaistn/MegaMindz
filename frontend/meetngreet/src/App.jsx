@@ -6,6 +6,7 @@ import UserAccount from "./components/UserAccount.jsx";
 import Chatroom from "./components/Chatroom.jsx";
 import VideoRoom from "./components/VideoRoom.jsx";
 import ChatroomUsers from "./components/ChatroomUsers.jsx";
+import UserAgreement from "./components/UserAgreement.jsx";
 import React from "react";
 import NavigationBar from './components/NavigationBar.jsx';
 import Home from './components/Home.jsx';
@@ -30,6 +31,11 @@ class App extends React.Component {
                             <Route path="/user-account">
                                 <CardTemplate page_title={"User Account"}>
                                     <UserAccount/>
+                                </CardTemplate>
+                            </Route>
+                            <Route path="/user-agreement">
+                                <CardTemplate page_title={"User Agreement"}>
+                                    <UserAgreement/>
                                 </CardTemplate>
                             </Route>
                             <Route path="/login">

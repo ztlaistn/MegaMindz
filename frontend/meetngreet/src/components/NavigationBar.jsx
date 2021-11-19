@@ -115,6 +115,14 @@ class NavigationBar extends React.Component {
                     </li>
                 </div>
             );
+        }else if(window.location.pathname === "/user-agreement"){
+            return(
+                <div className="login-bar">
+                    <li>
+                        <input type="button" value="Home" className="button-primary" onClick={this.toHome}/>
+                    </li>
+                </div>
+            );
         }else if(window.location.pathname === "/chatroom"){
             return(
                 <div className="chatroom-bar">
@@ -212,6 +220,18 @@ class NavigationBar extends React.Component {
                         <br/>
                         <br/>
                         <input type="button" value="Log In" className="hamburger-item" onClick={this.toLogin}/>
+                    </div>
+                );
+            } else if(window.location.pathname === "/user-agreement"){
+                return(
+                    <div className="mobile-menu">
+                        <input type="button" value="=" className="button-hamburger" onClick={this.toggleMenu}/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <input type="button" value="Home" className="hamburger-item" onClick={this.toHome}/>
                     </div>
                 );
             } else if(window.location.pathname === "/user-account"){
