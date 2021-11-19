@@ -55,9 +55,6 @@ class Server {
     /* backend routes exist here
     NOTE: will likely need to organize into seperate files as we add more routes*/
     backendRoutes() {
-        // this.app.get("/chatroom", (req,res) => {
-        //     res.render("chatroom");
-        // });
         const rootdir = __dirname.substring(0, __dirname.length-7);
         const root = require('path').join(rootdir, 'frontend', 'meetngreet', 'build')
             this.app.use(express.static(root));
@@ -68,14 +65,6 @@ class Server {
         authRouter(this.app);
         usersRouter(this.app);
         roomRouter(this.app);
-
-        this.app.get('/register', (req, res) => {
-            res.render('register');
-        });
-
-    /*this.app.get("/chat/:room", (req, res) => {
-      res.render("chatroom" , {roomId: req.param.room});
-    });*/
     }
 
 
@@ -92,43 +81,41 @@ class Server {
 
             /* ------------------ START SIGNALING SERVER FUNCTIONS ------------------*/
             socket.on("video room", () => {
-                console.log("The user entered the video room")
+                // use this to disable conflicting events for the chatroom
+                // like: disconnect event
                 videoRoom = true;
             });
 
             socket.on("join room", roomID => {
-                console.log("video room value:")
-                console.log(videoRoom)
                 if (users[roomID]) {
-                    /*
+                    /* TO DO: In video room (not chatroom), enforce max 2 video users
                     const length = users[roomID].length;
                     if (length === 4) {
                         socket.emit("room full");
                         return;
                     }
                     */
+                    // add non-first user to the correct room
                     users[roomID].push(socket.id);
-                    console.log("Adding a non-first user {" +socket.id + "} to the room: "+roomID);
                 } else {
+                    // Add first user to the correct room
                     users[roomID] = [socket.id];
-                    console.log("Adding a first user {" +socket.id + "} to the room: "+roomID);
                 }
+                // keep track of which socket ID is in which room
                 socketToRoom[socket.id] = roomID;
+                // get every other user in the room except the joiner
                 const usersInThisRoom = users[roomID].filter(id => id !== socket.id);
-
-                console.log("Sending this user {"+socket.id+"} the list of all users:");
-                usersInThisRoom.forEach( user => console.log(user));
-
+                // send it to the joiner
                 socket.emit("all users", usersInThisRoom);
             });
 
             socket.on("sending signal", payload => {
-                console.log("Original sender: {"+ payload.callerID + "} sending a signal to: {" + payload.userToSignal + "}");
+                //console.log("Original sender: {"+ payload.callerID + "} sending a signal to: {" + payload.userToSignal + "}");
                 io.to(payload.userToSignal).emit('user joined', { signal: payload.signal, callerID: payload.callerID });
             });
 
             socket.on("returning signal", payload => {
-                console.log("Another peer {" + socket.id + "} is returning their signal to: {" + payload.callerID + "}");
+                //console.log("Another peer {" + socket.id + "} is returning their signal to: {" + payload.callerID + "}");
                 io.to(payload.callerID).emit('receiving returned signal', { signal: payload.signal, id: socket.id });
             });
 

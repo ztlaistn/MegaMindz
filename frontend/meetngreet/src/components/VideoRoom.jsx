@@ -31,6 +31,20 @@ const Video = (props) => {
     );
 }
 
+const Audio = (props) => {
+    const ref = useRef();
+
+    useEffect(() => {
+        props.peer.on("stream", stream => {
+            ref.current.srcObject = stream;
+        })
+    }, []);
+
+    return (
+        <audio autoPlay ref={ref} />
+    );
+}
+
 
 const videoConstraints = {
     height: window.innerHeight / 2,
@@ -47,21 +61,22 @@ const Room = (props) => {
     useEffect(() => {
         socketRef.current = io.connect("/");
         socketRef.current.emit("video room");
-        navigator.mediaDevices.getUserMedia({ video: videoConstraints, audio: true }).then(stream => {
+        navigator.mediaDevices.getUserMedia({ video: props.videoEnabled, audio: true }).then(stream => {
            userVideo.current.srcObject = stream;
            socketRef.current.emit("join room", roomId);
+
            socketRef.current.on("all users", users => {
-            /* This array is for rendering purposes */
-            const peers = [];
-            users.forEach(userId => {
-                const peer = createPeer(userId, socketRef.current.id, stream);
-                peersRef.current.push({
-                    peerId: userId,
-                    peer,
+                /* This array is for rendering purposes */
+                const peers = [];
+                users.forEach(userId => {
+                    const peer = createPeer(userId, socketRef.current.id, stream);
+                    peersRef.current.push({
+                        peerId: userId,
+                        peer,
+                    });
+                    peers.push(peer);
                 });
-                peers.push(peer);
-            });
-            setPeers(peers);
+                setPeers(peers);
            });
 
            socketRef.current.on("user joined", payload => {
@@ -81,18 +96,21 @@ const Room = (props) => {
         })
     }, []);
 
-    /* call other users in the room */
-    // userToSignal: the other person
-    // callerId: our id
-    // stream: our stream
+    /* Function: Call another user in the room, send part 1 of 2 part handshake 
+    You send a signal to them with your stream, and expect part 2 of the handshake in the "receiving returned signal" event
+    * @param userToSignal: The user you want to call
+    * @param callerId: Your callerID
+    * @param stream: Your stream
+    */
     function createPeer(userToSignal, callerID, stream) {
         const peer = new Peer({
-            initiator: true, // we initiate our stream
+            initiator: true, // we initiated our stream
             trickle: false,
             stream
         });
         // signal event fired immediately cuz initiator: true
         peer.on("signal", signal => {
+            // send your callerID and signal to the other user via our signaling server
             socketRef.current.emit("sending signal", {userToSignal, callerID, signal});
         });
 
@@ -119,17 +137,31 @@ const Room = (props) => {
         return peer;
     }
 
-    return (
-        <Container>
-            <h1>Video Room</h1>
-            <StyledVideo muted ref={userVideo} autoPlay playsInline />
-            {peers.map((peer, index) => {
-                return (
-                    <Video key={index} peer={peer} />
-                );
-            })}
-        </Container>
-    );
+    if (props.videoEnabled){
+        return (
+            <div>
+                <h1>Video Room</h1>
+                <StyledVideo muted ref={userVideo} autoPlay playsInline />
+                {peers.map((peer, index) => {
+                    return (
+                        <Video key={index} peer={peer} />
+                    );
+                })}
+            </div>
+        );
+    } else {
+        return (
+            <div>
+                <h1>Audio Room</h1>
+                <audio ref={userVideo} autoPlay />
+                {peers.map((peer, index) => {
+                    return (
+                        <Audio key={index} peer={peer} />
+                    );
+                })}
+            </div>
+        );
+    }
 };
 
 export default Room;

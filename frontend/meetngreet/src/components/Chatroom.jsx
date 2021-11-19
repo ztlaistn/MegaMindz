@@ -133,7 +133,6 @@ export default class Chatroom extends React.Component {
     render() {
         const isError = this.state.noRoomError || this.state.socketError;
         if (isError) {
-            // to do: plug in socket error to second msg
             const errorMsg = this.state.noRoomError ? 'Error: You have not joined a valid room' : this.state.socketErrorMsg;
             return (
                 <div class="chatroom-container">
@@ -144,7 +143,6 @@ export default class Chatroom extends React.Component {
         }
 
         return (
-
             <div class="chatroom-container">
                 <div class="chatroom">
                     <Gamified socket={this.state.socket} username={this.username}/>
