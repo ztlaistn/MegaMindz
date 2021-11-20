@@ -40,18 +40,8 @@ export default class Chatroom extends React.Component {
         // if no roomId (or roomId is not number), show error message to user
         if (!roomId || !(+roomId)) {
             this.setState({noRoomError: true});
-            //window.alert("Error: Failed to join room, no roomID");
         }else{
-            // console.log("Connecting to socket for room " + roomId)
-            // oldThis.setState({roomId: roomId});
-            // let socket = oldThis.state.socket;
-            // socket.on("connect",function() {
-            //     const connData = {
-            //         auth: "Bearer " + sessionStorage.getItem("token"),
-            //         roomId: parseInt(roomId) 
-            //     };
-            //     socket.emit("new-user", connData);
-            // });
+
             fetch('/room/joinRoom', {
                 method: 'POST', 
                 headers: {
@@ -88,15 +78,6 @@ export default class Chatroom extends React.Component {
                                 console.log("we are connecting")
                                 socket.emit("new-user", connData);
                             });
-                            
-                            // socket.on("reconnect", function() {
-                            //     const connData = {
-                            //         auth: "Bearer " + sessionStorage.getItem("token"),
-                            //         roomId: parseInt(roomId) 
-                            //     };
-                            //     console.log("we are reconnecting")
-                            //     socket.emit("new-user", connData);
-                            // });
 
                             oldThis.setState({
                                 ourRole: data.role,
