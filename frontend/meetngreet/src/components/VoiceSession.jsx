@@ -1,37 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import io from "socket.io-client";
 import Peer from "simple-peer";
-import styled from "styled-components";
+import MediaPlayer from "./MediaPlayer";
 
-const StyledVideo = styled.video`
-    height: 40%;
-    width: 50%;
-`;
-
-const MediaPlayer = (props) => {
-    const ref = useRef();
-
-    useEffect(() => {
-        props.peer.on("stream", stream => {
-            ref.current.srcObject = stream;
-        })
-    }, []);
-
-    let chosenMedia = props.videoEnabled // if video enabled
-                        ? (<StyledVideo playsInline autoPlay ref={ref} />) // return styled video
-                        : (<audio autoPlay ref={ref} />); // else return audio
-    return (
-        chosenMedia
-    );
-}
-
-
+// constraints currently not in use, feel free to use for future development
 const videoConstraints = {
     height: window.innerHeight / 2,
     width: window.innerWidth / 2
 };
 
-const Room = (props) => {
+const VoiceSession = (props) => {
     const [peers, setPeers] = useState([]); // used for rendering video
     const socketRef = useRef();
     const userVideo = useRef();
@@ -120,7 +98,7 @@ const Room = (props) => {
 
     const mediaText = props.videoEnabled ? "Video" : "Audio";
     const ourMediaPlayer = props.videoEnabled
-                                ? (<StyledVideo muted ref={userVideo} autoPlay playsInline />)
+                                ? (<video muted ref={userVideo} autoPlay playsInline />)
                                 : (<audio muted ref={userVideo} autoPlay />);
     return (
         <div>
@@ -139,4 +117,4 @@ const Room = (props) => {
     );
 };
 
-export default Room;
+export default VoiceSession;
