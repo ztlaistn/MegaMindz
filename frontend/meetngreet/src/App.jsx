@@ -50,7 +50,7 @@ class App extends React.Component {
                                 <ChatroomUsers/>
                             </Route>
                             <Route path="/videoroom">
-                                <VideoRoom videoEnabled={false} />
+                                <VideoRoom videoEnabled={true} />
                             </Route>
                             <Route path="/">
                                 <CardTemplate page_title={"Home"}>

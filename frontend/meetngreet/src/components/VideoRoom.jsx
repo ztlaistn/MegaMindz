@@ -3,21 +3,12 @@ import io from "socket.io-client";
 import Peer from "simple-peer";
 import styled from "styled-components";
 
-const Container = styled.div`
-    padding: 20px;
-    display: flex;
-    height: 100vh;
-    width: 90%;
-    margin: auto;
-    flex-wrap: wrap;
-`;
-
 const StyledVideo = styled.video`
     height: 40%;
     width: 50%;
 `;
 
-const Video = (props) => {
+const MediaPlayer = (props) => {
     const ref = useRef();
 
     useEffect(() => {
@@ -26,22 +17,11 @@ const Video = (props) => {
         })
     }, []);
 
+    let chosenMedia = props.videoEnabled // if video enabled
+                        ? (<StyledVideo playsInline autoPlay ref={ref} />) // return styled video
+                        : (<audio autoPlay ref={ref} />); // else return audio
     return (
-        <StyledVideo playsInline autoPlay ref={ref} />
-    );
-}
-
-const Audio = (props) => {
-    const ref = useRef();
-
-    useEffect(() => {
-        props.peer.on("stream", stream => {
-            ref.current.srcObject = stream;
-        })
-    }, []);
-
-    return (
-        <audio autoPlay ref={ref} />
+        chosenMedia
     );
 }
 
@@ -125,43 +105,38 @@ const Room = (props) => {
             trickle: false,
             stream
         });
-        // not fired immediately, we send our signal back to them
-        // it fires when we accept their signal (#1)
+        // not fired immediately, 
+        // it fires when we accept other user's signal (*)
+        // then we return our signal back to them
         peer.on("signal", signal => {
             socketRef.current.emit("returning signal", {signal, callerID});
         });
 
-        // accept their signal here
+        // (*) accept their signal here
         peer.signal(incomingSignal);
 
         return peer;
     }
 
-    if (props.videoEnabled){
-        return (
-            <div>
-                <h1>Video Room</h1>
-                <StyledVideo muted ref={userVideo} autoPlay playsInline />
-                {peers.map((peer, index) => {
-                    return (
-                        <Video key={index} peer={peer} />
-                    );
-                })}
-            </div>
-        );
-    } else {
-        return (
-            <div>
-                <h1>Audio Room</h1>
-                <audio ref={userVideo} autoPlay />
-                {peers.map((peer, index) => {
-                    return (
-                        <Audio key={index} peer={peer} />
-                    );
-                })}
-            </div>
-        );
-    }
+    const mediaText = props.videoEnabled ? "Video" : "Audio";
+    const ourMediaPlayer = props.videoEnabled
+                                ? (<StyledVideo muted ref={userVideo} autoPlay playsInline />)
+                                : (<audio muted ref={userVideo} autoPlay />);
+    return (
+        <div>
+            <h1>{`${mediaText} Room`}</h1>
+
+            {/* Add our media player */}
+            {ourMediaPlayer}
+
+            {/* Add other users' media players */}
+            {peers.map((peer, index) => {
+                return (
+                    <MediaPlayer key={index} peer={peer} videoEnabled={props.videoEnabled}/>
+                );
+            })}
+        </div>
+    );
 };
 
 export default Room;
