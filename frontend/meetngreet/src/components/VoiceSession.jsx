@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import io from "socket.io-client";
 import Peer from "simple-peer";
 import MediaPlayer from "./MediaPlayer";
 
@@ -9,13 +8,20 @@ const videoConstraints = {
     width: window.innerWidth / 2
 };
 
-const VoiceSession = ({videoEnabled, socket}) => {
-    const [peers, setPeers] = useState([]); // used for rendering video
+/* Functional Component: Sets up the voice session by using Peer objects and rendering their streams in HTML elements
+* @param videoEnabled: true/false - whether to render video/audio or audio only
+* @param socket: The socket object
+* @param addPeersRef: Function that adds a new peer to the parent's state
+* @param findPeersRefById: Function that locates peer ref from parent state using specified id
+*/
+const VoiceSession = ({videoEnabled, socket, addPeersRef, findPeersRefById}) => {
+    // peers array used for rendering each peer as MediaPlayer component (useState causes a re-render on change)
+    const [peers, setPeers] = useState([]); 
     const socketRef = useRef();
     const ourMedia = useRef();
-    const peersRef = useRef([]); // Holds actual peer streams
     const roomId = sessionStorage.getItem("roomId");
 
+    // detect changes to the web socket
     useEffect(() => {
         if (socket) {
             socketRef.current = socket;
@@ -25,31 +31,30 @@ const VoiceSession = ({videoEnabled, socket}) => {
                 console.log("join room event sent");
 
                 socketRef.current.on("all users", users => {
-                        /* This array is for rendering purposes */
                         const peers = [];
                         users.forEach(userId => {
                             const peer = createPeer(userId, socketRef.current.id, stream);
-                            peersRef.current.push({
-                                peerId: userId,
-                                peer,
-                            });
+                            /* Add peer stream to state in parent component */
+                            addPeersRef(userId, peer);
+                            /* Add peer to temp array */
                             peers.push(peer);
                         });
+                        /* Set array to temp array for rendering purposes */
                         setPeers(peers);
                 });
 
                 socketRef.current.on("user joined", payload => {
                         const peer = addPeer(payload.signal, payload.callerID, stream);
-                        peersRef.current.push({
-                            peerId : payload.callerID,
-                            peer,
-                        });
                         
+                        /* Add peer stream to state in parent component */
+                        addPeersRef(payload.callerID, peer);
+                        
+                        /* add this peer to rendering array */
                         setPeers( users => [...users, peer]);
                 });
 
                 socketRef.current.on("receiving returned signal", payload => {
-                        const item = peersRef.current.find(p => p.peerId === payload.id);
+                        const item = findPeersRefById(payload.id);
                         item.peer.signal(payload.signal);
                 });
             });
@@ -100,8 +105,8 @@ const VoiceSession = ({videoEnabled, socket}) => {
 
     const mediaText = videoEnabled ? "Video" : "Audio";
     const ourMediaPlayer = videoEnabled
-                                ? (<video muted ref={ourMedia} autoPlay playsInline />)
-                                : (<audio muted ref={ourMedia} autoPlay />);
+                                ? (<video muted ref={ourMedia} autoPlay playsInline />) // if true
+                                : (<audio muted ref={ourMedia} autoPlay />); // if false
     return (
         <div>
             <h1>{`${mediaText} Room`}</h1>

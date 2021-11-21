@@ -1,4 +1,4 @@
-import React from "react";
+import React, {createRef} from "react";
 import io from "socket.io-client";
 import "./styles/Text.css";
 import "./styles/Input.css";
@@ -9,6 +9,7 @@ import VoiceSession from "./VoiceSession";
 export default class Videoroom extends React.Component {
     constructor(props) {
         super(props);
+        // when state is changed, this component is re-rendered
         this.state = {
             socket: null,
             username: "",
@@ -16,6 +17,13 @@ export default class Videoroom extends React.Component {
             noRoomError: false,
             setup: false
         };
+        // Holds actual peer streams - when Ref is changed, there is no re-render
+        this.peersRef = [];
+
+        // do not let scoping in function to change
+        this.addPeersRef = this.addPeersRef.bind(this);
+        this.findPeersRefById = this.findPeersRefById.bind(this);
+
     }
 
     componentDidMount() {
@@ -40,7 +48,8 @@ export default class Videoroom extends React.Component {
                 socket.emit("video room");
                 oldThis.setState({
                     setup: true,
-                    socket
+                    socket,
+                    roomId
                 });
             }
         }
@@ -49,6 +58,18 @@ export default class Videoroom extends React.Component {
     toHome = () => {
         window.location.href = "/home";
     };
+
+    addPeersRef = (peerId, peer) => {
+        this.peersRef.push({
+            peerId,
+            peer,
+        });
+    }
+
+    findPeersRefById = (targetId) => {
+        const item = this.peersRef.find(p => p.peerId === targetId);
+        return item;
+    }
 
     render() {
         if (this.state.noRoomError) {
@@ -64,7 +85,13 @@ export default class Videoroom extends React.Component {
         return (
             <div class="videoroom-container">
                 <div class="videoroom">
-                    <VoiceSession videoEnabled={true} socket={this.state.socket}  />
+                    <VoiceSession 
+                        videoEnabled={true} 
+                        socket={this.state.socket} 
+                        peersRef={this.peersRef}
+                        addPeersRef={this.addPeersRef}
+                        findPeersRefById={this.findPeersRefById}
+                    />
                 </div>
             </div>
         );
