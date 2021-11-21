@@ -4,7 +4,7 @@ import LoginForm from "./components/Login.jsx";
 import RegistrationForm from "./components/Registration.jsx";
 import UserAccount from "./components/UserAccount.jsx";
 import Chatroom from "./components/Chatroom.jsx";
-import VideoRoom from "./components/VideoRoom.jsx";
+import Videoroom from './components/VideoRoom';
 import ChatroomUsers from "./components/ChatroomUsers.jsx";
 import UserAgreement from "./components/UserAgreement.jsx";
 import React from "react";
@@ -50,7 +50,7 @@ class App extends React.Component {
                                 <ChatroomUsers/>
                             </Route>
                             <Route path="/videoroom">
-                                <VideoRoom/>
+                                <Videoroom/>
                             </Route>
                             <Route path="/">
                                 <CardTemplate page_title={"Home"}>
