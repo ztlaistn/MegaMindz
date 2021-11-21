@@ -103,14 +103,11 @@ const VoiceSession = ({videoEnabled, socket, addPeersRef, findPeersRefById}) => 
         return peer;
     }
 
-    const mediaText = videoEnabled ? "Video" : "Audio";
     const ourMediaPlayer = videoEnabled
                                 ? (<video muted ref={ourMedia} autoPlay playsInline />) // if true
                                 : (<audio muted ref={ourMedia} autoPlay />); // if false
     return (
         <div>
-            <h1>{`${mediaText} Room`}</h1>
-
             {/* Add our media player */}
             {ourMediaPlayer}
 
