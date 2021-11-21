@@ -5,10 +5,12 @@ import "./styles/Chatroom.css";
 import Gamified from "./Gamified.jsx";
 import io from "socket.io-client";
 import Chat from "./EnterChat"
+import VoiceSession from "./VoiceSession";
 
 export default class Chatroom extends React.Component {
     constructor(props) {
         super(props);
+        // when state is changed, this component is re-rendered
         this.state = {
             socket: null,
             username: "",
@@ -19,8 +21,13 @@ export default class Chatroom extends React.Component {
             ourRole: 0,
             setup: false
         };
+        // Holds actual peer streams - when changed, there is no re-render
+        this.peersRef = [];
+
         // do not let scoping in function to change
         this.handleSocketError = this.handleSocketError.bind(this);
+        this.addPeersRef = this.addPeersRef.bind(this);
+        this.findPeersRefById = this.findPeersRefById.bind(this);
     }
 
     componentDidMount() {
@@ -104,6 +111,18 @@ export default class Chatroom extends React.Component {
         window.location.href = "/home";
     };
 
+    addPeersRef = (peerId, peer) => {
+        this.peersRef.push({
+            peerId,
+            peer,
+        });
+    }
+
+    findPeersRefById = (targetId) => {
+        const item = this.peersRef.find(p => p.peerId === targetId);
+        return item;
+    }
+
     render() {
         const isError = this.state.noRoomError || this.state.socketError;
         if (isError) {
@@ -121,6 +140,13 @@ export default class Chatroom extends React.Component {
                 <div class="chatroom">
                     <Gamified socket={this.state.socket} username={this.username}/>
                     <Chat socket={this.state.socket} username={this.username} handleSocketError={this.handleSocketError} role = {this.state.ourRole} roomId={this.state.roomId}/>
+                    <VoiceSession 
+                        videoEnabled={false} 
+                        socket={this.state.socket} 
+                        peersRef={this.peersRef}
+                        addPeersRef={this.addPeersRef}
+                        findPeersRefById={this.findPeersRefById}
+                    />
                 </div>
             </div>
         );

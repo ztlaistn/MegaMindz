@@ -17,7 +17,7 @@ export default class Videoroom extends React.Component {
             noRoomError: false,
             setup: false
         };
-        // Holds actual peer streams - when Ref is changed, there is no re-render
+        // Holds actual peer streams - when changed, there is no re-render
         this.peersRef = [];
 
         // do not let scoping in function to change
