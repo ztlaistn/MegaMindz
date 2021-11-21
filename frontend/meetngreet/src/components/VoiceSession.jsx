@@ -12,7 +12,7 @@ const videoConstraints = {
 const VoiceSession = ({videoEnabled, socket}) => {
     const [peers, setPeers] = useState([]); // used for rendering video
     const socketRef = useRef();
-    const userVideo = useRef();
+    const ourMedia = useRef();
     const peersRef = useRef([]); // Holds actual peer streams
     const roomId = sessionStorage.getItem("roomId");
 
@@ -20,7 +20,7 @@ const VoiceSession = ({videoEnabled, socket}) => {
         if (socket) {
             socketRef.current = socket;
             navigator.mediaDevices.getUserMedia({ video: videoEnabled, audio: true }).then(stream => {
-                userVideo.current.srcObject = stream;
+                ourMedia.current.srcObject = stream;
                 socketRef.current.emit("join room", roomId);
                 console.log("join room event sent");
 
@@ -100,8 +100,8 @@ const VoiceSession = ({videoEnabled, socket}) => {
 
     const mediaText = videoEnabled ? "Video" : "Audio";
     const ourMediaPlayer = videoEnabled
-                                ? (<video muted ref={userVideo} autoPlay playsInline />)
-                                : (<audio muted ref={userVideo} autoPlay />);
+                                ? (<video muted ref={ourMedia} autoPlay playsInline />)
+                                : (<audio muted ref={ourMedia} autoPlay />);
     return (
         <div>
             <h1>{`${mediaText} Room`}</h1>
