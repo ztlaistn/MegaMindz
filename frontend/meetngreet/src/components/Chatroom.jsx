@@ -111,8 +111,9 @@ export default class Chatroom extends React.Component {
         window.location.href = "/home";
     };
 
-    addPeersRef = (peerId, peer) => {
+    addPeersRef = (peerName, peerId, peer) => {
         this.peersRef.push({
+            username: peerName,
             peerId,
             peer,
         });
