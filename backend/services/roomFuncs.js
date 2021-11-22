@@ -316,12 +316,10 @@ function newUserRoomPosition(io, socket, ourRoomId, ourUserId, ourUsername, ourS
         console.log("UserId: " + ourUserId + " first person to add position to room " + ourRoomId);
 
         posDict[ourRoomId] = new roomPosition();
-        const out_pos_obj = posDict[ourRoomId].newPlayer(ourUserId, ourUsername, ourSprite);
+        posDict[ourRoomId].newPlayer(ourUserId, ourUsername, ourSprite);
 
-        // Note: This is a socket emit since we want the message to not go back to the sender.
-        // This is because we will have an update all event made for them
-        // This out_pos_obj will include sprite information.
-        socket.to(ourRoomId.toString()).emit('new-charater-event', out_pos_obj);
+        // Note: Doesn't send the new character event since no one else is in the room to recieve it
+
         // Note: this WILL inlcude the user that just joined
         socket.emit('update-all-positions', posDict[ourRoomId].returnVisable());
     }
