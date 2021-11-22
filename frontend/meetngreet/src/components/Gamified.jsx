@@ -35,6 +35,8 @@ export default function Gamified({socket, username}) {
 
                 //Add other online characters
                 this.otherPlayers = this.add.group();
+                this.otherNames = this.add.group();
+
                 let self = this;
                 //Populate the room with other characters
                 socket.on('new-character-event', function(player){
@@ -42,15 +44,25 @@ export default function Gamified({socket, username}) {
                         const otherPlayer = self.add.sprite(player.x, player.y, 'character');
                         otherPlayer.playerId = player.username;
                         self.otherPlayers.add(otherPlayer);
+
+                        const otherName = self.add.text((player.x - 40), (player.y + 70), player.username, { fontFamily: 'Work Sans', color: '#FFFFFF', stroke: '#000000', strokeThickness: 5 });
+                        otherName.playerId = player.username;
+                        self.otherNames.add(otherName);
                     }
                 });
                 this.character = this.add.sprite(200, 200, 'character');
+                this.name = this.add.text((200 - 40), (200 + 70), sessionStorage.getItem("username"), { fontFamily: 'Work Sans', color: '#FFFFFF', stroke: '#000000', strokeThickness: 5 });
 
                 //Removes the character locally and in other games upon disconnect
                 socket.on('member-left-room', function(player) {
                     self.otherPlayers.getChildren().forEach(function(otherPlayer) {
                         if (player.username === otherPlayer.playerId) {
                             otherPlayer.destroy();
+                        }
+                    });
+                    self.otherNames.getChildren().forEach(function(otherName) {
+                        if (player.username === otherName.playerId) {
+                            otherName.destroy();
                         }
                     })
                 });
@@ -64,6 +76,11 @@ export default function Gamified({socket, username}) {
                                 otherPlayer.playerId = player.username;
                                 self.otherPlayers.add(otherPlayer);
                             }
+                            if(!self.otherNames.getChildren().includes(player.username)){
+                                const otherName = self.add.text((player.x - 40), (player.y + 70), player.username, { fontFamily: 'Work Sans', color: '#FFFFFF', stroke: '#000000', strokeThickness: 5 });
+                                otherName.playerId = player.username;
+                                self.otherNames.add(otherName);
+                            }
                         }
                     })
                 });
@@ -74,6 +91,11 @@ export default function Gamified({socket, username}) {
                     self.otherPlayers.getChildren().forEach(function(otherPlayer) {
                         if (player.username === otherPlayer.playerId) {
                             otherPlayer.setPosition(player.x, player.y);
+                        }
+                    });
+                    self.otherNames.getChildren().forEach(function(otherName) {
+                        if (player.username === otherName.playerId) {
+                            otherName.setPosition((player.x - 40), (player.y + 70));
                         }
                     })
                 });
@@ -98,20 +120,35 @@ export default function Gamified({socket, username}) {
                     isClicking = false;
                 }
 
+                //Perform distance calculations
+                this.otherNames.getChildren().forEach((otherName) => {
+                    if(Math.sqrt((Math.pow((otherName.x - this.name.x), 2)) + (Math.pow((otherName.y - this.name.y), 2))) < 250){
+                        otherName.setStyle({ fontFamily: 'Work Sans', color: '#34FF00', stroke: '#000000', strokeThickness: 5 });
+                    } else {
+                        otherName.setStyle({ fontFamily: 'Work Sans', color: '#FF021F', stroke: '#000000', strokeThickness: 5 });
+                    }
+                });
+
                 //Perform movement calculations
                 if(Math.abs(this.character.x - this.character.getData("positionX")) <= 10) {
                     this.character.x = this.character.getData("positionX");
+                    this.name.x = this.character.getData("positionX") - 40;
                 } else if(this.character.x < this.character.getData("positionX")) {
                     this.character.x += 5;
+                    this.name.x += 5;
                 } else if(this.character.x > this.character.getData("positionX")) {
                     this.character.x -= 5;
+                    this.name.x -= 5;
                 }
                 if(Math.abs(this.character.y - this.character.getData("positionY")) <= 10) {
                     this.character.y = this.character.getData("positionY");
+                    this.name.y = this.character.getData("positionY") + 70;
                 } else if(this.character.y < this.character.getData("positionY")) {
                     this.character.y += 5;
+                    this.name.y += 5;
                 } else if(this.character.y > this.character.getData("positionY")) {
                     this.character.y -= 5;
+                    this.name.y -= 5;
                 }
 
                 var x = this.character.x;
