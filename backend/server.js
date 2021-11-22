@@ -86,7 +86,8 @@ class Server {
                 videoRoom = true;
             });
 
-            socket.on("join room", roomID => {
+            socket.on("join room", data => {
+                const {username, roomID} = data;
                 if (users[roomID]) {
                     /* TO DO: In video room (not chatroom), enforce max 2 video users
                     const length = users[roomID].length;
@@ -96,22 +97,28 @@ class Server {
                     }
                     */
                     // add non-first user to the correct room
-                    users[roomID].push(socket.id);
+                    users[roomID].push({
+                        socketId: socket.id, 
+                        callerName: username
+                    });
                 } else {
                     // Add first user to the correct room
-                    users[roomID] = [socket.id];
+                    users[roomID] = [{
+                        socketId: socket.id, 
+                        callerName: username
+                    }];
                 }
                 // keep track of which socket ID is in which room
                 socketToRoom[socket.id] = roomID;
                 // get every other user in the room except the joiner
-                const usersInThisRoom = users[roomID].filter(id => id !== socket.id);
+                const usersInThisRoom = users[roomID].filter(elem => elem.socketId !== socket.id);
                 // send it to the joiner
                 socket.emit("all users", usersInThisRoom);
             });
 
             socket.on("sending signal", payload => {
-                //console.log("Original sender: {"+ payload.callerID + "} sending a signal to: {" + payload.userToSignal + "}");
-                io.to(payload.userToSignal).emit('user joined', { signal: payload.signal, callerID: payload.callerID });
+                console.log(`Original sender: ${payload.callerID} name: ${payload.username} sending a signal to: ${payload.userToSignal}`);
+                io.to(payload.userToSignal).emit('user joined', { signal: payload.signal, callerID: payload.callerID, callerName: payload.username });
             });
 
             socket.on("returning signal", payload => {

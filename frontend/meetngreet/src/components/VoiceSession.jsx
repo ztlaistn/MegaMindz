@@ -20,6 +20,8 @@ const VoiceSession = ({videoEnabled, socket, addPeersRef, findPeersRefById}) => 
     const socketRef = useRef();
     const ourMedia = useRef();
     const roomId = sessionStorage.getItem("roomId");
+    const username = sessionStorage.getItem("username");
+
 
     // detect changes to the web socket
     useEffect(() => {
@@ -27,15 +29,18 @@ const VoiceSession = ({videoEnabled, socket, addPeersRef, findPeersRefById}) => 
             socketRef.current = socket;
             navigator.mediaDevices.getUserMedia({ video: videoEnabled, audio: true }).then(stream => {
                 ourMedia.current.srcObject = stream;
-                socketRef.current.emit("join room", roomId);
+
+                const data = {username, roomId};
+                socketRef.current.emit("join room", data);
                 console.log("join room event sent");
 
                 socketRef.current.on("all users", users => {
                         const peers = [];
-                        users.forEach(userId => {
-                            const peer = createPeer(userId, socketRef.current.id, stream);
+                        users.forEach(user => {
+                            const {socketId, callerName} = user; // here we get the caller's name
+                            const peer = createPeer(socketId, socket.id, username, stream);
                             /* Add peer stream to state in parent component */
-                            addPeersRef(userId, peer);
+                            addPeersRef(callerName, socketId, peer);
                             /* Add peer to temp array */
                             peers.push(peer);
                         });
@@ -44,10 +49,11 @@ const VoiceSession = ({videoEnabled, socket, addPeersRef, findPeersRefById}) => 
                 });
 
                 socketRef.current.on("user joined", payload => {
+                        console.log("Attempting to connect to: "+ payload.callerName);
                         const peer = addPeer(payload.signal, payload.callerID, stream);
                         
                         /* Add peer stream to state in parent component */
-                        addPeersRef(payload.callerID, peer);
+                        addPeersRef(payload.callerName, payload.callerId, peer);
                         
                         /* add this peer to rendering array */
                         setPeers( users => [...users, peer]);
@@ -55,6 +61,7 @@ const VoiceSession = ({videoEnabled, socket, addPeersRef, findPeersRefById}) => 
 
                 socketRef.current.on("receiving returned signal", payload => {
                         const item = findPeersRefById(payload.id);
+                        addPeersRef(item.username, payload.id, )
                         item.peer.signal(payload.signal);
                 });
             });
@@ -67,7 +74,7 @@ const VoiceSession = ({videoEnabled, socket, addPeersRef, findPeersRefById}) => 
     * @param callerId: Your callerID
     * @param stream: Your stream
     */
-    function createPeer(userToSignal, callerID, stream) {
+    function createPeer(userToSignal, callerID, username, stream) {
         const peer = new Peer({
             initiator: true, // we initiated our stream
             trickle: false,
@@ -76,7 +83,7 @@ const VoiceSession = ({videoEnabled, socket, addPeersRef, findPeersRefById}) => 
         // signal event fired immediately cuz initiator: true
         peer.on("signal", signal => {
             // send your callerID and signal to the other user via our signaling server
-            socketRef.current.emit("sending signal", {userToSignal, callerID, signal});
+            socketRef.current.emit("sending signal", {userToSignal, callerID, username, signal});
         });
 
         return peer;
