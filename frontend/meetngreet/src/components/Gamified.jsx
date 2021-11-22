@@ -35,6 +35,8 @@ export default function Gamified({socket, username}) {
 
                 //Add other online characters
                 this.otherPlayers = this.add.group();
+                this.otherNames = this.add.group();
+
                 let self = this;
                 //Populate the room with other characters
                 socket.on('new-character-event', function(player){
@@ -42,6 +44,10 @@ export default function Gamified({socket, username}) {
                         const otherPlayer = self.add.sprite(player.x, player.y, 'character');
                         otherPlayer.playerId = player.username;
                         self.otherPlayers.add(otherPlayer);
+
+                        const otherName = self.add.text((player.x - 40), (player.y + 70), player.username);
+                        otherName.playerId = player.username;
+                        self.otherNames.add(otherName);
                     }
                 });
                 this.character = this.add.sprite(200, 200, 'character');
@@ -51,6 +57,11 @@ export default function Gamified({socket, username}) {
                     self.otherPlayers.getChildren().forEach(function(otherPlayer) {
                         if (player.username === otherPlayer.playerId) {
                             otherPlayer.destroy();
+                        }
+                    });
+                    self.otherNames.getChildren().forEach(function(otherName) {
+                        if (player.username === otherName.playerId) {
+                            otherName.destroy();
                         }
                     })
                 });
@@ -64,6 +75,11 @@ export default function Gamified({socket, username}) {
                                 otherPlayer.playerId = player.username;
                                 self.otherPlayers.add(otherPlayer);
                             }
+                            if(!self.otherNames.getChildren().includes(player.username)){
+                                const otherName = self.add.text((player.x - 40), (player.y + 70), player.username);
+                                otherName.playerId = player.username;
+                                self.otherNames.add(otherName);
+                            }
                         }
                     })
                 });
@@ -74,6 +90,11 @@ export default function Gamified({socket, username}) {
                     self.otherPlayers.getChildren().forEach(function(otherPlayer) {
                         if (player.username === otherPlayer.playerId) {
                             otherPlayer.setPosition(player.x, player.y);
+                        }
+                    });
+                    self.otherNames.getChildren().forEach(function(otherName) {
+                        if (player.username === otherName.playerId) {
+                            otherName.setPosition((player.x - 40), (player.y + 70));
                         }
                     })
                 });
@@ -97,6 +118,13 @@ export default function Gamified({socket, username}) {
                     this.character.setData("positionY", this.input.activePointer.position.y);
                     isClicking = false;
                 }
+
+                //Perform distance calculations
+                this.otherPlayers.getChildren().forEach((otherPlayer) => {
+                    if(Math.sqrt((Math.pow((otherPlayer.x - this.character.x), 2)) + (Math.pow((otherPlayer.y - this.character.y), 2))) < 250){
+                        console.log(otherPlayer.username);
+                    }
+                });
 
                 //Perform movement calculations
                 if(Math.abs(this.character.x - this.character.getData("positionX")) <= 10) {
