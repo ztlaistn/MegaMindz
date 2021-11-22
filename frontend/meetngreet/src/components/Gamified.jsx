@@ -50,9 +50,7 @@ export default function Gamified({socket, username}) {
                         self.otherNames.add(otherName);
                     }
                 });
-                this.character = this.add.sprite(200, 200, 'character');
-                this.name = this.add.text((200 - 40), (200 + 70), sessionStorage.getItem("username"), { fontFamily: 'Work Sans', color: '#FFFFFF', stroke: '#000000', strokeThickness: 5 });
-
+                
                 //Removes the character locally and in other games upon disconnect
                 socket.on('member-left-room', function(player) {
                     self.otherPlayers.getChildren().forEach(function(otherPlayer) {
@@ -81,13 +79,16 @@ export default function Gamified({socket, username}) {
                                 otherName.playerId = player.username;
                                 self.otherNames.add(otherName);
                             }
+                        }else{
+                            self.character = self.add.sprite(player.x, player.y, 'character');
+                            self.name = self.add.text((player.x - 40), (player.y + 70), sessionStorage.getItem("username"), { fontFamily: 'Work Sans', color: '#FFFFFF', stroke: '#000000', strokeThickness: 5 });
                         }
                     })
                 });
 
                 //Updates the movement of characters on the local screen
                 socket.on('new-move', function(player) {
-                    console.log(player);
+                    // console.log(player);
                     self.otherPlayers.getChildren().forEach(function(otherPlayer) {
                         if (player.username === otherPlayer.playerId) {
                             otherPlayer.setPosition(player.x, player.y);
@@ -107,55 +108,58 @@ export default function Gamified({socket, username}) {
                 });
             },
             update: function() {
-                // save old position data
-                this.character.oldPosition = {
-                  x: this.character.x,
-                  y: this.character.y,
-                };
-                //Define character movement (click to move)
-                //Check if mouse pointer was clicked or screen was tapped
-                if(!this.input.activePointer.isDown && isClicking === true) {
-                    this.character.setData("positionX", this.input.activePointer.position.x);
-                    this.character.setData("positionY", this.input.activePointer.position.y);
-                    isClicking = false;
-                }
-
-                //Perform distance calculations
-                this.otherNames.getChildren().forEach((otherName) => {
-                    if(Math.sqrt((Math.pow((otherName.x - this.name.x), 2)) + (Math.pow((otherName.y - this.name.y), 2))) < 250){
-                        otherName.setStyle({ fontFamily: 'Work Sans', color: '#34FF00', stroke: '#000000', strokeThickness: 5 });
-                    } else {
-                        otherName.setStyle({ fontFamily: 'Work Sans', color: '#FF021F', stroke: '#000000', strokeThickness: 5 });
+                if (this.character){
+                    // save old position data
+                    this.character.oldPosition = {
+                        x: this.character.x,
+                        y: this.character.y,
+                    };
+                    //Define character movement (click to move)
+                    //Check if mouse pointer was clicked or screen was tapped
+                    if(!this.input.activePointer.isDown && isClicking === true) {
+                        this.character.setData("positionX", this.input.activePointer.position.x);
+                        this.character.setData("positionY", this.input.activePointer.position.y);
+                        isClicking = false;
                     }
-                });
-
-                //Perform movement calculations
-                if(Math.abs(this.character.x - this.character.getData("positionX")) <= 10) {
-                    this.character.x = this.character.getData("positionX");
-                    this.name.x = this.character.getData("positionX") - 40;
-                } else if(this.character.x < this.character.getData("positionX")) {
-                    this.character.x += 5;
-                    this.name.x += 5;
-                } else if(this.character.x > this.character.getData("positionX")) {
-                    this.character.x -= 5;
-                    this.name.x -= 5;
+    
+                    //Perform distance calculations
+                    this.otherNames.getChildren().forEach((otherName) => {
+                        if(Math.sqrt((Math.pow((otherName.x - this.name.x), 2)) + (Math.pow((otherName.y - this.name.y), 2))) < 250){
+                            otherName.setStyle({ fontFamily: 'Work Sans', color: '#34FF00', stroke: '#000000', strokeThickness: 5 });
+                        } else {
+                            otherName.setStyle({ fontFamily: 'Work Sans', color: '#FF021F', stroke: '#000000', strokeThickness: 5 });
+                        }
+                    });
+    
+                    //Perform movement calculations
+                    if(Math.abs(this.character.x - this.character.getData("positionX")) <= 10) {
+                        this.character.x = this.character.getData("positionX");
+                        this.name.x = this.character.getData("positionX") - 40;
+                    } else if(this.character.x < this.character.getData("positionX")) {
+                        this.character.x += 5;
+                        this.name.x += 5;
+                    } else if(this.character.x > this.character.getData("positionX")) {
+                        this.character.x -= 5;
+                        this.name.x -= 5;
+                    }
+                    if(Math.abs(this.character.y - this.character.getData("positionY")) <= 10) {
+                        this.character.y = this.character.getData("positionY");
+                        this.name.y = this.character.getData("positionY") + 70;
+                    } else if(this.character.y < this.character.getData("positionY")) {
+                        this.character.y += 5;
+                        this.name.y += 5;
+                    } else if(this.character.y > this.character.getData("positionY")) {
+                        this.character.y -= 5;
+                        this.name.y -= 5;
+                    }
+    
+                    var x = this.character.x;
+                    var y = this.character.y;
+                    if (this.character.oldPosition && (x !== this.character.oldPosition.x || y !== this.character.oldPosition.y)) {
+                        socket.emit('new-move', {auth: "Bearer " + sessionStorage.getItem("token"), move: { x: this.character.x, y: this.character.y}});
+                    }
                 }
-                if(Math.abs(this.character.y - this.character.getData("positionY")) <= 10) {
-                    this.character.y = this.character.getData("positionY");
-                    this.name.y = this.character.getData("positionY") + 70;
-                } else if(this.character.y < this.character.getData("positionY")) {
-                    this.character.y += 5;
-                    this.name.y += 5;
-                } else if(this.character.y > this.character.getData("positionY")) {
-                    this.character.y -= 5;
-                    this.name.y -= 5;
-                }
-
-                var x = this.character.x;
-                var y = this.character.y;
-                if (this.character.oldPosition && (x !== this.character.oldPosition.x || y !== this.character.oldPosition.y)) {
-                  socket.emit('new-move', {auth: "Bearer " + sessionStorage.getItem("token"), move: { x: this.character.x, y: this.character.y}});
-                }
+                
             }
         }
     }}
