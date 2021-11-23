@@ -53,6 +53,8 @@ export default function Gamified({socket, username}) {
                             if(!self.otherPlayers.getChildren().includes(player.username)){
                                 const otherPlayer = self.add.sprite(player.x, player.y, "s" + player.sprite);
                                 otherPlayer.playerId = player.username;
+                                otherPlayer.width = 100;
+                                otherPlayer.height = 128;
                                 self.otherPlayers.add(otherPlayer);
                             }
                             if(!self.otherNames.getChildren().includes(player.username)){
@@ -62,6 +64,8 @@ export default function Gamified({socket, username}) {
                             }
                         }else{
                             self.character = self.add.sprite(player.x, player.y, "s" + player.sprite);
+                            self.character.width = 100;
+                            self.character.heigh = 128;
                             self.name = self.add.text((player.x - 40), (player.y + 70), sessionStorage.getItem("username"), { fontFamily: 'Work Sans', color: '#FFFFFF', stroke: '#000000', strokeThickness: 5 });
                         }
                     })
@@ -72,6 +76,8 @@ export default function Gamified({socket, username}) {
                     if(player.username !== sessionStorage.getItem("username")){
                         const otherPlayer = self.add.sprite(player.x, player.y, "s" + player.sprite);
                         otherPlayer.playerId = player.username;
+                        otherPlayer.width = 100;
+                        otherPlayer.height = 128;
                         self.otherPlayers.add(otherPlayer);
 
                         const otherName = self.add.text((player.x - 40), (player.y + 70), player.username, { fontFamily: 'Work Sans', color: '#FFFFFF', stroke: '#000000', strokeThickness: 5 });

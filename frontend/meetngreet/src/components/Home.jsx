@@ -146,8 +146,7 @@ export default class Home extends React.Component {
     render() {
         return (
             <div id="home">
-
-
+                <img src={sample_profile} className="profile-picture" alt=""/>
                 <br/>
                 <b>Welcome back, {this.state.username}</b>
                 <br/>
