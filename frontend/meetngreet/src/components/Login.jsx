@@ -65,9 +65,17 @@ export default class Login extends React.Component {
                 <div className="login-credentials">
                     <form>
                         <label for="email" className="text-input-label">Email Address</label>
-                        <input type="email" required id="email" name="email" placeholder="Email" onChange={this.check_credentials}/>
+                        <input type="email" required id="email" name="email" placeholder="Email" onChange={this.check_credentials} onKeyDown={(event)=> {
+                        if(event.key === "Enter") {
+                          this.process_login();
+                        };
+                        }}/>
                         <label for="password" className="text-input-label">Password</label>
-                        <input type="password" required id="password" name="password" placeholder="Password" onChange={this.check_credentials}/>
+                        <input type="password" required id="password" name="password" placeholder="Password" onChange={this.check_credentials} onKeyDown={(event)=> {
+                        if(event.key === "Enter") {
+                          this.process_login();
+                        };
+                        }}/>
                         <aside class="error-text">{this.state.errorMsg}</aside>
                         <input type="button" id="login_button" value="Log In" className="button-primary" onClick={this.process_login}/>
                     </form>
