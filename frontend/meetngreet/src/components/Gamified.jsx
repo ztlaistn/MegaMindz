@@ -7,8 +7,12 @@ import "./styles/Gamified.css";
 //Import game images here
 import chatroom_background from "../assets/chatroom-background.jpg";
 import chatroom_character from "../assets/chatroom-character.gif";
-import chatroom_sprite_1 from "../assets/chatroom-character-1.png";
-import chatroom_sprite_2 from "../assets/chatroom-character-2.png";
+import chatroom_sprite_default from "../assets/sample-profile-cropped.png";
+import chatroom_sprite_1 from "../assets/sprite1.png";
+import chatroom_sprite_2 from "../assets/sprite2.png";
+import chatroom_sprite_3 from "../assets/sprite3.png";
+import chatroom_sprite_4 from "../assets/sprite4.png";
+
 import chatroom_sprite_test from "../assets/chatroom-idle-test.png";
 
 //Initialize game as HTML component
@@ -29,10 +33,11 @@ export default function Gamified({socket, username}) {
                 //Load all assets used in the scene
                 console.log(chatroom_sprite_1)
                 this.load.image('background',chatroom_background);
-                this.load.image('s0', chatroom_character);
+                this.load.image('s0', chatroom_sprite_default);
                 this.load.image('s1', chatroom_sprite_1);
                 this.load.image('s2', chatroom_sprite_2);
-                this.load.image('s3', chatroom_sprite_test);
+                this.load.image('s3', chatroom_sprite_3);
+                this.load.image('s4', chatroom_sprite_4);
             },
             create: function() {
                 //Add background; define sizes
@@ -53,8 +58,8 @@ export default function Gamified({socket, username}) {
                             if(!self.otherPlayers.getChildren().includes(player.username)){
                                 const otherPlayer = self.add.sprite(player.x, player.y, "s" + player.sprite);
                                 otherPlayer.playerId = player.username;
-                                otherPlayer.width = 100;
-                                otherPlayer.height = 128;
+                                otherPlayer.displayWidth = 100;
+                                otherPlayer.displayHeight = 128;
                                 self.otherPlayers.add(otherPlayer);
                             }
                             if(!self.otherNames.getChildren().includes(player.username)){
@@ -64,8 +69,8 @@ export default function Gamified({socket, username}) {
                             }
                         }else{
                             self.character = self.add.sprite(player.x, player.y, "s" + player.sprite);
-                            self.character.width = 100;
-                            self.character.heigh = 128;
+                            self.character.displayWidth = 100;
+                            self.character.displayHeight = 128;
                             self.name = self.add.text((player.x - 40), (player.y + 70), sessionStorage.getItem("username"), { fontFamily: 'Work Sans', color: '#FFFFFF', stroke: '#000000', strokeThickness: 5 });
                         }
                     })
@@ -76,9 +81,10 @@ export default function Gamified({socket, username}) {
                     if(player.username !== sessionStorage.getItem("username")){
                         const otherPlayer = self.add.sprite(player.x, player.y, "s" + player.sprite);
                         otherPlayer.playerId = player.username;
-                        otherPlayer.width = 100;
-                        otherPlayer.height = 128;
+                        otherPlayer.displayWidth = 100;
+                                otherPlayer.displayHeight = 128;
                         self.otherPlayers.add(otherPlayer);
+
 
                         const otherName = self.add.text((player.x - 40), (player.y + 70), player.username, { fontFamily: 'Work Sans', color: '#FFFFFF', stroke: '#000000', strokeThickness: 5 });
                         otherName.playerId = player.username;

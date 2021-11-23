@@ -22,7 +22,7 @@ export default class UserAccount extends React.Component {
             dob : "",
             sprite : 0,
             url : process.env.SITE_URL,
-            sprites_map : {0:profile_sample,1:sprite_one,2:sprite_two,3:sprite_three, 4:sprite_four}
+            sprites_map : {0:sample_profile,1:sprite_one,2:sprite_two,3:sprite_three, 4:sprite_four}
         };
 
         //this.change_Handler = this.change_Handler.bind(this);
@@ -133,32 +133,32 @@ export default class UserAccount extends React.Component {
     // }
 
     handleClick0= () =>  {
-        console.log("sprite num" + 0);
+        // console.log("sprite num" + 0);
         this.setState({
             sprite:0
         });
     };
     handleClick1= () =>  {
-        console.log("sprite num" + 1);
+        // console.log("sprite num" + 1);
         this.setState({
             sprite:1
         });
     };
     handleClick2= () => {
-        console.log("sprite num" + 2);
+        // console.log("sprite num" + 2);
         this.setState({
             sprite:2
 
         });
     };
     handleClick3= () =>  {
-        console.log("sprite num" + 3);
+        // console.log("sprite num" + 3);
         this.setState({
             sprite:3
         });
     };
     handleClick4= () =>  {
-        console.log("sprite num" + 4);
+        // console.log("sprite num" + 4);
         this.setState({
             sprite:4
         });
@@ -166,14 +166,13 @@ export default class UserAccount extends React.Component {
     
     render() {
         console.log(this.state.sprite)
-        console.log("kk")
         console.log(this.state.sprites_map[this.state.sprite])
         return (
             <div id="user-account">
                     <div className="images">
                         <p>Choose your Avatar!</p>
                         <div className="image">
-                            <img src={profile_sample} className="profile-picture" alt = "" onClick={this.handleClick0}/>
+                            <img src={sample_profile} className="profile-picture" alt = "" onClick={this.handleClick0}/>
                         </div>
                         <div className="image">
                             <img src={sprite_one} className="profile-picture" alt ="" onClick={this.handleClick1}/>
