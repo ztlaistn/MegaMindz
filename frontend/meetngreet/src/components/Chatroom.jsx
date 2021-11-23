@@ -145,6 +145,7 @@ export default class Chatroom extends React.Component {
 
         // Temp page when socket setup not complete
         if (!this.state.setupComplete){
+            return (<div></div>);
             return (
                 <div class="chatroom-container">
                     <h1 class="title-font">{"Connecting You To Chatroom."}</h1>

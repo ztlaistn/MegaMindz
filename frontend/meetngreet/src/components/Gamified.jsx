@@ -44,6 +44,28 @@ export default function Gamified({socket, username}) {
                 this.otherNames = this.add.group();
 
                 let self = this;
+
+                socket.on('update-all-positions', function(players) {
+                    console.log(players);
+                    players.forEach((player) =>{
+                        if(player.username !== sessionStorage.getItem("username")){
+                            if(!self.otherPlayers.getChildren().includes(player.username)){
+                                const otherPlayer = self.add.sprite(player.x, player.y, "character"); //+ player.sprite);
+                                otherPlayer.playerId = player.username;
+                                self.otherPlayers.add(otherPlayer);
+                            }
+                            if(!self.otherNames.getChildren().includes(player.username)){
+                                const otherName = self.add.text((player.x - 40), (player.y + 70), player.username, { fontFamily: 'Work Sans', color: '#FFFFFF', stroke: '#000000', strokeThickness: 5 });
+                                otherName.playerId = player.username;
+                                self.otherNames.add(otherName);
+                            }
+                        }else{
+                            self.character = self.add.sprite(player.x, player.y, "character");// + player.sprite);
+                            self.name = self.add.text((player.x - 40), (player.y + 70), sessionStorage.getItem("username"), { fontFamily: 'Work Sans', color: '#FFFFFF', stroke: '#000000', strokeThickness: 5 });
+                        }
+                    })
+                });
+                
                 //Populate the room with other characters
                 socket.on('new-character-event', function(player){
                     if(player.username !== sessionStorage.getItem("username")){
@@ -67,27 +89,6 @@ export default function Gamified({socket, username}) {
                     self.otherNames.getChildren().forEach(function(otherName) {
                         if (player.username === otherName.playerId) {
                             otherName.destroy();
-                        }
-                    })
-                });
-
-                socket.on('update-all-positions', function(players) {
-                    console.log(players);
-                    players.forEach((player) =>{
-                        if(player.username !== sessionStorage.getItem("username")){
-                            if(!self.otherPlayers.getChildren().includes(player.username)){
-                                const otherPlayer = self.add.sprite(player.x, player.y, "character"); //+ player.sprite);
-                                otherPlayer.playerId = player.username;
-                                self.otherPlayers.add(otherPlayer);
-                            }
-                            if(!self.otherNames.getChildren().includes(player.username)){
-                                const otherName = self.add.text((player.x - 40), (player.y + 70), player.username, { fontFamily: 'Work Sans', color: '#FFFFFF', stroke: '#000000', strokeThickness: 5 });
-                                otherName.playerId = player.username;
-                                self.otherNames.add(otherName);
-                            }
-                        }else{
-                            self.character = self.add.sprite(player.x, player.y, "character");// + player.sprite);
-                            self.name = self.add.text((player.x - 40), (player.y + 70), sessionStorage.getItem("username"), { fontFamily: 'Work Sans', color: '#FFFFFF', stroke: '#000000', strokeThickness: 5 });
                         }
                     })
                 });
