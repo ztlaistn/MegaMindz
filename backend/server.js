@@ -137,6 +137,7 @@ class Server {
             let ourUsername;
             let ourUserId = -1;
             let ourRoomId = -1;
+            let ourSprite = -1;
 
             console.log("Socket connected.");
             socket.emit('new-message', {message:'Trying to connect user to room.'});
@@ -161,6 +162,7 @@ class Server {
                     ourUserId = retData.userId;
                     ourRoomId = retData.roomId;
                     ourUsername = retData.username;
+                    ourSprite = retData.sprite;
                     setupFlag = true;
                 } catch (err){
                     console.log(err);
@@ -170,7 +172,7 @@ class Server {
                 if (setupFlag){
                     // If we are here, we can assume we setup correctly
                     // Can do any actions needed for once a user connects to a room
-                    roomFuncs.newUserRoomPosition(io, socket, ourRoomId, ourUserId, ourUsername, oldThis.positionDict)
+                    roomFuncs.newUserRoomPosition(io, socket, ourRoomId, ourUserId, ourUsername, ourSprite, oldThis.positionDict)
                 }
             });
 
