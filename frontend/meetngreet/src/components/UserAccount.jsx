@@ -3,8 +3,12 @@ import "./styles/Login.css";
 import "./styles/Input.css";
 import "./styles/UserAccount.css";
 
-import sample_profile from "../assets/sample-profile.png";
 import login_icon from "../assets/login_icon.png";
+import zero from "../assets/sample-profile.png";
+import one from "../assets/1.png";
+import two from "../assets/2.png";
+import three from "../assets/3.png";
+import four from "../assets/4.png";
 
 export default class UserAccount extends React.Component {
     constructor(props) {
@@ -16,8 +20,11 @@ export default class UserAccount extends React.Component {
             skills: "",
             status : "",
             dob : "",
-            url : process.env.SITE_URL
+            sprite : 1,
+            url : process.env.SITE_URL,
+            sprites_map : {1:one,2:two,3:three,4:four}
         };
+
         //this.change_Handler = this.change_Handler.bind(this);
         //this.handle_submit = this.handle_submit.bind(this);
         this.componentDidMount = this.componentDidMount.bind(this);
@@ -47,7 +54,8 @@ export default class UserAccount extends React.Component {
                     dob: this.state.dob,
                     location: this.state.location,
                     status: this.state.status,
-                    skills: this.state.skills
+                    skills: this.state.skills,
+                    sprite:this.state.sprite
                 }
             })
         }).then(
@@ -98,13 +106,15 @@ export default class UserAccount extends React.Component {
                         //console.log("This is us4: ", this);
                         response.json().then(function(data) {
                             console.log(data);
+                            console.log("hii");
                             var trimmedDOB = data.dob.substring(0, 10);
                             temp_this.setState({
                                 full_name: data.full_name,
                                 dob: trimmedDOB,
                                 location: data.location,
                                 status: data.status,
-                                skills: data.skills
+                                skills: data.skills,
+                                sprite: data.sprite
                             });
                         });
                     }
@@ -116,12 +126,69 @@ export default class UserAccount extends React.Component {
         }
     }
 
+    // handleClick = (props) => {
+    //     this.setState({
+    //         hasBeenClicked: true
+    //     })
+    // }
 
+    handleClick1= () =>  {
+        console.log("sprite num");
+        this.setState({
+            sprite:1
+        });
+
+
+    };
+    handleClick2= () => {
+        console.log("sprite num");
+        this.setState({
+            sprite:2
+
+        });
+
+
+    };
+    handleClick3= () =>  {
+        console.log("sprite num");
+        this.setState({
+            sprite:3
+        });
+
+
+    };
+    handleClick4= () =>  {
+        console.log("sprite num");
+        this.setState({
+            sprite:4
+        });
+
+    };
     render() {
+        console.log(this.state.sprite)
+        console.log("kk")
+        console.log(this.state.sprites_map[this.state.sprite])
         return (
             <div id="user-account">
-                <img src={sample_profile} className="profile-picture" alt=""/>
+                    <div className="images">
+                        <p>Choose your Avatar!</p>
+                        <div className="image">
+                    <img src={one} className="profile-picture" alt = "" onClick={this.handleClick1}/>
+                        </div>
+                        <div className="image">
+                        <img src={two} className="profile-picture" alt=""  onClick={this.handleClick2}/>
+                        </div>
+                        <div className="image">
+                        <img src={three} className="profile-picture" alt="" onClick={this.handleClick3}/>
+                        </div>
+                        <div className="image">
+                        <img src={four} className="profile-picture" alt="" onClick={this.handleClick4}/>
+                        </div>
+                    </div>
                 <div className="account-credentials">
+                    <p>Your current Avatar!</p>
+                    <img src={this.state.sprites_map[this.state.sprite]} className="profile-picture" alt = "Choose Profile Picture" />
+
                     <form onSubmit={this.handle_submit}>
                         <label className="name">
                             Name
