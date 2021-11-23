@@ -63,13 +63,29 @@ export default class Registration extends React.Component {
                 <div className="registration-credentials">
                     <form>
                         <label for="email">Email Address</label>
-                        <input type="email" required id="email" name="email" placeholder="Email" onChange={this.check_credentials}/>
+                        <input type="email" required id="email" name="email" placeholder="Email" onChange={this.check_credentials} onKeyDown={(event)=> {
+                        if(event.key === "Enter") {
+                          this.process_registration();
+                        };
+                        }}/>
                         <label for="username">Username</label>
-                        <input type="text" required id="username" name="username" placeholder="Username" onChange={this.check_credentials}/>
+                        <input type="text" required id="username" name="username" placeholder="Username" onChange={this.check_credentials} onKeyDown={(event)=> {
+                        if(event.key === "Enter") {
+                          this.process_registration();
+                        };
+                        }}/>
                         <label for="password">Password (Must be at least 8 characters)</label>
-                        <input type="password" required id="password" name="password" placeholder="Password" onChange={this.check_credentials}/>
+                        <input type="password" required id="password" name="password" placeholder="Password" onChange={this.check_credentials} onKeyDown={(event)=> {
+                        if(event.key === "Enter") {
+                          this.process_registration();
+                        };
+                        }}/>
                         <label for="password-confirmation">Confirm Password</label>
-                        <input type="password" required id="password-confirmation" name="password-confirmation" placeholder="Password" onChange={this.check_credentials}/>
+                        <input type="password" required id="password-confirmation" name="password-confirmation" placeholder="Password" onChange={this.check_credentials} onKeyDown={(event)=> {
+                        if(event.key === "Enter") {
+                          this.process_registration();
+                        };
+                        }}/>
                         <label>Accept our <a href="user-agreement">User Agreement?</a> <input type="checkbox" class="eula" id="eula" name="eula" value="EULA"/></label>
                         <br/>
                         <aside class="error-text">{this.state.errorMsg}</aside>
