@@ -28,6 +28,7 @@ export default class Chatroom extends React.Component {
         this.handleSocketError = this.handleSocketError.bind(this);
         this.addPeersRef = this.addPeersRef.bind(this);
         this.findPeersRefById = this.findPeersRefById.bind(this);
+        this.mutePeerByUsername = this.mutePeerByUsername.bind(this);
     }
 
     componentDidMount() {
@@ -124,6 +125,18 @@ export default class Chatroom extends React.Component {
         return item;
     }
 
+    mutePeerByUsername = (otherName, isMuted) => {
+        this.peersRef.forEach((player) => {
+            if((player.username === otherName) && (player.username !== sessionStorage.getItem("username")) && (player.peer != null)){
+                if(player.peer._remoteStreams != null) {
+                    player.peer._remoteStreams.forEach((stream) => {
+                        stream.getAudioTracks().forEach(track => track.enabled = !isMuted);
+                    });
+                }
+            }
+        });
+    }
+
     render() {
         const isError = this.state.noRoomError || this.state.socketError;
         if (isError) {
@@ -139,7 +152,7 @@ export default class Chatroom extends React.Component {
         return (
             <div class="chatroom-container">
                 <div class="chatroom">
-                    <Gamified socket={this.state.socket} username={this.username}/>
+                    <Gamified socket={this.state.socket} username={this.username} mutePeerByUsername={this.mutePeerByUsername}/>
                     <Chat socket={this.state.socket} username={this.username} handleSocketError={this.handleSocketError} role = {this.state.ourRole} roomId={this.state.roomId}/>
                     <VoiceSession 
                         videoEnabled={false} 

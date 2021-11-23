@@ -9,7 +9,7 @@ import chatroom_background from "../assets/chatroom-background.jpg";
 import chatroom_character from "../assets/chatroom-character.gif";
 
 //Initialize game as HTML component
-export default function Gamified({socket, username}) {
+export default function Gamified({socket, username, mutePeerByUsername}) {
     var isClicking = false;
     console.log(socket);
     return(
@@ -120,12 +120,31 @@ export default function Gamified({socket, username}) {
                     isClicking = false;
                 }
 
+                socket.on('update-all-positions', (players) => {
+                    players.forEach((player) => {
+                        this.otherPlayers.getChildren().forEach((otherPlayer) => {
+                            if (player.username === otherPlayer.playerId) {
+                                otherPlayer.x = player.x;
+                                otherPlayer.y = player.y;
+                            }
+                        });
+                        this.otherNames.getChildren().forEach((otherName) => {
+                            if (player.username === otherName.playerId) {
+                                otherName.x = player.x - 40;
+                                otherName.y = player.y + 70;
+                            }
+                        });
+                    });
+                });
+
                 //Perform distance calculations
                 this.otherNames.getChildren().forEach((otherName) => {
                     if(Math.sqrt((Math.pow((otherName.x - this.name.x), 2)) + (Math.pow((otherName.y - this.name.y), 2))) < 250){
-                        otherName.setStyle({ fontFamily: 'Work Sans', color: '#34FF00', stroke: '#000000', strokeThickness: 5 });
+                        otherName.setStyle({ fontFamily: 'Work Sans', color: '#58CFEA', stroke: '#000000', strokeThickness: 5 });
+                        mutePeerByUsername(otherName.playerId, false);
                     } else {
-                        otherName.setStyle({ fontFamily: 'Work Sans', color: '#FF021F', stroke: '#000000', strokeThickness: 5 });
+                        otherName.setStyle({ fontFamily: 'Work Sans', color: '#F5A623', stroke: '#000000', strokeThickness: 5 });
+                        mutePeerByUsername(otherName.playerId, true);
                     }
                 });
 
