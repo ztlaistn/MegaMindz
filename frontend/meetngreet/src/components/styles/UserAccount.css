@@ -16,6 +16,37 @@
     border-radius: 1000px;
 }
 
+.current-sprite{
+    cursor: pointer;
+    border-radius: 500px;
+}
+
+.images{
+    cursor: pointer;
+    display: block;
+    float: left;
+    border-radius: 1000px;
+    height: 100px;
+    width: 200px;
+
+}
+/*.image:hover {*/
+/*    position:relative;*/
+/*    top:-25px;*/
+/*    left:-35px;*/
+/*    width:500px;*/
+/*    height:auto;*/
+/*    display:block;*/
+/*    z-index:999;*/
+/*}*/
+.images::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+
+
 /* Small devices (landscape phones, 576px and up) */
 @media only screen and (max-width: 768px) {
     .account-credentials {

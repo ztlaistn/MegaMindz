@@ -6,6 +6,7 @@ import sample_profile from "../assets/sample-profile.png";
 import login_icon from "../assets/login_icon.png";
 import {Link, Redirect} from "react-router-dom";
 
+
 export default class Home extends React.Component {
     constructor(props) {
         super(props);
@@ -145,7 +146,8 @@ export default class Home extends React.Component {
     render() {
         return (
             <div id="home">
-                <img src={sample_profile} className="profile-picture" alt=""/>
+
+
                 <br/>
                 <b>Welcome back, {this.state.username}</b>
                 <br/>
