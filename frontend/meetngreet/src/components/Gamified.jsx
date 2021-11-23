@@ -7,9 +7,9 @@ import "./styles/Gamified.css";
 //Import game images here
 import chatroom_background from "../assets/chatroom-background.jpg";
 import chatroom_character from "../assets/chatroom-character.gif";
-import chatroom_sprite0 from "../assets/chatroom-sprite0.png";
-import chatroom_sprite1 from "../assets/chatroom-sprite1.png";
-import chatroom_sprite2 from "../assets/chatroom-sprite2.png";
+// import chatroom_sprite_a from "../assets/chatroom-sprite0.png";
+// import chatroom_sprite_b from "../assets/chatroom-sprite1.png";
+// import chatroom_sprite_c from "../assets/chatroom-sprite2.png";
 
 //Initialize game as HTML component
 export default function Gamified({socket, username}) {
@@ -29,9 +29,9 @@ export default function Gamified({socket, username}) {
                 //Load all assets used in the scene
                 this.load.image('background',chatroom_background);
                 this.load.image('character',chatroom_character);
-                this.load.image('sprite0', chatroom_sprite0);
-                this.load.image('sprite1', chatroom_sprite1);
-                this.load.image('sprite2', chatroom_sprite2);
+                // this.load.image('spriteA', chatroom_sprite_a);
+                // this.load.image('spriteB', chatroom_sprite_b);
+                // this.load.image('spriteC', chatroom_sprite_c);
             },
             create: function() {
                 //Add background; define sizes
@@ -47,7 +47,7 @@ export default function Gamified({socket, username}) {
                 //Populate the room with other characters
                 socket.on('new-character-event', function(player){
                     if(player.username !== sessionStorage.getItem("username")){
-                        const otherPlayer = self.add.sprite(player.x, player.y, "sprite" + player.sprite);
+                        const otherPlayer = self.add.sprite(player.x, player.y, "character"); //+ player.sprite);
                         otherPlayer.playerId = player.username;
                         self.otherPlayers.add(otherPlayer);
 
@@ -73,10 +73,10 @@ export default function Gamified({socket, username}) {
 
                 socket.on('update-all-positions', function(players) {
                     console.log(players);
-                    players.forEach(function(player){
+                    players.forEach((player) =>{
                         if(player.username !== sessionStorage.getItem("username")){
                             if(!self.otherPlayers.getChildren().includes(player.username)){
-                                const otherPlayer = self.add.sprite(player.x, player.y, "sprite" + player.sprite);
+                                const otherPlayer = self.add.sprite(player.x, player.y, "character"); //+ player.sprite);
                                 otherPlayer.playerId = player.username;
                                 self.otherPlayers.add(otherPlayer);
                             }
@@ -86,7 +86,7 @@ export default function Gamified({socket, username}) {
                                 self.otherNames.add(otherName);
                             }
                         }else{
-                            self.character = self.add.sprite(player.x, player.y, "sprite" + player.sprite);
+                            self.character = self.add.sprite(player.x, player.y, "character");// + player.sprite);
                             self.name = self.add.text((player.x - 40), (player.y + 70), sessionStorage.getItem("username"), { fontFamily: 'Work Sans', color: '#FFFFFF', stroke: '#000000', strokeThickness: 5 });
                         }
                     })
