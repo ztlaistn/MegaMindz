@@ -7,22 +7,25 @@ We will likely cater this to a conference or education based setting.
 
 ## Getting Started
 - Download the app
-- CMD/Terminal into the directory with the dockerfile
-- docker-compose up
+- CMD/Terminal into the main directory
+- Execute npm install
+- Execute yarn heroku-postbuild
+- Execute yarn start
 
 ## Features
 - Log In with email and password
-- Password reset email
+- Set User Settings
 - Movement with mouse, or touchpad if mobile
 - Voice proximity
+- Text chat
 
 ## Deployment
-- Our app is not yet live on Heroku [here](https://google.com)
+- Our app is live on Heroku [here](https://megamindzz.herokuapp.com/)
+- Our development version is live on Heroku [here](https://meet--n--greet.herokuapp.com/)
 - Our wireframes are live on Figma [here](https://www.figma.com/file/ZiVKfdxSwSmI6LpcNDQrye/Conference-App-Style-Guide)
 
 ## Built With
 - NodeJS
-- Python
 - JavaScript
 - Docker
 
