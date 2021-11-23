@@ -21,6 +21,7 @@ export default function Chat({socket, username, handleSocketError,role,roomId}) 
 
             await socket.emit("new-message", sendData)
             document.getElementById("message").value = ""
+            setCurrentMessage("")
         }
     }
     const endMeeting = async () =>{
@@ -80,9 +81,14 @@ export default function Chat({socket, username, handleSocketError,role,roomId}) 
 
                     <input type="text" required id="message" name="message" placeholder="Start Chatting..." onChange={(event)=>
                         setCurrentMessage(event.target.value)
-                    }/>
+                    }
+                    onKeyDown={(event)=> {
+                        if(event.key === "Enter") {
+                            sendMessage();
+                        };
+                    }}/>
                     <input type="button" value="Send Message" className="button-primary" onClick={sendMessage}/>
-
+                    
                     {end_meeting}
 
 

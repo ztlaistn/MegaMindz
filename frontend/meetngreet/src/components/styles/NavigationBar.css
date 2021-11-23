@@ -8,6 +8,7 @@
   flex-direction: row;
   background-color: #FFFFFF;
   list-style-type: none;
+  z-index: 100;
 }
 
 .navigation-bar ul{
@@ -48,6 +49,7 @@
     margin-left: auto;
     gap: 30px;
     list-style-type: none;
+    z-index: 100;
 }
 
 .navigation-items{
@@ -144,6 +146,7 @@
     background-color: #1D4FB4;
     min-width: 160px;
     flex-direction: column;
+    z-index: 1000;
 }
 .button-chatroom-dropdown + .dropdown-content:active,
 .button-chatroom-dropdown:focus + .dropdown-content {

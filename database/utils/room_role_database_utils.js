@@ -3,7 +3,7 @@
 */
 const {Client} = require('pg');
 
-
+const ROLE_BANNED        = -1;
 const ROLE_GUEST        = 0;
 const ROLE_VIP          = 1;
 const ROLE_MODERATOR    = 2;
@@ -204,6 +204,7 @@ module.exports = {
     find_user_in_room_roll,
     set_role,
     close_room,
+    ROLE_BANNED,
     ROLE_GUEST,
     ROLE_VIP,
     ROLE_MODERATOR,

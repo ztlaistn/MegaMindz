@@ -160,6 +160,11 @@ export default class Home extends React.Component {
                         type="text"
                         onChange={e => this.change_Handler("roomId", e)}
                         value={this.state.roomId}
+                        onKeyDown={(event)=> {
+                            if(event.key === "Enter") {
+                                this.join_room();
+                            };
+                        }}
                     />
                 </label>
                 <input type="button" value="Join Chat Room" className="button-primary" onClick={this.join_room}/>
@@ -172,6 +177,11 @@ export default class Home extends React.Component {
                         type="text"
                         onChange={e => this.change_Handler("videoRoomId", e)}
                         value={this.state.videoRoomId}
+                        onKeyDown={(event)=> {
+                            if(event.key === "Enter") {
+                                this.toVideoRoom();
+                            };
+                        }}
                     />
                 </label>
                 <input type="button" value="Join Video Room" className="button-primary" onClick={this.toVideoRoom}/>
