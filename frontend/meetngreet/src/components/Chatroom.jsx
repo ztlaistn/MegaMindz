@@ -82,6 +82,7 @@ export default class Chatroom extends React.Component {
                                 };
                                 console.log("we are connecting")
                                 socket.emit("new-user", connData);
+                                oldThis.state.setupComplete = true;
                                 // oldThis.setState({
                                 //     setupComplete: true       
                                 // });
@@ -144,15 +145,15 @@ export default class Chatroom extends React.Component {
         }
 
         // Temp page when socket setup not complete
-        // if (!this.state.setupComplete){
-        //     return (<div></div>);
-        //     return (
-        //         <div class="chatroom-container">
-        //             <h1 class="title-font">{"Connecting You To Chatroom."}</h1>
-        //             <input type="button" value="Return to Home" className="button-primary" onClick={this.toHome}/>
-        //         </div>
-        //     );
-        // }
+        if (!this.state.setupStart){
+            return (<div></div>);
+            return (
+                <div class="chatroom-container">
+                    <h1 class="title-font">{"Connecting You To Chatroom."}</h1>
+                    <input type="button" value="Return to Home" className="button-primary" onClick={this.toHome}/>
+                </div>
+            );
+        }
 
         return (
             <div class="chatroom-container">
