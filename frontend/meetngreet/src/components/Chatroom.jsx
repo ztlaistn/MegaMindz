@@ -83,17 +83,17 @@ export default class Chatroom extends React.Component {
                                 console.log("we are connecting")
                                 socket.emit("new-user", connData);
                                 oldThis.setState({
-                                    setupComplete: true,
-                                    ourRole: data.role,
-                                    username: sessionStorage.getItem("username"),
-                                    roomId: roomId
+                                    setupComplete: true       
                                 });
                             });
 
+                            oldThis.state.ourRole = data.role;
+                            oldThis.state.username = sessionStorage.getItem("username");
+                            oldThis.state.roomId = roomId;
                             // oldThis.setState({
-                                // ourRole: data.role,
-                                // username: sessionStorage.getItem("username"),
-                                // roomId: roomId,
+                            //     ourRole: data.role,
+                            //     username: sessionStorage.getItem("username"),
+                            //     roomId: roomId,
                             // });
                         });
                     }
