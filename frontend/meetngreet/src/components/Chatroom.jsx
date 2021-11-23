@@ -19,7 +19,8 @@ export default class Chatroom extends React.Component {
             socketError: false,
             socketErrorMsg: "",
             ourRole: 0,
-            setup: false
+            setupStart: false,
+            setupComplete: false
         };
         // Holds actual peer streams - when changed, there is no re-render
         this.peersRef = [];
@@ -65,9 +66,9 @@ export default class Chatroom extends React.Component {
                         });
                     }else{
                         response.json().then(function(data){
-                            if (!oldThis.state.setup){
+                            if (!oldThis.state.setupStart){
                                 oldThis.state.socket = io.connect("/")
-                                oldThis.state.setup = true
+                                oldThis.state.setupStart = true;
                             }
 
                             let socket = oldThis.state.socket;
@@ -81,8 +82,15 @@ export default class Chatroom extends React.Component {
                                 };
                                 console.log("we are connecting")
                                 socket.emit("new-user", connData);
+                                oldThis.state.setupComplete = true;
+                                // oldThis.setState({
+                                //     setupComplete: true       
+                                // });
                             });
 
+                            // oldThis.state.ourRole = data.role;
+                            // oldThis.state.username = sessionStorage.getItem("username");
+                            // oldThis.state.roomId = roomId;
                             oldThis.setState({
                                 ourRole: data.role,
                                 username: sessionStorage.getItem("username"),
@@ -131,6 +139,17 @@ export default class Chatroom extends React.Component {
             return (
                 <div class="chatroom-container">
                     <h1 class="title-font">{errorMsg}</h1>
+                    <input type="button" value="Return to Home" className="button-primary" onClick={this.toHome}/>
+                </div>
+            );
+        }
+
+        // Temp page when socket setup not complete
+        if (!this.state.setupStart){
+            return (<div></div>);
+            return (
+                <div class="chatroom-container">
+                    <h1 class="title-font">{"Connecting You To Chatroom."}</h1>
                     <input type="button" value="Return to Home" className="button-primary" onClick={this.toHome}/>
                 </div>
             );
