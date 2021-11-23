@@ -19,7 +19,8 @@ export default class Chatroom extends React.Component {
             socketError: false,
             socketErrorMsg: "",
             ourRole: 0,
-            setup: false
+            setup: false,
+            peersHTML: []
         };
         // Holds actual peer streams - when changed, there is no re-render
         this.peersRef = [];
@@ -28,6 +29,7 @@ export default class Chatroom extends React.Component {
         this.handleSocketError = this.handleSocketError.bind(this);
         this.addPeersRef = this.addPeersRef.bind(this);
         this.findPeersRefById = this.findPeersRefById.bind(this);
+        this.setPeersHTML = this.setPeersHTML.bind(this);
     }
 
     componentDidMount() {
@@ -124,6 +126,12 @@ export default class Chatroom extends React.Component {
         return item;
     }
 
+    setPeersHTML = (peers) => {
+        this.setState({
+            peersHTML: peers
+        });
+    }
+
     render() {
         const isError = this.state.noRoomError || this.state.socketError;
         if (isError) {
@@ -147,6 +155,8 @@ export default class Chatroom extends React.Component {
                         peersRef={this.peersRef}
                         addPeersRef={this.addPeersRef}
                         findPeersRefById={this.findPeersRefById}
+                        peersHTML={this.state.peersHTML}
+                        setPeersHTML={this.setPeersHTML}
                     />
                 </div>
             </div>

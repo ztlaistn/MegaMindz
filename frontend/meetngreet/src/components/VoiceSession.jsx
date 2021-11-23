@@ -14,9 +14,9 @@ const videoConstraints = {
 * @param addPeersRef: Function that adds a new peer to the parent's state
 * @param findPeersRefById: Function that locates peer ref from parent state using specified id
 */
-const VoiceSession = ({videoEnabled, socket, addPeersRef, findPeersRefById}) => {
+const VoiceSession = ({videoEnabled, socket, addPeersRef, findPeersRefById, peersHTML, setPeersHTML}) => {
     // peers array used for rendering each peer as MediaPlayer component (useState causes a re-render on change)
-    const [peers, setPeers] = useState([]); 
+    //const [peers, setPeers] = useState([]); 
     const socketRef = useRef();
     const ourMedia = useRef();
     const roomId = sessionStorage.getItem("roomId");
@@ -42,10 +42,10 @@ const VoiceSession = ({videoEnabled, socket, addPeersRef, findPeersRefById}) => 
                             /* Add peer stream to state in parent component */
                             addPeersRef(callerName, socketId, peer);
                             /* Add peer to temp array */
-                            peers.push(peer);
+                            peers.push({peer: peer, username: callerName});
                         });
                         /* Set array to temp array for rendering purposes */
-                        setPeers(peers);
+                        setPeersHTML(peers);
                 });
 
                 socketRef.current.on("user joined", payload => {
@@ -56,7 +56,9 @@ const VoiceSession = ({videoEnabled, socket, addPeersRef, findPeersRefById}) => 
                         addPeersRef(payload.callerName, payload.callerId, peer);
                         
                         /* add this peer to rendering array */
-                        setPeers( users => [...users, peer]);
+                        //setPeers( users => [...users, peer]);
+                        const newPeers = [...peersHTML, {peer: peer, username: payload.callerName}];
+                        setPeersHTML(newPeers);
                 });
 
                 socketRef.current.on("receiving returned signal", payload => {
@@ -119,9 +121,9 @@ const VoiceSession = ({videoEnabled, socket, addPeersRef, findPeersRefById}) => 
             {ourMediaPlayer}
 
             {/* Add other users' media players */}
-            {peers.map((peer, index) => {
+            {peersHTML.map(peerInfo => {
                 return (
-                    <MediaPlayer key={index} peer={peer} videoEnabled={videoEnabled}/>
+                    <MediaPlayer id={peerInfo.username} peer={peerInfo.peer} videoEnabled={videoEnabled}/>
                 );
             })}
         </div>

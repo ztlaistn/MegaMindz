@@ -15,8 +15,8 @@ const MediaPlayer = (props) => {
     }, []);
 
     let chosenMedia = props.videoEnabled // if video enabled
-                        ? (<video playsInline autoPlay ref={ref} />) // return video
-                        : (<audio autoPlay ref={ref} />); // else return audio
+                        ? (<video playsInline autoPlay ref={ref} id={props.id} />) // return video
+                        : (<audio autoPlay ref={ref} id={props.id} />); // else return audio
     return (
         chosenMedia
     );
