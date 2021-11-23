@@ -257,7 +257,7 @@ async function handleNewChatSocketUser(io, socket, auth, roomId){
                 
                 // everything worked, resolve with our data to be set on return
                 return new Promise((resolve, reject) => {
-                    resolve({userId: tokenUID, username: row.username, roomId: roomId});
+                    resolve({userId: tokenUID, username: row.username, roomId: roomId, sprite:row.sprite});
                 });
             }else{
                 socClient.end()
@@ -292,41 +292,36 @@ async function handleNewChatSocketUser(io, socket, auth, roomId){
  * since this is expected of the text chat socet funtion.
  * 
  * Parameters:
- *      io:         io object for this connection
- *      socket:     socket the user has connected on 
- *      roomId:     room number that the user has joined
- *      userId:     User Id of ther user that is joining
- *      username:   username of the user that has joined
- *      posDict:    position dictionary object for the server
+ *      io:             io object for this connection
+ *      socket:         socket the user has connected on 
+ *      ourRoomId:      room number that the user has joined
+ *      ourUserId:      User Id of ther user that is joining
+ *      ourUsername:    username of the user that has joined
+ *      ourSprite:      Sprite selection of the new user
+ *      posDict:        position dictionary object for the server
  */
-function newUserRoomPosition(io, socket, roomId, userId, username, posDict){
-    if(posDict[roomId]){
-        console.log("UserId: " + userId + " adding position to room " + roomId);
-        const out_pos_obj = posDict[roomId].newPlayer(userId, username);
+function newUserRoomPosition(io, socket, ourRoomId, ourUserId, ourUsername, ourSprite, posDict){
+    if(posDict[ourRoomId]){
+        console.log("UserId: " + ourUserId + " adding position to room " + ourRoomId);
+        const out_pos_obj = posDict[ourRoomId].newPlayer(ourUserId, ourUsername, ourSprite);
 
-        //TODO: change the name of the evenet once we coordinate with frontend
-        //TODO: in the future, we will want to look up that user in the database and send their avatar selection as well
-        
         // Note: This is a socket emit since we want the message to not go back to the sender.
         // This is because we will have an update all event made for them.
-        socket.to(roomId.toString()).emit('new-character-event', out_pos_obj);
+        // This out_pos_obj will include sprite information.
+        socket.to(ourRoomId.toString()).emit('new-character-event', out_pos_obj);
         // Note: this WILL inlcude the user that just joined
-        socket.emit('update-all-positions', posDict[roomId].returnVisable());
+        socket.emit('update-all-positions', posDict[ourRoomId].returnVisable());
     }else{
         // This is the first person to join this room 
-        console.log("UserId: " + userId + " first person to add position to room " + roomId);
+        console.log("UserId: " + ourUserId + " first person to add position to room " + ourRoomId);
 
-        posDict[roomId] = new roomPosition();
-        const out_pos_obj = posDict[roomId].newPlayer(userId, username);
+        posDict[ourRoomId] = new roomPosition();
+        posDict[ourRoomId].newPlayer(ourUserId, ourUsername, ourSprite);
 
-        //TODO: change the name of the evenet once we coordinate with frontend
-        //TODO: in the future, we will want to look up that user in the database and send their avatar selection as well
-        
-        // Note: This is a socket emit since we want the message to not go back to the sender.
-        // This is because we will have an update all event made for them.
-        socket.to(roomId.toString()).emit('new-charater-event', out_pos_obj);
+        // Note: Doesn't send the new character event since no one else is in the room to recieve it
+
         // Note: this WILL inlcude the user that just joined
-        socket.emit('update-all-positions', posDict[roomId].returnVisable());
+        socket.emit('update-all-positions', posDict[ourRoomId].returnVisable());
     }
 }
 
@@ -366,6 +361,7 @@ function relayPositionMove(io, socket, ourUserId, ourRoomId, ourUsername, posDic
             posDict[ourRoomId].movePlayer(ourUserId, moveDataOut);
 
             // broadcast message for our room, not back to the sender though
+            // Note: move data will not include sprite, since it is the front end's responsibilty to keep track of this after the first time.
             socket.to(ourRoomId.toString()).emit("new-move", moveDataOut);
         }    
     }
