@@ -14,7 +14,7 @@ const videoConstraints = {
 * @param addPeersRef: Function that adds a new peer to the parent's state
 * @param findPeersRefById: Function that locates peer ref from parent state using specified id
 */
-const VoiceSession = ({videoEnabled, socket, addPeersRef, findPeersRefById, peersHTML, setPeersHTML}) => {
+const VoiceSession = ({videoEnabled, socket, addPeersRef, removePeersRef, findPeersRefById}) => {
     // peers array used for rendering each peer as MediaPlayer component (useState causes a re-render on change)
     const [peers, setPeers] = useState([]); 
     const socketRef = useRef();
@@ -62,6 +62,11 @@ const VoiceSession = ({videoEnabled, socket, addPeersRef, findPeersRefById, peer
                         const item = findPeersRefById(payload.id);
                         item.peer.signal(payload.signal);
                 });
+
+                socketRef.current.on("user left", payload => {
+                    console.log("removing peer "+ payload.callerName);
+                    removePeersRef(payload.callerName);
+            });
             });
         }
     }, [socket]);
