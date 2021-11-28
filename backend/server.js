@@ -87,8 +87,9 @@ class Server {
             });
 
             socket.on("join room", data => {
-                const {username, roomID} = data;
-                if (users[roomID]) {
+                const {username, roomId} = data;
+                console.log(`${username} is joining room ${roomId}`);
+                if (users[roomId]) {
                     /* TO DO: In video room (not chatroom), enforce max 2 video users
                     const length = users[roomID].length;
                     if (length === 4) {
@@ -97,33 +98,40 @@ class Server {
                     }
                     */
                     // add non-first user to the correct room
-                    users[roomID].push({
+                    users[roomId].push({
                         socketId: socket.id, 
                         callerName: username
                     });
                 } else {
                     // Add first user to the correct room
-                    users[roomID] = [{
+                    users[roomId] = [{
                         socketId: socket.id, 
                         callerName: username
                     }];
                 }
                 // keep track of which socket ID is in which room
-                socketToRoom[socket.id] = roomID;
+                socketToRoom[socket.id] = roomId;
+                console.log("room info:");
+                console.log(users[roomId]);
                 // get every other user in the room except the joiner
-                const usersInThisRoom = users[roomID].filter(elem => elem.socketId !== socket.id);
+                const usersInThisRoom = users[roomId].filter(elem => elem.socketId !== socket.id);
+              
+                console.log("Sending them list of users:");
+                usersInThisRoom.forEach(element => {
+                    console.log(element);
+                });
                 // send it to the joiner
                 socket.emit("all users", usersInThisRoom);
             });
 
             socket.on("sending signal", payload => {
-                console.log(`Original sender: ${payload.callerID} name: ${payload.username} sending a signal to: ${payload.userToSignal}`);
-                io.to(payload.userToSignal).emit('user joined', { signal: payload.signal, callerID: payload.callerID, callerName: payload.username });
+                console.log(`Original sender: ${socket.id} name: ${payload.username} sending a signal to: ${payload.userToSignal}`);
+                io.to(payload.userToSignal).emit('user joined', { signal: payload.signal, callerId: socket.id, callerName: payload.username });
             });
 
             socket.on("returning signal", payload => {
-                //console.log("Another peer {" + socket.id + "} is returning their signal to: {" + payload.callerID + "}");
-                io.to(payload.callerID).emit('receiving returned signal', { signal: payload.signal, id: socket.id });
+                console.log(`Another peer ${socket.id} is returning their signal to: ${payload.callerId}`);
+                io.to(payload.callerId).emit('receiving returned signal', { signal: payload.signal, id: socket.id });
             });
 
             // Disconnect for video room, mixed with disconnect for chat room (with conditional check)
@@ -215,16 +223,26 @@ class Server {
                     // now we can remove (make not visible) them from the position dict and let everyone else in the room know.
                     roomFuncs.disconnectRoomPosition(io, socket, ourUserId, ourRoomId, ourUsername, oldThis.positionDict);
                 }else{
-                    //disconnect for video room
-                    console.log("Socket {"+socket.id + "} disconnected");
-                    const roomID = socketToRoom[socket.id];
-                    let room = users[roomID];
-                    if (room) {
-                        room = room.filter(id => id !== socket.id);
-                        users[roomID] = room;
-                    }
                     videoRoom = false;
                 }
+                //console.log(`Socket ${socket.id} disconnected`);
+                // remove reference to that user from the users data structure
+                const roomId = socketToRoom[socket.id];
+                let room = users[roomId];
+                let leavingUser = room.filter(elem => elem.socketId === socket.id);
+
+                if (room) {
+                    room = room.filter(elem => elem.socketId !== socket.id);
+                    users[roomId] = room;
+                }
+                //console.log("the room now has:");
+                //console.log(users[roomId]);
+
+                // emit to all others users that this person left
+                users[roomId].forEach(user => {
+                    io.to(user.socketId).emit('user left', {callerName: leavingUser.callerName});
+                });
+
             });
 
             /*
