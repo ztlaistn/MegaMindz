@@ -14,12 +14,11 @@ const videoConstraints = {
 * @param addPeersRef: Function that adds a new peer to the parent's state
 * @param findPeersRefById: Function that locates peer ref from parent state using specified id
 */
-const VoiceSession = ({videoEnabled, socket, addPeersRef, findPeersRefById}) => {
+const VoiceSession = ({videoEnabled, socket, addPeersRef, removePeersRef, findPeersRefById}) => {
     // peers array used for rendering each peer as MediaPlayer component (useState causes a re-render on change)
     const [peers, setPeers] = useState([]); 
     const socketRef = useRef();
     const ourMedia = useRef();
-    const roomId = sessionStorage.getItem("roomId");
     const username = sessionStorage.getItem("username");
 
 
@@ -30,7 +29,7 @@ const VoiceSession = ({videoEnabled, socket, addPeersRef, findPeersRefById}) => 
             navigator.mediaDevices.getUserMedia({ video: videoEnabled, audio: true }).then(stream => {
                 ourMedia.current.srcObject = stream;
 
-                const data = {username, roomId};
+                const data = {username, roomId: sessionStorage.getItem("roomId")};
                 socketRef.current.emit("join room", data);
                 console.log("join room event sent");
 
@@ -38,11 +37,11 @@ const VoiceSession = ({videoEnabled, socket, addPeersRef, findPeersRefById}) => 
                         const peers = [];
                         users.forEach(user => {
                             const {socketId, callerName} = user; // here we get the caller's name
-                            const peer = createPeer(socketId, socket.id, username, stream);
+                            const peer = createPeer(socketId, username, stream);
                             /* Add peer stream to state in parent component */
                             addPeersRef(callerName, socketId, peer);
                             /* Add peer to temp array */
-                            peers.push(peer);
+                            peers.push({peer: peer, username: callerName});
                         });
                         /* Set array to temp array for rendering purposes */
                         setPeers(peers);
@@ -50,20 +49,24 @@ const VoiceSession = ({videoEnabled, socket, addPeersRef, findPeersRefById}) => 
 
                 socketRef.current.on("user joined", payload => {
                         console.log("Attempting to connect to: "+ payload.callerName);
-                        const peer = addPeer(payload.signal, payload.callerID, stream);
+                        const peer = addPeer(payload.signal, payload.callerId, stream);
                         
                         /* Add peer stream to state in parent component */
                         addPeersRef(payload.callerName, payload.callerId, peer);
                         
                         /* add this peer to rendering array */
-                        setPeers( users => [...users, peer]);
+                        setPeers( users => [...users, {peer: peer, username: payload.callerName}]);
                 });
 
                 socketRef.current.on("receiving returned signal", payload => {
                         const item = findPeersRefById(payload.id);
-                        addPeersRef(item.username, payload.id, )
                         item.peer.signal(payload.signal);
                 });
+
+                socketRef.current.on("user left", payload => {
+                    console.log("removing peer "+ payload.callerName);
+                    removePeersRef(payload.callerName);
+            });
             });
         }
     }, [socket]);
@@ -71,10 +74,10 @@ const VoiceSession = ({videoEnabled, socket, addPeersRef, findPeersRefById}) => 
     /* Function: Call another user in the room, send part 1 of 2 part handshake 
     You send a signal to them with your stream, and expect part 2 of the handshake in the "receiving returned signal" event
     * @param userToSignal: The user you want to call
-    * @param callerId: Your callerID
+    * @param username: Your username
     * @param stream: Your stream
     */
-    function createPeer(userToSignal, callerID, username, stream) {
+    function createPeer(userToSignal, username, stream) {
         const peer = new Peer({
             initiator: true, // we initiated our stream
             trickle: false,
@@ -82,8 +85,8 @@ const VoiceSession = ({videoEnabled, socket, addPeersRef, findPeersRefById}) => 
         });
         // signal event fired immediately cuz initiator: true
         peer.on("signal", signal => {
-            // send your callerID and signal to the other user via our signaling server
-            socketRef.current.emit("sending signal", {userToSignal, callerID, username, signal});
+            // send your callerId and signal to the other user via our signaling server
+            socketRef.current.emit("sending signal", {userToSignal, username, signal});
         });
 
         return peer;
@@ -91,7 +94,7 @@ const VoiceSession = ({videoEnabled, socket, addPeersRef, findPeersRefById}) => 
 
 
     /* accept someone else's call */
-    function addPeer(incomingSignal, callerID, stream) {
+    function addPeer(incomingSignal, callerId, stream) {
         const peer = new Peer({
             initiator: false, // we don't initiate their stream
             trickle: false,
@@ -101,7 +104,7 @@ const VoiceSession = ({videoEnabled, socket, addPeersRef, findPeersRefById}) => 
         // it fires when we accept other user's signal (*)
         // then we return our signal back to them
         peer.on("signal", signal => {
-            socketRef.current.emit("returning signal", {signal, callerID});
+            socketRef.current.emit("returning signal", {signal, callerId});
         });
 
         // (*) accept their signal here
@@ -119,9 +122,9 @@ const VoiceSession = ({videoEnabled, socket, addPeersRef, findPeersRefById}) => 
             {ourMediaPlayer}
 
             {/* Add other users' media players */}
-            {peers.map((peer, index) => {
+            {peers.map(peerInfo => {
                 return (
-                    <MediaPlayer key={index} peer={peer} videoEnabled={videoEnabled}/>
+                    <MediaPlayer id={peerInfo.username} peer={peerInfo.peer} videoEnabled={videoEnabled}/>
                 );
             })}
         </div>

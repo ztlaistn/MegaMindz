@@ -28,6 +28,7 @@ export default class Chatroom extends React.Component {
         // do not let scoping in function to change
         this.handleSocketError = this.handleSocketError.bind(this);
         this.addPeersRef = this.addPeersRef.bind(this);
+        this.removePeersRef = this.removePeersRef.bind(this);
         this.findPeersRefById = this.findPeersRefById.bind(this);
     }
 
@@ -127,6 +128,11 @@ export default class Chatroom extends React.Component {
         });
     }
 
+    removePeersRef = (peerName) => {
+        let index = this.peersRef.findIndex(elem => elem.username === peerName);
+        this.peersRef.splice(index);
+    }
+
     findPeersRefById = (targetId) => {
         const item = this.peersRef.find(p => p.peerId === targetId);
         return item;
@@ -146,7 +152,6 @@ export default class Chatroom extends React.Component {
 
         // Temp page when socket setup not complete
         if (!this.state.setupStart){
-            return (<div></div>);
             return (
                 <div class="chatroom-container">
                     <h1 class="title-font">{"Connecting You To Chatroom."}</h1>
@@ -165,6 +170,7 @@ export default class Chatroom extends React.Component {
                         socket={this.state.socket} 
                         peersRef={this.peersRef}
                         addPeersRef={this.addPeersRef}
+                        removePeersRef={this.removePeersRef}
                         findPeersRefById={this.findPeersRefById}
                     />
                 </div>
