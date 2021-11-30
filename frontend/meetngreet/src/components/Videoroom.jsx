@@ -2,6 +2,7 @@ import React, {createRef} from "react";
 import io from "socket.io-client";
 import "./styles/Text.css";
 import "./styles/Input.css";
+import "./styles/Videoroom.css";
 import VoiceSession from "./VoiceSession";
 
 
@@ -22,8 +23,8 @@ export default class Videoroom extends React.Component {
 
         // do not let scoping in function to change
         this.addPeersRef = this.addPeersRef.bind(this);
+        this.removePeersRef = this.removePeersRef.bind(this);
         this.findPeersRefById = this.findPeersRefById.bind(this);
-
     }
 
     componentDidMount() {
@@ -67,6 +68,11 @@ export default class Videoroom extends React.Component {
         });
     }
 
+    removePeersRef = (peerName) => {
+        let index = this.peersRef.findIndex(elem => elem.username === peerName);
+        this.peersRef.splice(index);
+    }
+
     findPeersRefById = (targetId) => {
         const item = this.peersRef.find(p => p.peerId === targetId);
         return item;
@@ -86,13 +92,14 @@ export default class Videoroom extends React.Component {
         return (
             <div class="videoroom-container">
                 <div class="videoroom">
-                    <VoiceSession 
-                        videoEnabled={true} 
-                        socket={this.state.socket} 
-                        peersRef={this.peersRef}
-                        addPeersRef={this.addPeersRef}
-                        findPeersRefById={this.findPeersRefById}
-                    />
+                        <VoiceSession 
+                            videoEnabled={true} 
+                            socket={this.state.socket} 
+                            peersRef={this.peersRef}
+                            addPeersRef={this.addPeersRef}
+                            removePeersRef={this.removePeersRef}
+                            findPeersRefById={this.findPeersRefById}
+                        />
                 </div>
             </div>
         );
