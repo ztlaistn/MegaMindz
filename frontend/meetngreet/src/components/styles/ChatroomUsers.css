@@ -47,3 +47,12 @@
     top: 200px;
     left: 100px;
 }
+
+@media only screen and (max-width: 768px) {
+    .chatroom-card-frame {
+        width: 100vw;
+    }
+    .chatroom-container > * {
+        margin-left: 0%;
+    }
+}

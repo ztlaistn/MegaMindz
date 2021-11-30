@@ -25,6 +25,7 @@ export default function Gamified({socket, username, mutePeerByUsername, mobile})
     var name_distance_x = 55;
     var name_distance_y = 70;
     var font_size = 20;
+    var movement_speed = 5;
     if(mobile === true){
         scene_width = "100%";
         scene_height = "80%";
@@ -177,21 +178,21 @@ export default function Gamified({socket, username, mutePeerByUsername, mobile})
                         this.character.x = this.character.getData("positionX");
                         this.name.x = this.character.getData("positionX") - name_distance_x;
                     } else if(this.character.x < this.character.getData("positionX")) {
-                        this.character.x += 5;
-                        this.name.x += 5;
+                        this.character.x += movement_speed;
+                        this.name.x += movement_speed;
                     } else if(this.character.x > this.character.getData("positionX")) {
-                        this.character.x -= 5;
-                        this.name.x -= 5;
+                        this.character.x -= movement_speed;
+                        this.name.x -= movement_speed;
                     }
                     if(Math.abs(this.character.y - this.character.getData("positionY")) <= 10) {
                         this.character.y = this.character.getData("positionY");
                         this.name.y = this.character.getData("positionY") + name_distance_y;
                     } else if(this.character.y < this.character.getData("positionY")) {
-                        this.character.y += 5;
-                        this.name.y += 5;
+                        this.character.y += movement_speed;
+                        this.name.y += movement_speed;
                     } else if(this.character.y > this.character.getData("positionY")) {
-                        this.character.y -= 5;
-                        this.name.y -= 5;
+                        this.character.y -= movement_speed;
+                        this.name.y -= movement_speed;
                     }
     
                     var x = this.character.x;
