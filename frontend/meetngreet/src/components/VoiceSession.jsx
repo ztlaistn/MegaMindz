@@ -114,10 +114,10 @@ const VoiceSession = ({videoEnabled, socket, addPeersRef, removePeersRef, findPe
     }
 
     const ourMediaPlayer = videoEnabled
-                                ? (<video muted ref={ourMedia} autoPlay playsInline />) // if true
+                                ? (<div class="video-container"><video muted ref={ourMedia} autoPlay playsInline /><p class="">{sessionStorage.getItem("username")}</p></div>) // if true
                                 : (<audio muted ref={ourMedia} autoPlay />); // if false
     return (
-        <div>
+        <div class="media-container">
             {/* Add our media player */}
             {ourMediaPlayer}
 
