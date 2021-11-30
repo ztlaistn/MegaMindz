@@ -4,7 +4,7 @@ import "./styles/Input.css";
 import "./styles/UserAccount.css";
 
 import login_icon from "../assets/login_icon.png";
-import sample_profile from "../assets/sample-profile.png";
+import sample_profile from "../assets/sample-profile-cropped.png";
 import sprite_one from "../assets/sprite1.png";
 import sprite_two from "../assets/sprite2.png";
 import sprite_three from "../assets/sprite3.png";
@@ -170,21 +170,21 @@ export default class UserAccount extends React.Component {
         return (
             <div id="user-account">
                     <div className="images">
-                        <p>Choose your Avatar!</p>
+                        <p><center>Choose your Avatar!Click Save Changes to save your Selection.</center></p>
                         <div className="image">
-                            <img src={sample_profile} className="profile-picture" alt = "" onClick={this.handleClick0}/>
+                            <img src={sample_profile} className="profile-picture-selection" alt = "" onClick={this.handleClick0}/>
                         </div>
                         <div className="image">
-                            <img src={sprite_one} className="profile-picture" alt ="" onClick={this.handleClick1}/>
+                            <img src={sprite_one} className="profile-picture-selection" alt ="" onClick={this.handleClick1}/>
                         </div>
                         <div className="image">
-                            <img src={sprite_two} className="profile-picture" alt=""  onClick={this.handleClick2}/>
+                            <img src={sprite_two} className="profile-picture-selection" alt=""  onClick={this.handleClick2}/>
                         </div>
                         <div className="image">
-                            <img src={sprite_three} className="profile-picture" alt="" onClick={this.handleClick3}/>
+                            <img src={sprite_three} className="profile-picture-selection" alt="" onClick={this.handleClick3}/>
                         </div>
                         <div className="image">
-                            <img src={sprite_four} className="profile-picture" alt="" onClick={this.handleClick4}/>
+                            <img src={sprite_four} className="profile-picture-selection" alt="" onClick={this.handleClick4}/>
                         </div>
                     </div>
                 <div className="account-credentials">

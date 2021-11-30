@@ -75,7 +75,9 @@ export default (app) => {
       for (var user of user_list) {
         const username = await DbUtil.select_user_with_id(client, user);
         const role = await DbRoll.find_user_in_room_roll(client,user,roomId);
-        listOfUsers.push([user, username.username, role.role]);
+        if (user != userId) {
+          listOfUsers.push([user, username.username, role.role]);
+        }
       }
 	    client.end();
 	    return res.status(200).json({user_list: listOfUsers});
