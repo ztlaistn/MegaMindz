@@ -211,7 +211,7 @@ export default (app) => {
     try{
       const roleRow = await DbRoll.find_user_in_room_roll(client, callerId, roomId) //role of caller
       const roleRow2 = await DbRoll.find_user_in_room_roll(client, user_Id, roomId) //role of target
-      if (roleRow.role <= roleRow2){
+      if (roleRow.role <= roleRow2.role){
         const errString = "LIST ROOM ADMIN ERROR #2: Not authorized for these actions.";
         client.end();
         return res.status(400).json({message: errString});
@@ -228,8 +228,63 @@ export default (app) => {
 
     try{
       await DbRoll.set_role(client, user_Id, DbRoll.ROLE_BANNED, roomId);
-
+      const kickedUsername = await DbUtil.select_user_with_id(client, user_Id);
+      req.app.get("io").to(roomId.toString()).emit('kicked', {username: kickedUsername.username});
       const sucString = "Success! That user has been banned from this room";
+      
+	    client.end();
+	    return res.status(200).json({message: sucString});
+    } catch(err){
+      const errString = "LIST ROOM CLIENT ERROR #3: " + err;
+      client.end();
+      return res.status(400).json({message: errString});
+    }
+  });
+
+
+  router.post('/kickUser', tokenAuthorization, async function (req, res) {
+    const { user_Id, roomId, auth } = req.body; //for some strange reason userId is the same as callerId when its named userId
+    const callerId = validateToken(auth); //Get userid from the token.
+    if (callerId == -1) {
+      const errString = "User Not Found From Token"
+      console.log(errString);
+      return res.status(400).json({message: errString});
+    }
+
+    let client;
+    try {
+      // connect client
+      client = await DbUtil.connect_client();
+    }catch (err) {
+      const errString = "LIST ROOM ADMIN CLIENT ERROR #1:" + err
+      console.log(errString);
+      return res.status(400).json({message: errString});
+    }
+
+    // make sure the user from the token is higher rank than the target to be kicked
+    try{
+      const roleRow = await DbRoll.find_user_in_room_roll(client, callerId, roomId) //role of caller
+      const roleRow2 = await DbRoll.find_user_in_room_roll(client, user_Id, roomId) //role of target
+      if (roleRow.role <= roleRow2.role){
+        const errString = "LIST ROOM ADMIN ERROR #2: Not authorized for these actions.";
+        client.end();
+        return res.status(400).json({message: errString});
+      }
+    } catch (err){
+      const errString = "LIST ROOM ADMIN ERROR #3: " + err;
+      client.end();
+      return res.status(400).json({message: errString});
+    }
+
+    
+
+    //kick
+
+    try{
+      //await DbRoll.set_role(client, user_Id, DbRoll.ROLE_BANNED, roomId);
+      const kickedUsername = await DbUtil.select_user_with_id(client, user_Id);
+      req.app.get("io").to(roomId.toString()).emit('kicked', {username: kickedUsername.username});
+      const sucString = "Success! That user has been kicked from this room";
       
 	    client.end();
 	    return res.status(200).json({message: sucString});

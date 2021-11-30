@@ -54,6 +54,15 @@ export default function Chat({socket, username, handleSocketError,role,roomId}) 
                 sessionStorage.setItem("roomId", "");
                 window.location.href = "/";
             });
+            //Kicked
+            socket.on("kicked",(data)=>{
+                const {username} = data
+                if (username == sessionStorage.getItem("username")) {
+                    window.alert("You were ejected from this room.");
+                    sessionStorage.setItem("roomId", "");
+                    window.location.href = "/";
+                }
+            });
             // ERROR EVENT DUE TO PERMISSIONS
             socket.on("error-permissions",(data)=>{
                 console.log(data);

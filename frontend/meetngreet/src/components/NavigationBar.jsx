@@ -3,6 +3,7 @@ import './styles/NavigationBar.css'
 import logo from "../assets/logo.png";
 import {Link} from 'react-router-dom';
 import {BrowserView, MobileView} from 'react-device-detect';
+import ModalMenu from './ModalMenu.jsx';
 
 class NavigationBar extends React.Component {
     constructor(props) {
@@ -12,6 +13,20 @@ class NavigationBar extends React.Component {
             muteText: "Mute"
         };
     };
+
+    state = {
+        show: false
+      };
+      showModal = e => {
+        this.setState({
+          show: !this.state.show
+        });
+      };
+      onClose = e => {
+        this.props.onClose && this.props.onClose(e);
+      };
+      
+    
 
     toLogin = () => {
         window.location.href = "login";
@@ -145,7 +160,7 @@ class NavigationBar extends React.Component {
                             <div class="dropdown-option" onClick={this.callMeeting}>Call a Meeting</div>
                             <div class="dropdown-option" onClick={this.toggleMute}>Toggle Audio</div>
                             <div class="dropdown-option" onClick={this.listUsersInRoom}>Users in Room</div>
-                            <div class="dropdown-option" onClick={this.chatroomUsers}>Admin Options</div>
+                            <div class="dropdown-option" onClick={e => {this.showModal();}}>Admin Options</div>
                         </div>
                     </li>
                     <li>
@@ -297,9 +312,14 @@ class NavigationBar extends React.Component {
     }
 
     render() {
+        if (window.self !== window.top) {
+            return null;
+        }
+        if (window.location.pathname === "/chatroom") {
         return (
             <>
                 <BrowserView>
+                    <div className="modal-wrapper">
                     <div className="navigation-bar">
                         <div className="logo-bar">
                             <li>
@@ -310,6 +330,7 @@ class NavigationBar extends React.Component {
                         </div>
                         {this.showLogin()}
                     </div>
+                    <ModalMenu onClose={this.showModal} show={this.state.show}/></div>
                 </BrowserView>
                 <MobileView>
                     <div className="navigation-bar">
@@ -319,6 +340,31 @@ class NavigationBar extends React.Component {
                 </MobileView>
             </>
         );
+        }
+        else {
+            return (
+                <>
+                    <BrowserView>
+                        <div className="navigation-bar">
+                            <div className="logo-bar">
+                                <li>
+                                    <Link to="/" >
+                                        <img src={logo} title="Home" className="logo"/>
+                                    </Link>
+                                </li>
+                            </div>
+                            {this.showLogin()}
+                        </div>
+                    </BrowserView>
+                    <MobileView>
+                        <div className="navigation-bar">
+                            <img src={logo} title="Home" className="logo-mobile"/>
+                        </div>
+                        {this.hamburgerMenu()}
+                    </MobileView>
+                </>
+            );
+        }
     }
 }
 export default NavigationBar;
