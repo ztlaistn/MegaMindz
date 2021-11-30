@@ -19,6 +19,7 @@ const VoiceSession = ({videoEnabled, socket, addPeersRef, removePeersRef, findPe
     const [peers, setPeers] = useState([]); 
     const socketRef = useRef();
     const ourMedia = useRef();
+    const muteButton = useRef();
     const username = sessionStorage.getItem("username");
 
 
@@ -113,20 +114,42 @@ const VoiceSession = ({videoEnabled, socket, addPeersRef, removePeersRef, findPe
         return peer;
     }
 
-    const ourMediaPlayer = videoEnabled
-                                ? (<div class="video-container"><video muted ref={ourMedia} autoPlay playsInline /><p class="">{sessionStorage.getItem("username")}</p></div>) // if true
-                                : (<audio muted ref={ourMedia} autoPlay />); // if false
-    return (
-        <div class="media-container">
-            {/* Add our media player */}
-            {ourMediaPlayer}
+    function toggleMute() {
+        // toggle
+        ourMedia.current.srcObject.getAudioTracks()[0].enabled = !ourMedia.current.srcObject.getAudioTracks()[0].enabled;
+        // change value of mute button
+        muteButton.current.value = muteButton.current.value == "Mute" ? "Unmute" : "Mute";
+    }
 
-            {/* Add other users' media players */}
-            {peers.map(peerInfo => {
-                return (
-                    <MediaPlayer id={peerInfo.username} peer={peerInfo.peer} videoEnabled={videoEnabled}/>
-                );
-            })}
+    function leaveRoom() {
+        window.location.href = "/";
+    }
+
+    const ourMediaPlayer = videoEnabled
+                                ? (<div class="video-container"><video muted id="our-media-device" ref={ourMedia} autoPlay playsInline /><p class="">{sessionStorage.getItem("username")}</p></div>) // if true
+                                : (<audio muted id="our-media-device" ref={ourMedia} autoPlay />); // if false
+
+    const videoToolBar = videoEnabled
+                                ? (
+                                    <div class="video-toolbar">
+                                        <input type="button" value="Mute" className="button-primary" ref={muteButton} onClick={toggleMute}/>
+                                        <input type="button" value="Leave Room" className="button-primary" onClick={leaveRoom}/>
+                                    </div>
+                                ) : null;
+    return (
+        <div>
+            <div class="media-container">
+                {/* Add our media player */}
+                {ourMediaPlayer}
+                {/* Add other users' media players */}
+                {peers.map(peerInfo => {
+                    return (
+                        <MediaPlayer id={peerInfo.username} peer={peerInfo.peer} videoEnabled={videoEnabled}/>
+                    );
+                })}
+            </div>
+            {/* Add buttons menu for video */}
+            {videoToolBar}
         </div>
     );
 };
