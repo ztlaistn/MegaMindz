@@ -14,12 +14,17 @@ const MediaPlayer = (props) => {
         })
     }, []);
 
-    let chosenMedia = props.videoEnabled // if video enabled
-                        ? (<video playsInline autoPlay ref={ref} id={props.id}/>) // return video
-                        : (<audio autoPlay ref={ref} id={props.id}/>); // else return audio
-    return (
-        chosenMedia
-    );
+ if (props.videoEnabled){
+        return(
+            <div class="video-container">
+                <video playsInline autoPlay ref={ref} id={props.id}/>
+                {/* Render username under video */}
+                <p class="video-name-label">{props.id}</p>
+            </div>
+        );
+    } else{
+        return(<audio autoPlay ref={ref} id={props.id}/>);
+    }
 }
 
 export default MediaPlayer;
