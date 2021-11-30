@@ -16,7 +16,7 @@ import chatroom_sprite_4 from "../assets/sprite4.png";
 import chatroom_sprite_test from "../assets/chatroom-idle-test.png";
 
 //Initialize game as HTML component
-export default function Gamified({socket, username}) {
+export default function Gamified({socket, username, mutePeerByUsername}) {
     var isClicking = false;
     console.log(socket);
     return(
@@ -145,9 +145,11 @@ export default function Gamified({socket, username}) {
                     //Perform distance calculations
                     this.otherNames.getChildren().forEach((otherName) => {
                         if(Math.sqrt((Math.pow((otherName.x - this.name.x), 2)) + (Math.pow((otherName.y - this.name.y), 2))) < 250){
-                            otherName.setStyle({ fontFamily: 'Work Sans', color: '#34FF00', stroke: '#000000', strokeThickness: 5 });
+                            otherName.setStyle({ fontFamily: 'Work Sans', color: '#58CFEA', stroke: '#000000', strokeThickness: 5 });
+                            mutePeerByUsername(otherName.playerId, false);
                         } else {
-                            otherName.setStyle({ fontFamily: 'Work Sans', color: '#FF021F', stroke: '#000000', strokeThickness: 5 });
+                            otherName.setStyle({ fontFamily: 'Work Sans', color: '#F5A623', stroke: '#000000', strokeThickness: 5 });
+                            mutePeerByUsername(otherName.playerId, true);
                         }
                     });
     
