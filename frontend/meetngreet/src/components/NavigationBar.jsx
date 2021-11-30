@@ -8,7 +8,8 @@ class NavigationBar extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            menuToggled: false
+            menuToggled: false,
+            muteText: "Mute"
         };
     };
 
@@ -36,8 +37,13 @@ class NavigationBar extends React.Component {
     }
 
     toggleMute = () => {
-        //TODO: placeholder
-        window.alert("Not currently supported.");
+        // toggle
+        document.getElementById("our-media-device").srcObject.getAudioTracks()[0].enabled = !document.getElementById("our-media-device").srcObject.getAudioTracks()[0].enabled;
+        // change text of mute button
+        const buttonText = this.state.muteText == "Mute" ? "Unmute" : "Mute";
+        this.setState({
+            muteText: buttonText
+        })
     };
 
     userSettings = () => {
@@ -130,7 +136,7 @@ class NavigationBar extends React.Component {
                         <input type="button" value={"Room Code: " + sessionStorage.getItem("roomId")} className="button-primary"/>
                     </li>
                     <li>
-                        <input type="button" value="Toggle Mute" className="button-chatroom" onClick={this.toggleMute}/>
+                        <input type="button" value={this.state.muteText} className="button-chatroom" onClick={this.toggleMute}/>
                     </li>
                     <li>
                         <input type="button" value="Menu" class="button-chatroom-dropdown"/>
