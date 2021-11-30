@@ -30,15 +30,29 @@
     width: 200px;
 
 }
-/*.image:hover {*/
-/*    position:relative;*/
-/*    top:-25px;*/
-/*    left:-35px;*/
-/*    width:500px;*/
-/*    height:auto;*/
-/*    display:block;*/
-/*    z-index:999;*/
-/*}*/
+.image {
+    position:relative;
+    top:-25px;
+    left:-35px;
+    width:504px;
+    height:auto;
+    display:block;
+    z-index:900;
+}
+.profile-picture-selection{
+    display: block;
+    float: left;
+    margin-top: 5vh;
+    margin-left: 50px;
+    margin-right: auto;
+    max-width: 20%;
+    border-radius: 1000px;
+}
+.profile-picture-selection:hover{
+    /*border: 3px solid black;*/
+    transform: scale(1.3);
+}
+
 .images::after {
     content: "";
     clear: both;
