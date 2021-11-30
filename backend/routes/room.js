@@ -202,6 +202,12 @@ export default (app) => {
         our_role = row.role;
         set_role_flag = true;
       }
+      if (row.role === DbRoll.ROLE_BANNED) {
+        const errString = "ENTER ROOM CLIENT ERROR #7: You have been banned from this room"
+        client.end()
+        console.log(errString);
+        return res.status(400).json({message: "You have been banned from this room."});
+      }
     } catch (err){
       const errString = "ENTER ROOM CLIENT ERROR #4:" + err;
       console.log("Unable to get user "+ userId + "'s role in room "+ roomId + ", setting it to guest. Err: " + errString)

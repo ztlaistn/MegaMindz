@@ -1,5 +1,7 @@
 .chatroom-container {
     padding-top: 50px;
+    z-index: 1;
+    position: relative;
 }
 
 .chatroom-container > * {
@@ -10,6 +12,8 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    z-index: 1;
+    position: absolute;
 }
 
 .chatroom-background {

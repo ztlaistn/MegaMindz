@@ -153,9 +153,57 @@ export default class ChatroomUsers extends React.Component {
         });
     }
 
-    removeUserFromRoom(userId2) {
-        
+    banUser(user_Id) {
+        fetch('/users/banUser', {
+            method: 'POST', // or 'PUT'
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+            },
+            body: JSON.stringify({ roomId: sessionStorage.getItem("roomId"), user_Id: user_Id, auth: sessionStorage.getItem("token")}),
+        }).then(function(response){
+            if(response.status !== 200){
+                response.json().then(function(data) {
+                    console.log(data);
+                    window.alert("Error: Failed to Ban User : " + data.message);
+                    window.location.href = "/chatroom";
+                });
+            }else{
+                response.json().then(function(data){
+                    console.log(data);
+                    window.alert("" + data.message);
+                    //window.location.href = "/chatroom-users"; //refresh page since the dude got banned
+                });
+            }
+        }).catch(function(err) {
+            console.log('Fetch Error :-S', err);
+        });
+    }
 
+    unbanUser(user_Id) {
+        fetch('/users/unbanUser', {
+            method: 'POST', // or 'PUT'
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+            },
+            body: JSON.stringify({ roomId: sessionStorage.getItem("roomId"), user_Id: user_Id, auth: sessionStorage.getItem("token")}),
+        }).then(function(response){
+            if(response.status !== 200){
+                response.json().then(function(data) {
+                    console.log(data);
+                    window.alert("Error: Failed to Ban User : " + data.message);
+                    window.location.href = "/chatroom";
+                });
+            }else{
+                response.json().then(function(data){
+                    console.log(data);
+                    window.alert("" + data.message);
+                });
+            }
+        }).catch(function(err) {
+            console.log('Fetch Error :-S', err);
+        });
     }
     
     render() {
@@ -188,24 +236,37 @@ export default class ChatroomUsers extends React.Component {
                     <input type="button" value={user[1]} className="button-primary" onClick={() => this.demoteUser(user[0])}/>
                     ))}
                     </div>
+                    <br/>
+                    <br/>
                     <div class="chatroom">
                     Make User VIP
                     {users.user_list.map((user) => ( 
                     <input type="button" value={user[1]} className="button-primary" onClick={() => this.makeUserVIP(user[0])}/>
                     ))}
                     </div>
+                    <br/>
+                    <br/>
                     <div class="chatroom">
                     Make User Moderator
                     {users.user_list.map((user) => ( 
                     <input type="button" value={user[1]} className="button-primary" onClick={() => this.makeUserModerator(user[0])}/>
                     ))}
                     </div>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
                     <div class="chatroom">
-                    Remove User From Room
+                    Ban User From Room
                     {users.user_list.map((user) => ( 
-                    <input type="button" value={user[1]} className="button-primary" onClick={() => this.testAlert(user[1],user[0],user[2])}/>
+                    <input type="button" value={user[1]} className="button-primary" onClick={() => this.banUser(user[0])}/>
                     ))}
                     </div>
+                    <br/>
+                    <br/>
+                    
                 </div>
             );
         }
