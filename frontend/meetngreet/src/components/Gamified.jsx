@@ -16,7 +16,7 @@ import chatroom_sprite_4 from "../assets/sprite4.png";
 import chatroom_sprite_test from "../assets/chatroom-idle-test.png";
 
 //Initialize game as HTML component
-export default function Gamified({socket, username, mutePeerByUsername}) {
+export default function Gamified({socket, username, setupStatus, mutePeerByUsername}) {
     var isClicking = false;
     console.log(socket);
     return(
@@ -49,32 +49,46 @@ export default function Gamified({socket, username, mutePeerByUsername}) {
                 this.otherPlayers = this.add.group();
                 this.otherNames = this.add.group();
 
+                let gotUpdate = false;
+
                 let self = this;
 
                 socket.on('update-all-positions', function(players) {
                     console.log(players);
-                    players.forEach((player) =>{
-                        if(player.username !== sessionStorage.getItem("username")){
-                            if(!self.otherPlayers.getChildren().includes(player.username)){
-                                const otherPlayer = self.add.sprite(player.x, player.y, "s" + player.sprite);
-                                otherPlayer.playerId = player.username;
-                                otherPlayer.displayWidth = 100;
-                                otherPlayer.displayHeight = 128;
-                                self.otherPlayers.add(otherPlayer);
+                    if(!self.gotUpdate){
+                        self.gotUpdate = true;
+                        players.forEach((player) =>{
+                            if(player.username !== sessionStorage.getItem("username")){
+                                if(!self.otherPlayers.getChildren().includes(player.username)){
+                                    const otherPlayer = self.add.sprite(player.x, player.y, "s" + player.sprite);
+                                    otherPlayer.playerId = player.username;
+                                    otherPlayer.displayWidth = 100;
+                                    otherPlayer.displayHeight = 128;
+                                    self.otherPlayers.add(otherPlayer);
+                                }
+                                if(!self.otherNames.getChildren().includes(player.username)){
+                                    const otherName = self.add.text((player.x - 40), (player.y + 70), player.username, { fontFamily: 'Work Sans', color: '#FFFFFF', stroke: '#000000', strokeThickness: 5 });
+                                    otherName.playerId = player.username;
+                                    self.otherNames.add(otherName);
+                                }
+                            }else{
+                                self.character = self.add.sprite(player.x, player.y, "s" + player.sprite);
+                                self.character.displayWidth = 100;
+                                self.character.displayHeight = 128;
+                                self.name = self.add.text((player.x - 40), (player.y + 70), sessionStorage.getItem("username"), { fontFamily: 'Work Sans', color: '#FFFFFF', stroke: '#000000', strokeThickness: 5 });
                             }
-                            if(!self.otherNames.getChildren().includes(player.username)){
-                                const otherName = self.add.text((player.x - 40), (player.y + 70), player.username, { fontFamily: 'Work Sans', color: '#FFFFFF', stroke: '#000000', strokeThickness: 5 });
-                                otherName.playerId = player.username;
-                                self.otherNames.add(otherName);
-                            }
-                        }else{
-                            self.character = self.add.sprite(player.x, player.y, "s" + player.sprite);
-                            self.character.displayWidth = 100;
-                            self.character.displayHeight = 128;
-                            self.name = self.add.text((player.x - 40), (player.y + 70), sessionStorage.getItem("username"), { fontFamily: 'Work Sans', color: '#FFFFFF', stroke: '#000000', strokeThickness: 5 });
-                        }
-                    })
+                        });
+                    }
                 });
+
+                // If we have not yet gotten an update all event (but we have connected), request one
+                if(setupStatus && !gotUpdate){
+                    console.log("Requesting another position update.")
+                    const connData = {
+                        auth: "Bearer " + sessionStorage.getItem("token"),
+                    };
+                    socket.emit('request-update-all', connData);
+                }
                 
                 //Populate the room with other characters
                 socket.on('new-character-event', function(player){
@@ -97,13 +111,15 @@ export default function Gamified({socket, username, mutePeerByUsername}) {
                     self.otherPlayers.getChildren().forEach(function(otherPlayer) {
                         if (player.username === otherPlayer.playerId) {
                             otherPlayer.destroy();
+
                         }
                     });
                     self.otherNames.getChildren().forEach(function(otherName) {
                         if (player.username === otherName.playerId) {
                             otherName.destroy();
                         }
-                    })
+                    });
+
                 });
 
                 //Updates the movement of characters on the local screen
@@ -126,6 +142,7 @@ export default function Gamified({socket, username, mutePeerByUsername}) {
                 this.background.on('pointerdown', function () {
                     isClicking = true;
                 });
+
             },
             update: function() {
                 if (this.character){

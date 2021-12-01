@@ -206,6 +206,11 @@ class Server {
                 roomFuncs.relayPositionMove(io, socket, ourUserId, ourRoomId, ourUsername, oldThis.positionDict, move, auth);
             });
 
+            socket.on('request-update-all', function(data){
+                const {auth} = data;
+                roomFuncs.handleUpdateRequest(socket, ourRoomId, ourUserId, auth, oldThis.positionDict);
+            });
+
             /*
             * Handler function that will handle a disconnect event.
             * Will emit a disconnect new-message to the room if success.
