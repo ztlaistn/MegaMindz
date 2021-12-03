@@ -63,7 +63,7 @@ function newChatMessageEvent(io, socket, ourUserId, ourRoomId, ourUsername, auth
             // broadcast message for our room
             console.log("Users: ", ourUsername + " is sending: " + msg + " for room: " + ourRoomId);
             const sendStr = `${ourUsername}:  ${msg}`;
-            io.to(ourRoomId.toString()).emit("new-message", {message: sendStr})
+            io.to(ourRoomId.toString()).emit("new-message", {message: sendStr, senderUsername:ourUsername})
         }
     }
 }
