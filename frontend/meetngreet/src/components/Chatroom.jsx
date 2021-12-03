@@ -176,8 +176,18 @@ export default class Chatroom extends React.Component {
         return (
             <div class="chatroom-container">
                 <div class="chatroom">
-                    <Gamified socket={this.state.socket} username={this.username} mutePeerByUsername={this.mutePeerByUsername}/>
-                    <Chat socket={this.state.socket} username={this.username} handleSocketError={this.handleSocketError} role = {this.state.ourRole} roomId={this.state.roomId}/>
+                    <Gamified 
+                        socket={this.state.socket} 
+                        username={this.state.username} 
+                        mutePeerByUsername={this.mutePeerByUsername}
+                    />
+                    <Chat 
+                        socket={this.state.socket} 
+                        username={this.state.username} 
+                        handleSocketError={this.handleSocketError} 
+                        role = {this.state.ourRole} 
+                        roomId={this.state.roomId}
+                    />
                     <VoiceSession 
                         videoEnabled={false} 
                         socket={this.state.socket} 
