@@ -6,7 +6,6 @@ import Gamified from "./Gamified.jsx";
 import io from "socket.io-client";
 import Chat from "./EnterChat"
 import VoiceSession from "./VoiceSession";
-import {BrowserView, MobileView} from 'react-device-detect';
 
 export default class Chatroom extends React.Component {
     constructor(props) {
@@ -176,35 +175,28 @@ export default class Chatroom extends React.Component {
 
         return (
             <div class="chatroom-container">
-                <BrowserView>
-                    <div class="chatroom">
-                        <Gamified socket={this.state.socket} username={this.username} mutePeerByUsername={this.mutePeerByUsername} mobile={false}/>
-                        <Chat socket={this.state.socket} username={this.username} handleSocketError={this.handleSocketError} role = {this.state.ourRole} roomId={this.state.roomId}/>
-                        <VoiceSession
-                            videoEnabled={false}
-                            socket={this.state.socket}
-                            peersRef={this.peersRef}
-                            addPeersRef={this.addPeersRef}
-                            removePeersRef={this.removePeersRef}
-                            findPeersRefById={this.findPeersRefById}
-                        />
-                    </div>
-                </BrowserView>
-                <MobileView>
-                    <div class="chatroom-mobile">
-                        <Gamified socket={this.state.socket} username={this.username} mutePeerByUsername={this.mutePeerByUsername} mobile={true}/>
-                        <br/>
-                        <Chat socket={this.state.socket} username={this.username} handleSocketError={this.handleSocketError} role = {this.state.ourRole} roomId={this.state.roomId}/>
-                        <VoiceSession
-                            videoEnabled={false}
-                            socket={this.state.socket}
-                            peersRef={this.peersRef}
-                            addPeersRef={this.addPeersRef}
-                            removePeersRef={this.removePeersRef}
-                            findPeersRefById={this.findPeersRefById}
-                        />
-                    </div>
-                </MobileView>
+                <div class="chatroom">
+                    <Gamified 
+                        socket={this.state.socket} 
+                        username={this.state.username} 
+                        mutePeerByUsername={this.mutePeerByUsername}
+                    />
+                    <Chat 
+                        socket={this.state.socket} 
+                        username={this.state.username} 
+                        handleSocketError={this.handleSocketError} 
+                        role = {this.state.ourRole} 
+                        roomId={this.state.roomId}
+                    />
+                    <VoiceSession 
+                        videoEnabled={false} 
+                        socket={this.state.socket} 
+                        peersRef={this.peersRef}
+                        addPeersRef={this.addPeersRef}
+                        removePeersRef={this.removePeersRef}
+                        findPeersRefById={this.findPeersRefById}
+                    />
+                </div>
             </div>
         );
     }
