@@ -75,7 +75,7 @@ export default function Gamified({socket, username, setupStatus, mutePeerByUsern
 
                 socket.on('update-all-positions', function(players) {
                     console.log(players);
-					if(self.gotUpdate){
+					if(!self.gotUpdate){
 						self.gotUpdate = true;
 						players.forEach((player) =>{
 							if(player.username !== sessionStorage.getItem("username")){
