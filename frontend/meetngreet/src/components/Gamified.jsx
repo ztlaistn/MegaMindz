@@ -16,15 +16,35 @@ import chatroom_sprite_4 from "../assets/sprite4.png";
 import chatroom_sprite_test from "../assets/chatroom-idle-test.png";
 
 //Initialize game as HTML component
-export default function Gamified({socket, username, setupStatus, mutePeerByUsername}) {
+export default function Gamified({socket, username, setupStatus, mutePeerByUsername, mobile}) {
     var isClicking = false;
+    var scene_width = "70%";
+    var scene_height = "80%";
+    var character_width = 100;
+    var character_height = 128;
+    var name_distance_x = 55;
+    var name_distance_y = 70;
+    var font_size = 20;
+    var movement_speed = 5;
+    if(mobile === true){
+        scene_width = "100%";
+        scene_height = "80%";
+        character_width = character_width * 0.5;
+        character_height = character_height * 0.5;
+        name_distance_x = name_distance_x * 0.5;
+        name_distance_y = name_distance_y * 0.5;
+        font_size = font_size * 0.5;
+    }
+    var user_font_params = { fontFamily: 'Work Sans', color: '#FFFFFF', stroke: '#000000', strokeThickness: 5, fontSize: font_size };
+    var active_font_params = { fontFamily: 'Work Sans', color: '#58CFEA', stroke: '#000000', strokeThickness: 5, fontSize: font_size };
+    var inactive_font_params = { fontFamily: 'Work Sans', color: '#F5A623', stroke: '#000000', strokeThickness: 5, fontSize: font_size };
     console.log(socket);
     return(
     <GameComponent
     config={{
         //Define game element
-        width: "70%",
-        height: "80%",
+        width: scene_width,
+        height: scene_height,
         physics: {
             default: 'arcade'
         },
@@ -55,30 +75,30 @@ export default function Gamified({socket, username, setupStatus, mutePeerByUsern
 
                 socket.on('update-all-positions', function(players) {
                     console.log(players);
-                    if(!self.gotUpdate){
-                        self.gotUpdate = true;
-                        players.forEach((player) =>{
-                            if(player.username !== sessionStorage.getItem("username")){
-                                if(!self.otherPlayers.getChildren().includes(player.username)){
-                                    const otherPlayer = self.add.sprite(player.x, player.y, "s" + player.sprite);
-                                    otherPlayer.playerId = player.username;
-                                    otherPlayer.displayWidth = 100;
-                                    otherPlayer.displayHeight = 128;
-                                    self.otherPlayers.add(otherPlayer);
-                                }
-                                if(!self.otherNames.getChildren().includes(player.username)){
-                                    const otherName = self.add.text((player.x - 40), (player.y + 70), player.username, { fontFamily: 'Work Sans', color: '#FFFFFF', stroke: '#000000', strokeThickness: 5 });
-                                    otherName.playerId = player.username;
-                                    self.otherNames.add(otherName);
-                                }
-                            }else{
-                                self.character = self.add.sprite(player.x, player.y, "s" + player.sprite);
-                                self.character.displayWidth = 100;
-                                self.character.displayHeight = 128;
-                                self.name = self.add.text((player.x - 40), (player.y + 70), sessionStorage.getItem("username"), { fontFamily: 'Work Sans', color: '#FFFFFF', stroke: '#000000', strokeThickness: 5 });
-                            }
-                        });
-                    }
+					if(self.gotUpdate){
+						self.gotUpdate = true;
+						players.forEach((player) =>{
+							if(player.username !== sessionStorage.getItem("username")){
+								if(!self.otherPlayers.getChildren().includes(player.username)){
+									const otherPlayer = self.add.sprite(player.x, player.y, "s" + player.sprite);
+									otherPlayer.playerId = player.username;
+									otherPlayer.displayWidth = character_width;
+									otherPlayer.displayHeight = character_height;
+									self.otherPlayers.add(otherPlayer);
+								}
+								if(!self.otherNames.getChildren().includes(player.username)){
+									const otherName = self.add.text((player.x - name_distance_x), (player.y + name_distance_y), player.username, user_font_params);
+									otherName.playerId = player.username;
+									self.otherNames.add(otherName);
+								}
+							}else{
+								self.character = self.add.sprite(player.x, player.y, "s" + player.sprite);
+								self.character.displayWidth = character_width;
+								self.character.displayHeight = character_height;
+								self.name = self.add.text((player.x - name_distance_x), (player.y + name_distance_y), sessionStorage.getItem("username"), user_font_params);
+							}
+						});
+					}
                 });
 
                 // If we have not yet gotten an update all event (but we have connected), request one
@@ -95,12 +115,12 @@ export default function Gamified({socket, username, setupStatus, mutePeerByUsern
                     if(player.username !== sessionStorage.getItem("username")){
                         const otherPlayer = self.add.sprite(player.x, player.y, "s" + player.sprite);
                         otherPlayer.playerId = player.username;
-                        otherPlayer.displayWidth = 100;
-                                otherPlayer.displayHeight = 128;
+                        otherPlayer.displayWidth = character_width;
+                        otherPlayer.displayHeight = character_height;
                         self.otherPlayers.add(otherPlayer);
 
 
-                        const otherName = self.add.text((player.x - 40), (player.y + 70), player.username, { fontFamily: 'Work Sans', color: '#FFFFFF', stroke: '#000000', strokeThickness: 5 });
+                        const otherName = self.add.text((player.x - name_distance_x), (player.y + name_distance_y), player.username, user_font_params);
                         otherName.playerId = player.username;
                         self.otherNames.add(otherName);
                     }
@@ -132,7 +152,7 @@ export default function Gamified({socket, username, setupStatus, mutePeerByUsern
                     });
                     self.otherNames.getChildren().forEach(function(otherName) {
                         if (player.username === otherName.playerId) {
-                            otherName.setPosition((player.x - 40), (player.y + 70));
+                            otherName.setPosition((player.x - name_distance_x), (player.y + name_distance_y));
                         }
                     })
                 });
@@ -162,10 +182,10 @@ export default function Gamified({socket, username, setupStatus, mutePeerByUsern
                     //Perform distance calculations
                     this.otherNames.getChildren().forEach((otherName) => {
                         if(Math.sqrt((Math.pow((otherName.x - this.name.x), 2)) + (Math.pow((otherName.y - this.name.y), 2))) < 250){
-                            otherName.setStyle({ fontFamily: 'Work Sans', color: '#58CFEA', stroke: '#000000', strokeThickness: 5 });
+                            otherName.setStyle(active_font_params);
                             mutePeerByUsername(otherName.playerId, false);
                         } else {
-                            otherName.setStyle({ fontFamily: 'Work Sans', color: '#F5A623', stroke: '#000000', strokeThickness: 5 });
+                            otherName.setStyle(inactive_font_params);
                             mutePeerByUsername(otherName.playerId, true);
                         }
                     });
@@ -173,23 +193,23 @@ export default function Gamified({socket, username, setupStatus, mutePeerByUsern
                     //Perform movement calculations
                     if(Math.abs(this.character.x - this.character.getData("positionX")) <= 10) {
                         this.character.x = this.character.getData("positionX");
-                        this.name.x = this.character.getData("positionX") - 40;
+                        this.name.x = this.character.getData("positionX") - name_distance_x;
                     } else if(this.character.x < this.character.getData("positionX")) {
-                        this.character.x += 5;
-                        this.name.x += 5;
+                        this.character.x += movement_speed;
+                        this.name.x += movement_speed;
                     } else if(this.character.x > this.character.getData("positionX")) {
-                        this.character.x -= 5;
-                        this.name.x -= 5;
+                        this.character.x -= movement_speed;
+                        this.name.x -= movement_speed;
                     }
                     if(Math.abs(this.character.y - this.character.getData("positionY")) <= 10) {
                         this.character.y = this.character.getData("positionY");
-                        this.name.y = this.character.getData("positionY") + 70;
+                        this.name.y = this.character.getData("positionY") + name_distance_y;
                     } else if(this.character.y < this.character.getData("positionY")) {
-                        this.character.y += 5;
-                        this.name.y += 5;
+                        this.character.y += movement_speed;
+                        this.name.y += movement_speed;
                     } else if(this.character.y > this.character.getData("positionY")) {
-                        this.character.y -= 5;
-                        this.name.y -= 5;
+                        this.character.y -= movement_speed;
+                        this.name.y -= movement_speed;
                     }
     
                     var x = this.character.x;
