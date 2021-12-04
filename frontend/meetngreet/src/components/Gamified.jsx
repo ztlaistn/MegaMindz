@@ -16,7 +16,7 @@ import chatroom_sprite_4 from "../assets/sprite4.png";
 import chatroom_sprite_test from "../assets/chatroom-idle-test.png";
 
 //Initialize game as HTML component
-export default function Gamified({socket, username, mutePeerByUsername, mobile}) {
+export default function Gamified({socket, username, setupStatus, mutePeerByUsername, mobile}) {
     var isClicking = false;
     var scene_width = "70%";
     var scene_height = "80%";
@@ -69,32 +69,46 @@ export default function Gamified({socket, username, mutePeerByUsername, mobile})
                 this.otherPlayers = this.add.group();
                 this.otherNames = this.add.group();
 
+                let gotUpdate = false;
+
                 let self = this;
 
                 socket.on('update-all-positions', function(players) {
                     console.log(players);
-                    players.forEach((player) =>{
-                        if(player.username !== sessionStorage.getItem("username")){
-                            if(!self.otherPlayers.getChildren().includes(player.username)){
-                                const otherPlayer = self.add.sprite(player.x, player.y, "s" + player.sprite);
-                                otherPlayer.playerId = player.username;
-                                otherPlayer.displayWidth = character_width;
-                                otherPlayer.displayHeight = character_height;
-                                self.otherPlayers.add(otherPlayer);
-                            }
-                            if(!self.otherNames.getChildren().includes(player.username)){
-                                const otherName = self.add.text((player.x - name_distance_x), (player.y + name_distance_y), player.username, user_font_params);
-                                otherName.playerId = player.username;
-                                self.otherNames.add(otherName);
-                            }
-                        }else{
-                            self.character = self.add.sprite(player.x, player.y, "s" + player.sprite);
-                            self.character.displayWidth = character_width;
-                            self.character.displayHeight = character_height;
-                            self.name = self.add.text((player.x - name_distance_x), (player.y + name_distance_y), sessionStorage.getItem("username"), user_font_params);
-                        }
-                    })
+					if(!self.gotUpdate){
+						self.gotUpdate = true;
+						players.forEach((player) =>{
+							if(player.username !== sessionStorage.getItem("username")){
+								if(!self.otherPlayers.getChildren().includes(player.username)){
+									const otherPlayer = self.add.sprite(player.x, player.y, "s" + player.sprite);
+									otherPlayer.playerId = player.username;
+									otherPlayer.displayWidth = character_width;
+									otherPlayer.displayHeight = character_height;
+									self.otherPlayers.add(otherPlayer);
+								}
+								if(!self.otherNames.getChildren().includes(player.username)){
+									const otherName = self.add.text((player.x - name_distance_x), (player.y + name_distance_y), player.username, user_font_params);
+									otherName.playerId = player.username;
+									self.otherNames.add(otherName);
+								}
+							}else{
+								self.character = self.add.sprite(player.x, player.y, "s" + player.sprite);
+								self.character.displayWidth = character_width;
+								self.character.displayHeight = character_height;
+								self.name = self.add.text((player.x - name_distance_x), (player.y + name_distance_y), sessionStorage.getItem("username"), user_font_params);
+							}
+						});
+					}
                 });
+
+                // If we have not yet gotten an update all event (but we have connected), request one
+                if(setupStatus && !gotUpdate){
+                    console.log("Requesting another position update.")
+                    const connData = {
+                        auth: "Bearer " + sessionStorage.getItem("token"),
+                    };
+                    socket.emit('request-update-all', connData);
+                }
                 
                 //Populate the room with other characters
                 socket.on('new-character-event', function(player){
@@ -117,13 +131,15 @@ export default function Gamified({socket, username, mutePeerByUsername, mobile})
                     self.otherPlayers.getChildren().forEach(function(otherPlayer) {
                         if (player.username === otherPlayer.playerId) {
                             otherPlayer.destroy();
+
                         }
                     });
                     self.otherNames.getChildren().forEach(function(otherName) {
                         if (player.username === otherName.playerId) {
                             otherName.destroy();
                         }
-                    })
+                    });
+
                 });
 
                 //Updates the movement of characters on the local screen
@@ -146,6 +162,7 @@ export default function Gamified({socket, username, mutePeerByUsername, mobile})
                 this.background.on('pointerdown', function () {
                     isClicking = true;
                 });
+
             },
             update: function() {
                 if (this.character){
