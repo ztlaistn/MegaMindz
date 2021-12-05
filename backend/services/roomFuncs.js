@@ -63,7 +63,7 @@ function newChatMessageEvent(io, socket, ourUserId, ourRoomId, ourUsername, auth
             // broadcast message for our room
             console.log("Users: ", ourUsername + " is sending: " + msg + " for room: " + ourRoomId);
             const sendStr = `${ourUsername}:  ${msg}`;
-            io.to(ourRoomId.toString()).emit("new-message", {message: sendStr})
+            io.to(ourRoomId.toString()).emit("new-message", {message: sendStr, senderUsername:ourUsername})
         }
     }
 }
@@ -325,6 +325,29 @@ function newUserRoomPosition(io, socket, ourRoomId, ourUserId, ourUsername, ourS
     }
 }
 
+/**
+ * This function will be triggered on a socket when the client wants to get an update-all-positions event.
+ * Has to first authenticate that the user is who they say they are.  Assumes the socket is connected to a valid room, so uses that roomId.
+ * Parameters:
+ *  socket:         the socket the request was made over
+ *  ourRoomId:      the roomId the socket connected on
+ *  ourUserId:      the userId the socket connected on 
+ *  auth:           user's authentication token string
+ *  posDict:        server position dict
+ * 
+ *  returns:        nothing, but        
+ *                  on success: send the update event
+ *                  on failure: send error event
+ */
+function handleUpdateRequest(socket, ourRoomId, ourUserId, auth, posDict){
+    const tokenUID = validateSocketToken(auth);
+    if (tokenUID !== ourUserId){
+        const errString = "SOCKET HANDLE UPDATE REQUEST ERROR #0: Access Denied";
+        socket.emit('error', {message:errString});
+    }else{
+        socket.emit('update-all-positions', posDict[ourRoomId].returnVisable());
+    }
+}
 
 /**
  * Function that will handle relaying a movement update to all other users in the room
@@ -397,6 +420,7 @@ module.exports = {
     socketDisconnectEvent,
     handleNewChatSocketUser,
     newUserRoomPosition,
+    handleUpdateRequest,
     relayPositionMove,
     disconnectRoomPosition,
     endMeetingHandler

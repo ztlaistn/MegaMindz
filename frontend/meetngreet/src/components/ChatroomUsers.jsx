@@ -49,7 +49,7 @@ export default class ChatroomUsers extends React.Component {
                     response.json().then(function(data) {
                         console.log(data);
                         window.alert("Error: Failed to Enter Admin Options Page : " + data.message);
-                        window.location.href = "/chatroom";
+                        //window.location.href = "/chatroom";
                     });
                 }else{
                     response.json().then(function(data){
@@ -88,7 +88,7 @@ export default class ChatroomUsers extends React.Component {
                 response.json().then(function(data) {
                     console.log(data);
                     window.alert("Error: Failed to Demote User : " + data.message);
-                    window.location.href = "/chatroom";
+                    //window.location.href = "/chatroom";
                 });
             }else{
                 response.json().then(function(data){
@@ -114,7 +114,7 @@ export default class ChatroomUsers extends React.Component {
                 response.json().then(function(data) {
                     console.log(data);
                     window.alert("Error: Failed to Make User VIP : " + data.message);
-                    window.location.href = "/chatroom";
+                    //window.location.href = "/chatroom";
                 });
             }else{
                 response.json().then(function(data){
@@ -140,7 +140,7 @@ export default class ChatroomUsers extends React.Component {
                 response.json().then(function(data) {
                     console.log(data);
                     window.alert("Error: Failed to Make User Moderator : " + data.message);
-                    window.location.href = "/chatroom";
+                    //window.location.href = "/chatroom";
                 });
             }else{
                 response.json().then(function(data){
@@ -166,13 +166,40 @@ export default class ChatroomUsers extends React.Component {
                 response.json().then(function(data) {
                     console.log(data);
                     window.alert("Error: Failed to Ban User : " + data.message);
-                    window.location.href = "/chatroom";
+                    //window.location.href = "/chatroom";
                 });
             }else{
                 response.json().then(function(data){
                     console.log(data);
                     window.alert("" + data.message);
                     //window.location.href = "/chatroom-users"; //refresh page since the dude got banned
+                });
+            }
+        }).catch(function(err) {
+            console.log('Fetch Error :-S', err);
+        });
+    }
+
+    kickUser(user_Id) {
+        fetch('/users/kickUser', {
+            method: 'POST', // or 'PUT'
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+            },
+            body: JSON.stringify({ roomId: sessionStorage.getItem("roomId"), user_Id: user_Id, auth: sessionStorage.getItem("token")}),
+        }).then(function(response){
+            if(response.status !== 200){
+                response.json().then(function(data) {
+                    console.log(data);
+                    window.alert("Error: Failed to Kick User : " + data.message);
+                    //window.location.href = "/chatroom";
+                });
+            }else{
+                response.json().then(function(data){
+                    console.log(data);
+                    window.alert("" + data.message);
+                    //window.location.href = "/chatroom-users"; //refresh page since the dude got kicked
                 });
             }
         }).catch(function(err) {
@@ -193,7 +220,7 @@ export default class ChatroomUsers extends React.Component {
                 response.json().then(function(data) {
                     console.log(data);
                     window.alert("Error: Failed to Ban User : " + data.message);
-                    window.location.href = "/chatroom";
+                    //window.location.href = "/chatroom";
                 });
             }else{
                 response.json().then(function(data){
@@ -222,7 +249,7 @@ export default class ChatroomUsers extends React.Component {
                 
                 <div class="chatroom-container">
                     <div class="chatroom">
-                        Please wait...
+                        No available options.
                     </div>
                 </div>
             );
@@ -254,8 +281,12 @@ export default class ChatroomUsers extends React.Component {
                     </div>
                     <br/>
                     <br/>
-                    <br/>
-                    <br/>
+                    <div class="chatroom">
+                    Kick User From Room
+                    {users.user_list.map((user) => ( 
+                    <input type="button" value={user[1]} className="button-primary" onClick={() => this.kickUser(user[0])}/>
+                    ))}
+                    </div>
                     <br/>
                     <br/>
                     <div class="chatroom">
@@ -266,6 +297,7 @@ export default class ChatroomUsers extends React.Component {
                     </div>
                     <br/>
                     <br/>
+                    
                     
                 </div>
             );

@@ -12,6 +12,8 @@ export default function Chat({socket, username, handleSocketError,role,roomId}) 
     const [currentMessage, setCurrentMessage] = useState("")
     const [messages, setMessages] = useState([]);
     let end_meeting;
+    let initialScrollHeight;
+
     const sendMessage = async () =>{
         if (currentMessage!== "") {
             const sendData = {
@@ -19,11 +21,13 @@ export default function Chat({socket, username, handleSocketError,role,roomId}) 
                 msg: currentMessage
             }
 
+            // send the message and clear the text box
             await socket.emit("new-message", sendData)
             document.getElementById("message").value = ""
             setCurrentMessage("")
         }
     }
+
     const endMeeting = async () =>{
         const sendData = {
             auth: "Bearer " + sessionStorage.getItem("token"),
@@ -35,12 +39,34 @@ export default function Chat({socket, username, handleSocketError,role,roomId}) 
 
     useEffect(() => {
         if(socket){
+            const ourUsername = username;
             // NEW MESSAGE EVENT
             socket.on("new-message",(data)=>{
-                const {message} = data
+                const {message, senderUsername} = data
+                const msgView = document.getElementById("chat-messages"); 
+                
+                if(!initialScrollHeight){
+                    // If there is not a saved initial scroll height, save it here
+                    initialScrollHeight = msgView.scrollHeight;
+                }
+
+                let needToScroll = false;
+
+                if(msgView.scrollTop >= (msgView.scrollHeight-initialScrollHeight)){
+                    // we are at the bottom of the chat and got a new message, so auto scroll
+                    needToScroll = true;
+                }else if(senderUsername === ourUsername){
+                    // we will always scroll when we send the message
+                    needToScroll = true;
+                }
+
                 setMessages((list) =>[...list,message])
-                const msgView = document.getElementById("chat-messages");
-                msgView.scrollTop = msgView.scrollHeight;
+
+                if(needToScroll){
+                    // we need to scroll, so scroll to the max height
+                    msgView.scrollTop = msgView.scrollHeight;
+                }
+
             });
             // ERROR EVENT
             socket.on("error", (data)=>{
@@ -53,6 +79,15 @@ export default function Chat({socket, username, handleSocketError,role,roomId}) 
             socket.on("force-end",()=>{
                 sessionStorage.setItem("roomId", "");
                 window.location.href = "/";
+            });
+            //Kicked
+            socket.on("kicked",(data)=>{
+                const {username} = data
+                if (username == sessionStorage.getItem("username")) {
+                    window.alert("You were ejected from this room.");
+                    sessionStorage.setItem("roomId", "");
+                    window.location.href = "/";
+                }
             });
             // ERROR EVENT DUE TO PERMISSIONS
             socket.on("error-permissions",(data)=>{

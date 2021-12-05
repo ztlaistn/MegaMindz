@@ -36,6 +36,7 @@ class Server {
 
     initialize() {
         this.app = express();
+        
 
         // hook app up with ejs views
         this.app.set("view engine", "ejs");
@@ -50,6 +51,7 @@ class Server {
         this.httpServer = createServer(this.app);
         // initialize the Socket.IO server and attach it to the web server
         this.io = socketIO(this.httpServer);
+        this.app.set("io",this.io);
     }
 
     /* backend routes exist here
@@ -202,6 +204,11 @@ class Server {
             socket.on('new-move', function(data){
                 const {auth, move} = data;
                 roomFuncs.relayPositionMove(io, socket, ourUserId, ourRoomId, ourUsername, oldThis.positionDict, move, auth);
+            });
+
+            socket.on('request-update-all', function(data){
+                const {auth} = data;
+                roomFuncs.handleUpdateRequest(socket, ourRoomId, ourUserId, auth, oldThis.positionDict);
             });
 
             /*
