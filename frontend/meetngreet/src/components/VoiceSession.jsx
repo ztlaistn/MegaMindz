@@ -137,8 +137,8 @@ const VoiceSession = ({videoEnabled, socket, addPeersRef, removePeersRef, findPe
                                     </div>
                                 ) : null;
     return (
-        <div>
-            <div class="media-container">
+        <div class="media-container">
+            <div class="media">
                 {/* Add our media player */}
                 {ourMediaPlayer}
                 {/* Add other users' media players */}
