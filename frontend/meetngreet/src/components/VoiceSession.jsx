@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Peer from "simple-peer";
 import MediaPlayer from "./MediaPlayer";
+import "./styles/Text.css";
 
 // constraints currently not in use, feel free to use for future development
 const videoConstraints = {
@@ -126,14 +127,14 @@ const VoiceSession = ({videoEnabled, socket, addPeersRef, removePeersRef, findPe
     }
 
     const ourMediaPlayer = videoEnabled
-                                ? (<div class="video-container"><video muted id="our-media-device" ref={ourMedia} autoPlay playsInline /><p class="">{sessionStorage.getItem("username")}</p></div>) // if true
+                                ? (<div class="video-container"><video muted id="our-media-device" ref={ourMedia} autoPlay playsInline /><p class="video-name-label title-font">{sessionStorage.getItem("username")}</p></div>) // if true
                                 : (<audio muted id="our-media-device" ref={ourMedia} autoPlay />); // if false
 
     const videoToolBar = videoEnabled
                                 ? (
                                     <div class="video-toolbar">
-                                        <input type="button" value="Mute" className="button-primary" ref={muteButton} onClick={toggleMute}/>
-                                        <input type="button" value="Leave Room" className="button-primary" onClick={leaveRoom}/>
+                                        <input type="button" value="Mute" className="button-primary mute-button" ref={muteButton} onClick={toggleMute}/>
+                                        <input type="button" value="Leave Room" className="button-primary leave-room-button" onClick={leaveRoom}/>
                                     </div>
                                 ) : null;
     return (

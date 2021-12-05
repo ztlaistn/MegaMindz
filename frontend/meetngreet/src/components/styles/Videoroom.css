@@ -1,15 +1,38 @@
 .videoroom-container {
     width: 100%;
+    margin-top: 50px;
 }
 
 .media {
     display: flex;
 }
 
+.media-container {
+    width: 90%;
+    margin: auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0px 4px 8px 2px rgba(57, 53, 52, 0.2);
+}
+
 .video-container {
     width: 50%;
+    padding: 20px 20px 0px 20px;
 }
 
 .video-container video {
     width: 100%;
+}
+
+.video-name-label {
+    margin: 0;
+}
+
+.mute-button {
+    margin-left: 20px;
+}
+
+.leave-room-button {
+    float: right;
+    margin-right: 20px;
 }
