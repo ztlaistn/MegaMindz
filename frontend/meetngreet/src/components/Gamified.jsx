@@ -117,7 +117,13 @@ export default function Gamified({socket, username, setupStatus, mutePeerByUsern
                 
                 //Populate the room with other characters
                 socket.on('new-character-event', function(player){
-                    if(player.username !== sessionStorage.getItem("username")){
+                    if(!gotUpdate && self.otherPlayers.length === 0){
+                        console.log("Requesting another position update in new character.")
+                        const connData = {
+                            auth: "Bearer " + sessionStorage.getItem("token"),
+                        };
+                        socket.emit('request-update-all', connData);
+                    }else if(player.username !== sessionStorage.getItem("username")){
                         const otherPlayer = self.add.sprite(player.x, player.y, "s" + player.sprite);
                         otherPlayer.playerId = player.username;
                         otherPlayer.displayWidth = character_width;
@@ -150,22 +156,38 @@ export default function Gamified({socket, username, setupStatus, mutePeerByUsern
                 //Updates the movement of characters on the local screen
                 socket.on('new-move', function(player) {
                     // console.log(player);
-                    self.otherPlayers.getChildren().forEach(function(otherPlayer) {
-                        if (player.username === otherPlayer.playerId) {
-                            otherPlayer.setPosition(player.x, player.y);
-                        }
-                    });
-                    self.otherNames.getChildren().forEach(function(otherName) {
-                        if (player.username === otherName.playerId) {
-                            otherName.setPosition((player.x - name_distance_x), (player.y + name_distance_y));
-                        }
-                    })
+                    if(!gotUpdate && self.otherPlayers.length === 0){
+                        console.log("Requesting another position update in new-move.")
+                        const connData = {
+                            auth: "Bearer " + sessionStorage.getItem("token"),
+                        };
+                        socket.emit('request-update-all', connData);
+                    }else{
+                        self.otherPlayers.getChildren().forEach(function(otherPlayer) {
+                            if (player.username === otherPlayer.playerId) {
+                                otherPlayer.setPosition(player.x, player.y);
+                            }
+                        });
+                        self.otherNames.getChildren().forEach(function(otherName) {
+                            if (player.username === otherName.playerId) {
+                                otherName.setPosition((player.x - name_distance_x), (player.y + name_distance_y));
+                            }
+                        })
+                    }
                 });
 
                 //Event listener for clicking on background to move
                 //ensures that clicking outside the game doesn't move the character
                 this.background.on('pointerdown', function () {
-                    isClicking = true;
+                    if(!gotUpdate && mobile && self.otherPlayers.length === 0){
+                        console.log("Requesting another position update in pointer down.")
+                        const connData = {
+                            auth: "Bearer " + sessionStorage.getItem("token"),
+                        };
+                        socket.emit('request-update-all', connData);
+                    }else{
+                        isClicking = true;
+                    }
                 });
 
             },
