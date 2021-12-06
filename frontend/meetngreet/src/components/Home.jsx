@@ -106,7 +106,7 @@ export default class Home extends React.Component {
         window.location.href = "/videoroom";
     };
     newVideoRoom = () => {
-        sessionStorage.setItem("roomId", (Math.random() * 10000 + 1));
+        sessionStorage.setItem("roomId", Math.floor(Math.random() * 100000));
         window.location.href = "/videoroom";
     };
 
@@ -226,7 +226,7 @@ export default class Home extends React.Component {
                         }}
                     />
                 </label>
-
+                <br/>
                 <input type="button" value="Join Chat Room" className="chat-button" onClick={this.join_room} />
                 <input type="button" value="Join Video Room" className="button-primary" onClick={this.toVideoRoom} />
 
