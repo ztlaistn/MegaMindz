@@ -197,6 +197,7 @@ export default class Chatroom extends React.Component {
                             <Gamified
                                 socket={this.state.socket}
                                 username={this.state.username}
+                                setupStatus={this.state.setupComplete}
                                 mutePeerByUsername={this.mutePeerByUsername}
                                 mobile={false}
                             />
@@ -226,6 +227,7 @@ export default class Chatroom extends React.Component {
                             <Gamified
                                 socket={this.state.socket}
                                 username={this.state.username}
+                                setupStatus={this.state.setupComplete}
                                 mutePeerByUsername={this.mutePeerByUsername}
                                 mobile={true}
                             />
