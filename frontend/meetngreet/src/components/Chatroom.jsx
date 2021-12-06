@@ -21,7 +21,8 @@ export default class Chatroom extends React.Component {
             socketErrorMsg: "",
             ourRole: 0,
             setupStart: false,
-            setupComplete: false
+            setupComplete: false,
+            chatToggled: false
         };
         // Holds actual peer streams - when changed, there is no re-render
         this.peersRef = [];
@@ -32,6 +33,18 @@ export default class Chatroom extends React.Component {
         this.removePeersRef = this.removePeersRef.bind(this);
         this.findPeersRefById = this.findPeersRefById.bind(this);
         this.mutePeerByUsername = this.mutePeerByUsername.bind(this);
+    }
+
+    toggleChat = () => {
+        if(this.state.chatToggled === false){
+            this.setState({
+                  chatToggled: true
+            });
+        } else {
+            this.setState({
+                  chatToggled: false
+            });
+        }
     }
 
     componentDidMount() {
@@ -178,12 +191,14 @@ export default class Chatroom extends React.Component {
             <div class="chatroom-container">
                 <BrowserView>
                     <div class="chatroom">
-                        <Gamified
-                            socket={this.state.socket}
-                            username={this.state.username}
-                            mutePeerByUsername={this.mutePeerByUsername}
-                            mobile={false}
-                        />
+                        <div id="game-container">
+                            <Gamified
+                                socket={this.state.socket}
+                                username={this.state.username}
+                                mutePeerByUsername={this.mutePeerByUsername}
+                                mobile={false}
+                            />
+                        </div>
                         <Chat
                             socket={this.state.socket}
                             username={this.state.username}
@@ -203,12 +218,14 @@ export default class Chatroom extends React.Component {
                 </BrowserView>
                 <MobileView>
                     <div class="chatroom-mobile">
-                        <Gamified
-                            socket={this.state.socket}
-                            username={this.state.username}
-                            mutePeerByUsername={this.mutePeerByUsername}
-                            mobile={true}
-                        />
+                        <div id="game-container">
+                            <Gamified
+                                socket={this.state.socket}
+                                username={this.state.username}
+                                mutePeerByUsername={this.mutePeerByUsername}
+                                mobile={true}
+                            />
+                        </div>
                         <br/>
                         <Chat
                             socket={this.state.socket}

@@ -18,8 +18,8 @@ import chatroom_sprite_test from "../assets/chatroom-idle-test.png";
 //Initialize game as HTML component
 export default function Gamified({socket, username, mutePeerByUsername, mobile}) {
     var isClicking = false;
-    var scene_width = "70%";
-    var scene_height = "80%";
+    var scene_width = "100%";
+    var scene_height = "100%";
     var character_width = 100;
     var character_height = 128;
     var name_distance_x = 55;
@@ -41,12 +41,18 @@ export default function Gamified({socket, username, mutePeerByUsername, mobile})
     console.log(socket);
     return(
     <GameComponent
+    className="game"
     config={{
         //Define game element
         width: scene_width,
         height: scene_height,
         physics: {
             default: 'arcade'
+        },
+        scale: {
+            parent: "game-container",
+            autoCenter: Phaser.Scale.NO_CENTER,
+            mode: Phaser.Scale.FIT
         },
         scene: {
             preload: function() {
@@ -164,7 +170,7 @@ export default function Gamified({socket, username, mutePeerByUsername, mobile})
     
                     //Perform distance calculations
                     this.otherNames.getChildren().forEach((otherName) => {
-                        if(Math.sqrt((Math.pow((otherName.x - this.name.x), 2)) + (Math.pow((otherName.y - this.name.y), 2))) < 250){
+                        if((Math.abs(otherName.x - this.name.x) < 250) && (Math.abs(otherName.y - this.name.y) < 250)){
                             otherName.setStyle(active_font_params);
                             mutePeerByUsername(otherName.playerId, false);
                         } else {

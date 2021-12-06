@@ -25,8 +25,8 @@ class NavigationBar extends React.Component {
       onClose = e => {
         this.props.onClose && this.props.onClose(e);
       };
-      
-    
+
+
 
     toLogin = () => {
         window.location.href = "login";
@@ -72,11 +72,6 @@ class NavigationBar extends React.Component {
 
     chatroomUsers = () => {
         window.location.href = "/chatroom-users";
-    };
-
-    toggleAudio = () => {
-        //TODO: placeholder
-        window.alert("Not currently supported.");
     };
 
     openRoomMenu = () => {
@@ -279,16 +274,25 @@ class NavigationBar extends React.Component {
                         <br/>
                         <br/>
                         <br/>
+                        <input type="button" value={"Room Code: " + sessionStorage.getItem("roomId")} className="hamburger-item"/>
+                        <br/>
+                        <br/>
+                        <input type="button" value="User Settings" className="hamburger-item" onClick={this.userSettings}/>
+                        <br/>
+                        <br/>
+                        <input type="button" value="Call a Meeting" className="hamburger-item" onClick={this.callMeeting}/>
+                        <br/>
+                        <br/>
                         <input type="button" value="Toggle Mute" className="hamburger-item" onClick={this.toggleMute}/>
                         <br/>
                         <br/>
-                        <input type="button" value="Toggle Audio" className="hamburger-item" onClick={this.toggleAudio}/>
+                        <input type="button" value="Users in Room" className="hamburger-item" onClick={this.listUsersInRoom}/>
+                        <br/>
+                        <br/>
+                        <input type="button" value="Admin Options" className="hamburger-item" onClick={e => {this.showModal();}}/>
                         <br/>
                         <br/>
                         <input type="button" value="Leave Room" className="hamburger-item" onClick={this.toHome}/>
-                        <br/>
-                        <br/>
-                        <input type="button" value="Log Out" className="hamburger-item" onClick={this.logout}/>
                     </div>
                 );
             } else if(window.location.pathname === "/"){

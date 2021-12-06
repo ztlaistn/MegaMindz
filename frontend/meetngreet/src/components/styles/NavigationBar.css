@@ -95,6 +95,7 @@
     font-size: 40px;
     line-height: 25px;
     z-index: 101;
+    transition: transform .2s ease-in-out;
 }
 
 .hamburger-item {

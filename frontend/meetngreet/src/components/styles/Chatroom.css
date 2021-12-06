@@ -9,11 +9,12 @@
 }
 
 .chatroom {
-    display: flex;
+    display: table;
     flex-direction: row;
     align-items: center;
     z-index: 1;
     position: absolute;
+    height: 80vh;
 }
 
 .chatroom-background {
@@ -36,7 +37,7 @@
     /* Card Shadow */
     box-shadow: 0px 4px 8px 2px rgba(57, 53, 52, 0.2);
     border-radius: 12px;
-
+    display: table-cell;
 }
 
 .chat-messages {
@@ -50,4 +51,33 @@
     position: absolute;
     top: 200px;
     left: 100px;
+}
+
+div#game-container {
+    height: 80vh;
+    width: 70vw;
+    margin-left: auto;
+    margin-right: 0;
+}
+
+@media only screen and (max-width: 768px) {
+    .chatroom-card-frame {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 22vw;
+        background: #4f8fea;
+        display: block;
+        overflow: auto;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 2%;
+        flex-direction: column;
+        text-align: center;
+        height: 80vh;
+        /* Card Shadow */
+        box-shadow: 0px 4px 8px 2px rgba(57, 53, 52, 0.2);
+        border-radius: 12px;
+        z-index: 50;
+    }
 }
