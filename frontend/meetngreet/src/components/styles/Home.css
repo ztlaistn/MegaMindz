@@ -5,12 +5,50 @@
     margin-right: 0px;
     width: 40%;
 }
-
-.profile-picture {
-    max-width: 40%;
-    border-radius: 1000px;
+.home{
+    border: 1px solid #4287f5;
+    float: left;
+    height: 180px;
+    width: 500px;
+    position: relative;
+}
+.bottom-home {
+    flex: 0 0 50%;
+    display: flex;
+    justify-content: flex-start;
 }
 
+.profile-picture {
+    max-width: 25%;
+    border-radius: 10000px;
+}
+
+.buttons-container {
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+
+}
+
+.date-prompt {
+    font-family: Work Sans;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 30px;
+    line-height: 25px;
+    align-items: center;
+    color: black;
+}
+
+/*.profile-picture{*/
+/*    display: block;*/
+/*    float: left;*/
+/*    margin-top: 5vh;*/
+/*    margin-left: 50px;*/
+/*    margin-right: auto;*/
+/*    max-width: 40%;*/
+/*    border-radius: 1000px;*/
+/*}*/
 .left-home {
     display: block;
     float: left;
@@ -18,6 +56,8 @@
     margin-left: 50px;
     margin-right: auto;
 }
+
+
 
 /* Small devices (landscape phones, 576px and up) */
 @media only screen and (max-width: 768px) {
