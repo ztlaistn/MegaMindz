@@ -1,32 +1,44 @@
-.right-home {
-    display: block;
-    float: right;
-    margin-left: auto;
-    margin-right: 0px;
-    width: 40%;
-}
+
 .home{
-    border: 1px solid #4287f5;
-    float: left;
-    height: 180px;
-    width: 500px;
-    position: relative;
-}
-.bottom-home {
-    flex: 0 0 50%;
-    display: flex;
-    justify-content: flex-start;
+    display: none;
+    position:relative;
+    text-align: left;
 }
 
 .profile-picture {
-    max-width: 25%;
+    max-width: 30%;
     border-radius: 10000px;
 }
 
-.buttons-container {
-    display: flex;
-    align-items: flex-start;
-    margin: 0;
+.profile {
+    position:relative;
+}
+.chat-button{
+    margin-right: 3px;
+    width: fit-content;
+    background-color: #1D4FB4;
+    color: white;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: Work Sans;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 21px;
+    line-height: 25px;
+    transition-duration: 0.4s;
+}
+
+div#bottom-container {
+    display: none;
+    position: absolute;
+    bottom:0;
+    margin-left: 0;
+    /*margin-right: auto;*/
+    padding: 2%;
+    text-align: left;
+
 
 }
 
@@ -38,23 +50,6 @@
     line-height: 25px;
     align-items: center;
     color: black;
-}
-
-/*.profile-picture{*/
-/*    display: block;*/
-/*    float: left;*/
-/*    margin-top: 5vh;*/
-/*    margin-left: 50px;*/
-/*    margin-right: auto;*/
-/*    max-width: 40%;*/
-/*    border-radius: 1000px;*/
-/*}*/
-.left-home {
-    display: block;
-    float: left;
-    margin-top: 5vh;
-    margin-left: 50px;
-    margin-right: auto;
 }
 
 

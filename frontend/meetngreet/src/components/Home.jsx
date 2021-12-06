@@ -102,10 +102,13 @@ export default class Home extends React.Component {
     };
 
     toVideoRoom = () => {
-        sessionStorage.setItem("roomId", this.state.videoRoomId);
+        sessionStorage.setItem("roomId", this.state.roomId);
         window.location.href = "/videoroom";
     };
-
+    newVideoRoom = () => {
+        sessionStorage.setItem("roomId", (Math.random() * 10000 + 1));
+        window.location.href = "/videoroom";
+    };
 
     create_room = event => {
         //keep the form from actually submitting
@@ -200,15 +203,17 @@ export default class Home extends React.Component {
 
     render() {
         return (
-            <div>
-                {/*<div id = "home">*/}
-                {/*    <div id="bottom-home">*/}
+                <div id = "home">
                 <img src={this.state.sprites_map[this.state.sprite]} className="profile-picture" alt = "Choose Profile Picture" />
                 <header className="date-prompt">{this.state.time}</header>
                 <br/>
-                <input type="button" value="Create Room" className="button-primary" onClick={this.create_room}/>
+                    <input type="button" value="User Account" id = "bottom-container" className="button-secondary" onClick={this.toUserAccount} />
+                    <br/>
+                    <input type="button" value="Create Room" className="button-primary" onClick={this.create_room}/>
                 <br/>
-                <label className="Enter room code">
+                    <input type="button" value="Create Video Room" className="button-primary" onClick={this.newVideoRoom}/>
+                    <br/>
+                    <label className="Enter room code">
                     Enter room code
                     <input
                         type="text"
@@ -221,27 +226,12 @@ export default class Home extends React.Component {
                         }}
                     />
                 </label>
-                <input type="button" value="Join Chat Room" className="button-primary" onClick={this.join_room}/>
-                <br />
-                <label className="Enter VIDEO room code">
-                    Enter Video room code
-                    <input
-                        type="text"
-                        onChange={e => this.change_Handler("videoRoomId", e)}
-                        value={this.state.videoRoomId}
-                        onKeyDown={(event)=> {
-                            if(event.key === "Enter") {
-                                this.toVideoRoom();
-                            };
-                        }}
-                    />
-                </label>
-                <input type="button" value="Join Video Room" className="button-primary" onClick={this.toVideoRoom}/>
-                <br />
-                <div id ="bottom-container">
-                <input type="button" value="User Account" className="button-secondary" onClick={this.toUserAccount}/>
+
+                <input type="button" value="Join Chat Room" className="chat-button" onClick={this.join_room} />
+                <input type="button" value="Join Video Room" className="button-primary" onClick={this.toVideoRoom} />
+
                 </div>
-            </div>
+
         );
     }
 }
