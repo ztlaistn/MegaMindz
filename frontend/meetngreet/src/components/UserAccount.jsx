@@ -190,7 +190,6 @@ export default class UserAccount extends React.Component {
                 <div className="account-credentials">
                     <p>Your current Avatar!</p>
                     <img src={this.state.sprites_map[this.state.sprite]} className="profile-picture" alt = "Choose Profile Picture" />
-
                     <form onSubmit={this.handle_submit}>
                         <label className="name">
                             Name
