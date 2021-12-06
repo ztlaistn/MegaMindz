@@ -15,12 +15,24 @@ class NavigationBar extends React.Component {
     };
 
     state = {
-        show: false
+        show: false,
+        menu: false
       };
       showModal = e => {
         this.setState({
           show: !this.state.show
         });
+        this.setState({
+            menu: true
+          });
+      };
+      showHelpModal = e => {
+        this.setState({
+          show: !this.state.show
+        });
+        this.setState({
+            menu: false
+          });
       };
       onClose = e => {
         this.props.onClose && this.props.onClose(e);
@@ -156,6 +168,7 @@ class NavigationBar extends React.Component {
                             <div class="dropdown-option" onClick={this.toggleMute}>Toggle Audio</div>
                             <div class="dropdown-option" onClick={this.listUsersInRoom}>Users in Room</div>
                             <div class="dropdown-option" onClick={e => {this.showModal();}}>Admin Options</div>
+                            <div class="dropdown-option" onClick={e => {this.showHelpModal();}}>Help</div>
                         </div>
                     </li>
                     <li>
@@ -292,6 +305,9 @@ class NavigationBar extends React.Component {
                         <input type="button" value="Admin Options" className="hamburger-item" onClick={e => {this.showModal();}}/>
                         <br/>
                         <br/>
+                        <input type="button" value="Help" className="hamburger-item" onClick={e => {this.showHelpModal();}}/>
+                        <br/>
+                        <br/>
                         <input type="button" value="Leave Room" className="hamburger-item" onClick={this.toHome}/>
                     </div>
                 );
@@ -334,7 +350,7 @@ class NavigationBar extends React.Component {
                         </div>
                         {this.showLogin()}
                     </div>
-                    <ModalMenu onClose={this.showModal} show={this.state.show}/></div>
+                    <ModalMenu onClose={this.showModal} show={this.state.show} menu={this.state.menu}/></div>
                 </BrowserView>
                 <MobileView>
                     <div className="navigation-bar">
