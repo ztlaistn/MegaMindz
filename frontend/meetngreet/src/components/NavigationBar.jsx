@@ -302,9 +302,6 @@ class NavigationBar extends React.Component {
                         <input type="button" value="Users in Room" className="hamburger-item" onClick={this.listUsersInRoom}/>
                         <br/>
                         <br/>
-                        <input type="button" value="Help" className="hamburger-item" onClick={e => {this.showHelpModal();}}/>
-                        <br/>
-                        <br/>
                         <input type="button" value="Leave Room" className="hamburger-item" onClick={this.toHome}/>
                     </div>
                 );

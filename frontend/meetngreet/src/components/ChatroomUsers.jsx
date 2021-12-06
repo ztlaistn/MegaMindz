@@ -260,35 +260,35 @@ export default class ChatroomUsers extends React.Component {
                     <div class="admin-option">
                         Make User VIP
                         {users.user_list.map((user) => (
-                            <input type="button" value={user[1]} className="button-primary" onClick={() => this.makeUserVIP(user[0])}/>
+                            <input type="button" value={user[1]} className="button-user" onClick={() => this.makeUserVIP(user[0])}/>
                         ))}
                     </div>
                     <br/>
                     <div class="admin-option">
                         Make User Moderator
                         {users.user_list.map((user) => (
-                            <input type="button" value={user[1]} className="button-primary" onClick={() => this.makeUserModerator(user[0])}/>
+                            <input type="button" value={user[1]} className="button-user" onClick={() => this.makeUserModerator(user[0])}/>
                         ))}
                     </div>
                     <br/>
                     <div class="admin-option">
                         Demote User
                         {users.user_list.map((user) => (
-                            <input type="button" value={user[1]} className="button-primary" onClick={() => this.demoteUser(user[0])}/>
+                            <input type="button" value={user[1]} className="button-user" onClick={() => this.demoteUser(user[0])}/>
                         ))}
                     </div>
                     <br/>
                     <div class="admin-option">
                         Kick User From Room
                         {users.user_list.map((user) => (
-                            <input type="button" value={user[1]} className="button-primary" onClick={() => this.kickUser(user[0])}/>
+                            <input type="button" value={user[1]} className="button-user" onClick={() => this.kickUser(user[0])}/>
                         ))}
                     </div>
                     <br/>
                     <div class="admin-option">
                         Ban User From Room
                         {users.user_list.map((user) => (
-                            <input type="button" value={user[1]} className="button-primary" onClick={() => this.banUser(user[0])}/>
+                            <input type="button" value={user[1]} className="button-user" onClick={() => this.banUser(user[0])}/>
                         ))}
                     </div>
                 </div>

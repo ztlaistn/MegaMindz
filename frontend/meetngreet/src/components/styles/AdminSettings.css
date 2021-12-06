@@ -119,11 +119,11 @@ input[type=password]:focus {
   border-radius: 8px;
 }
 
-.button-primary {
+.button-user {
   width: fit-content;
   background-color: #1D4FB4;
   color: white;
-  padding: 14px 20px;
+  padding: 10px 14px;
   margin: 8px 0;
   border: none;
   border-radius: 8px;
@@ -171,11 +171,11 @@ input[type=password]:focus {
   transition-duration: 0.4s;
 }
 
-.button-primary:hover {
+.button-user:hover {
   background-color: #173D9F;
 }
 
-.button-primary:disabled {
+.button-user:disabled {
   opacity: 0.75;
   background-color: #1D4FB4;
 }
