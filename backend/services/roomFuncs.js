@@ -406,7 +406,10 @@ function relayPositionMove(io, socket, ourUserId, ourRoomId, ourUsername, posDic
  *      posDict:   The server position dictionary that keeps track of everyone's positions
  */
 function disconnectRoomPosition(io, socket, ourUserId, ourRoomId, ourUsername, posDict){
-    let wasInRoom = posDict[ourRoomId].leftRoom(ourUserId);
+    let wasInRoom = false;
+    if(posDict[ourRoomId]){
+        wasInRoom = posDict[ourRoomId].leftRoom(ourUserId);
+    }
 
     // This is only a socket emit rather than an io because it doesn't go back to the sender
     if (wasInRoom){
