@@ -302,9 +302,6 @@ class NavigationBar extends React.Component {
                         <input type="button" value="Users in Room" className="hamburger-item" onClick={this.listUsersInRoom}/>
                         <br/>
                         <br/>
-                        <input type="button" value="Admin Options" className="hamburger-item" onClick={e => {this.showModal();}}/>
-                        <br/>
-                        <br/>
                         <input type="button" value="Help" className="hamburger-item" onClick={e => {this.showHelpModal();}}/>
                         <br/>
                         <br/>
@@ -340,6 +337,8 @@ class NavigationBar extends React.Component {
             <>
                 <BrowserView>
                     <div className="modal-wrapper">
+                        <ModalMenu onClose={this.showModal} show={this.state.show} menu={this.state.menu}/>
+                    </div>
                     <div className="navigation-bar">
                         <div className="logo-bar">
                             <li>
@@ -350,7 +349,6 @@ class NavigationBar extends React.Component {
                         </div>
                         {this.showLogin()}
                     </div>
-                    <ModalMenu onClose={this.showModal} show={this.state.show} menu={this.state.menu}/></div>
                 </BrowserView>
                 <MobileView>
                     <div className="navigation-bar">
