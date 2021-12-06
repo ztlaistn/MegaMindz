@@ -99,7 +99,7 @@ export default function Chat({socket, username, handleSocketError,role,roomId}) 
     },[socket]);
     // to check if the end meeting button should be showed or not.
     if (role>2) {
-        end_meeting =  <input type="button" value="End Meeting" className="button-primary" onClick={endMeeting}/>;
+        end_meeting =  <input type="button" value="End Meeting" className="button-chat" onClick={endMeeting}/>;
 
     } else {
         end_meeting = "";
@@ -122,7 +122,7 @@ export default function Chat({socket, username, handleSocketError,role,roomId}) 
                             sendMessage();
                         };
                     }}/>
-                    <input type="button" value="Send Message" className="button-primary" onClick={sendMessage}/>
+                    <input type="button" value="Send Message" className="button-chat" onClick={sendMessage}/>
                     
                     {end_meeting}
 

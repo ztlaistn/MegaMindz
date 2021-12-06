@@ -38,7 +38,6 @@ export default function Gamified({socket, username, setupStatus, mutePeerByUsern
     var user_font_params = { fontFamily: 'Work Sans', color: '#FFFFFF', stroke: '#000000', strokeThickness: 5, fontSize: font_size };
     var active_font_params = { fontFamily: 'Work Sans', color: '#58CFEA', stroke: '#000000', strokeThickness: 5, fontSize: font_size };
     var inactive_font_params = { fontFamily: 'Work Sans', color: '#F5A623', stroke: '#000000', strokeThickness: 5, fontSize: font_size };
-    console.log(socket);
     return(
     <GameComponent
     className="game"

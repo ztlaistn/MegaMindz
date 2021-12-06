@@ -11,3 +11,13 @@
     flex-wrap: wrap;
 }
 
+@media only screen and (max-width: 768px) {
+    .media-container {
+        padding: 20px;
+        display: flex;
+        width: 90%;
+        height: 0px;
+        margin: auto;
+        flex-wrap: wrap;
+    }
+}

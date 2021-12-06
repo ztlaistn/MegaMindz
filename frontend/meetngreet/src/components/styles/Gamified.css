@@ -3,4 +3,14 @@ canvas {
     z-index: 1;
     float: right;
     display: table-cell;
+    border-radius: 12px;
+}
+
+@media only screen and (max-width: 768px) {
+    canvas {
+        z-index: 1;
+        position: absolute;
+        top: 60px;
+        left: 0px;
+    }
 }
