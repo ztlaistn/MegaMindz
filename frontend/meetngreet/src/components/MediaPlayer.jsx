@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import "./styles/Text.css";
 
 /* Function Component: Media Player will take the peer stream and attach it to the appropriate HTML element for rendering
 * @param props.key: key associated with that peer
@@ -17,9 +18,9 @@ const MediaPlayer = (props) => {
  if (props.videoEnabled){
         return(
             <div class="video-container">
+                {/* Render username above video */}
+                <p class="video-name-label title-font">{props.id}</p>
                 <video playsInline autoPlay ref={ref} id={props.id}/>
-                {/* Render username under video */}
-                <p class="video-name-label">{props.id}</p>
             </div>
         );
     } else{

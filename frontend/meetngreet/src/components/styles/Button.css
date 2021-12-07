@@ -1,0 +1,19 @@
+.mute-button {
+    width: fit-content;
+    color: white;
+    padding: 14px 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: Work Sans;
+    line-height: 25px;
+    transition-duration: 0.4s;
+}
+
+.mic-on {
+    background-color: #3BBCD9;
+}
+
+.mic-off {
+    background-color: #FF9A61;
+}

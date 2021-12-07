@@ -92,14 +92,15 @@ export default class Videoroom extends React.Component {
         return (
             <div class="videoroom-container">
                 <div class="videoroom">
-                        <VoiceSession 
-                            videoEnabled={true} 
-                            socket={this.state.socket} 
-                            peersRef={this.peersRef}
-                            addPeersRef={this.addPeersRef}
-                            removePeersRef={this.removePeersRef}
-                            findPeersRefById={this.findPeersRefById}
-                        />
+                    <h2 class="title-font">Room Code: {sessionStorage.getItem("roomId")}</h2>
+                    <VoiceSession 
+                        videoEnabled={true} 
+                        socket={this.state.socket} 
+                        peersRef={this.peersRef}
+                        addPeersRef={this.addPeersRef}
+                        removePeersRef={this.removePeersRef}
+                        findPeersRefById={this.findPeersRefById}
+                    />
                 </div>
             </div>
         );

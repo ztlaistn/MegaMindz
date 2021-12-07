@@ -1,23 +1,64 @@
 .videoroom-container {
     width: 100%;
+    margin-top: 50px;
+}
+
+.videoroom {
+    padding: 0px 5% 0px 5%;
+}
+
+.media {
+    display: flex;
 }
 
 .media-container {
-    padding: 20px;
-    display: flex;
-    height: 100vh;
-    width: 90%;
-    margin: auto;
-    flex-wrap: wrap;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0px 4px 8px 2px rgba(57, 53, 52, 0.2);
+    padding-bottom: 14px;
+}
+
+.video-toolbar {
+    margin-top: 14px;
+}
+
+.video-container {
+    width: 50%;
+    padding: 25px 25px 0px 25px;
+}
+
+.video-container video {
+    width: 100%;
+}
+
+.video-name-label {
+    margin: 0;
+}
+
+.mute-button {
+    margin-left: 20px;
+}
+
+.leave-room-button {
+    float: right;
+    margin: 0px 20px 0px 0px;
+    background-color: white;
+    color: #1D4FB4;
+    border: 3px #1D4FB4 solid;
+    border-radius: 8px;
+    font-family: Work Sans;
+    line-height: 20px;
 }
 
 @media only screen and (max-width: 768px) {
-    .media-container {
-        padding: 20px;
-        display: flex;
-        width: 90%;
-        height: 0px;
-        margin: auto;
-        flex-wrap: wrap;
+    .videoroom {
+        padding: 0px;
+    }
+    .media {
+        display: block;
+    }
+
+    .video-container {
+        width: 100%;
     }
 }

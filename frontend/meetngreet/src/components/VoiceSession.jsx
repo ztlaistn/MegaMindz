@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import Peer from "simple-peer";
 import MediaPlayer from "./MediaPlayer";
+import MicOnButton from "./elements/MicOn";
+import MicOffButton from "./elements/MicOff";
+import "./styles/Text.css";
 
 // constraints currently not in use, feel free to use for future development
 const videoConstraints = {
@@ -17,6 +20,7 @@ const videoConstraints = {
 const VoiceSession = ({videoEnabled, socket, addPeersRef, removePeersRef, findPeersRefById}) => {
     // peers array used for rendering each peer as MediaPlayer component (useState causes a re-render on change)
     const [peers, setPeers] = useState([]); 
+    const [muted, changeMutedState] = useState(false);
     const socketRef = useRef();
     const ourMedia = useRef();
     const muteButton = useRef();
@@ -118,7 +122,8 @@ const VoiceSession = ({videoEnabled, socket, addPeersRef, removePeersRef, findPe
         // toggle
         ourMedia.current.srcObject.getAudioTracks()[0].enabled = !ourMedia.current.srcObject.getAudioTracks()[0].enabled;
         // change value of mute button
-        muteButton.current.value = muteButton.current.value == "Mute" ? "Unmute" : "Mute";
+        //muteButton.current.value = muteButton.current.value == "Mute" ? "Unmute" : "Mute";
+        changeMutedState(!muted);
     }
 
     function leaveRoom() {
@@ -126,19 +131,19 @@ const VoiceSession = ({videoEnabled, socket, addPeersRef, removePeersRef, findPe
     }
 
     const ourMediaPlayer = videoEnabled
-                                ? (<div class="video-container"><video muted id="our-media-device" ref={ourMedia} autoPlay playsInline /><p class="">{sessionStorage.getItem("username")}</p></div>) // if true
+                                ? (<div class="video-container"><p class="video-name-label title-font">{sessionStorage.getItem("username")}</p><video muted id="our-media-device" ref={ourMedia} autoPlay playsInline /></div>) // if true
                                 : (<audio muted id="our-media-device" ref={ourMedia} autoPlay />); // if false
 
     const videoToolBar = videoEnabled
                                 ? (
                                     <div class="video-toolbar">
-                                        <input type="button" value="Mute" className="button-primary" ref={muteButton} onClick={toggleMute}/>
-                                        <input type="button" value="Leave Room" className="button-primary" onClick={leaveRoom}/>
+                                        {muted ? <MicOffButton onClick={toggleMute} /> : <MicOnButton onClick={toggleMute} /> }
+                                        <input type="button" value="Leave Room" className="button-primary leave-room-button" onClick={leaveRoom}/>
                                     </div>
                                 ) : null;
     return (
-        <div>
-            <div class="media-container">
+        <div class="media-container">
+            <div class="media">
                 {/* Add our media player */}
                 {ourMediaPlayer}
                 {/* Add other users' media players */}
