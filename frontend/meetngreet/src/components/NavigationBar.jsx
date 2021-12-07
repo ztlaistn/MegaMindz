@@ -38,6 +38,7 @@ class NavigationBar extends React.Component {
 
     toHome = () => {
         window.location.href = "/";
+        sessionStorage.removeItem("roomId");
     };
 
     toChatroom = () => {

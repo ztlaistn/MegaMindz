@@ -232,24 +232,22 @@ class Server {
                 }else{
                     videoRoom = false;
                 }
-                //console.log(`Socket ${socket.id} disconnected`);
+                
                 // remove reference to that user from the users data structure
                 const roomId = socketToRoom[socket.id];
                 let room = users[roomId];
-                let leavingUser = room.filter(elem => elem.socketId === socket.id);
 
                 if (room) {
+                    // get user's info
+                    let leavingUser = room.filter(elem => elem.socketId === socket.id);
+                    // remove that user from the room
                     room = room.filter(elem => elem.socketId !== socket.id);
                     users[roomId] = room;
+                    // emit to all others users that this person left
+                    users[roomId].forEach(user => {
+                        io.to(user.socketId).emit('user left', {callerName: leavingUser.callerName});
+                    });
                 }
-                //console.log("the room now has:");
-                //console.log(users[roomId]);
-
-                // emit to all others users that this person left
-                users[roomId].forEach(user => {
-                    io.to(user.socketId).emit('user left', {callerName: leavingUser.callerName});
-                });
-
             });
 
             /*
