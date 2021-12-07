@@ -2,16 +2,16 @@ import React from "react";
 import "./styles/Text.css";
 import "./styles/Input.css";
 import "./styles/Chatroom.css";
-import chatroom_background from "../assets/chatroom-background.jpg";
-import chatroom_character from "../assets/chatroom-character.gif";
 import Gamified from "./Gamified.jsx";
 import io from "socket.io-client";
 import Chat from "./EnterChat"
+import VoiceSession from "./VoiceSession";
+import {BrowserView, MobileView} from 'react-device-detect';
 
-//let socket = io.connect("/")
 export default class Chatroom extends React.Component {
     constructor(props) {
         super(props);
+        // when state is changed, this component is re-rendered
         this.state = {
             socket: null,
             username: "",
@@ -20,10 +20,33 @@ export default class Chatroom extends React.Component {
             socketError: false,
             socketErrorMsg: "",
             ourRole: 0,
-            setup: false
+            setupStart: false,
+            setupComplete: false,
+            chatToggled: true
         };
+        // Holds actual peer streams - when changed, there is no re-render
+        this.peersRef = [];
+
         // do not let scoping in function to change
         this.handleSocketError = this.handleSocketError.bind(this);
+        this.addPeersRef = this.addPeersRef.bind(this);
+        this.removePeersRef = this.removePeersRef.bind(this);
+        this.findPeersRefById = this.findPeersRefById.bind(this);
+        this.mutePeerByUsername = this.mutePeerByUsername.bind(this);
+    }
+
+    toggleChat = () => {
+        if(this.state.chatToggled === false){
+            this.setState({
+                  chatToggled: true
+            });
+            document.getElementById("chat").style.display = "block";
+        } else {
+            this.setState({
+                  chatToggled: false
+            });
+            document.getElementById("chat").style.display = "none";
+        }
     }
 
     componentDidMount() {
@@ -40,18 +63,8 @@ export default class Chatroom extends React.Component {
         // if no roomId (or roomId is not number), show error message to user
         if (!roomId || !(+roomId)) {
             this.setState({noRoomError: true});
-            //window.alert("Error: Failed to join room, no roomID");
         }else{
-            // console.log("Connecting to socket for room " + roomId)
-            // oldThis.setState({roomId: roomId});
-            // let socket = oldThis.state.socket;
-            // socket.on("connect",function() {
-            //     const connData = {
-            //         auth: "Bearer " + sessionStorage.getItem("token"),
-            //         roomId: parseInt(roomId) 
-            //     };
-            //     socket.emit("new-user", connData);
-            // });
+
             fetch('/room/joinRoom', {
                 method: 'POST', 
                 headers: {
@@ -71,9 +84,9 @@ export default class Chatroom extends React.Component {
                         });
                     }else{
                         response.json().then(function(data){
-                            if (!oldThis.state.setup){
+                            if (!oldThis.state.setupStart){
                                 oldThis.state.socket = io.connect("/")
-                                oldThis.state.setup = true
+                                oldThis.state.setupStart = true;
                             }
 
                             let socket = oldThis.state.socket;
@@ -87,17 +100,15 @@ export default class Chatroom extends React.Component {
                                 };
                                 console.log("we are connecting")
                                 socket.emit("new-user", connData);
+                                oldThis.state.setupComplete = true;
+                                // oldThis.setState({
+                                //     setupComplete: true       
+                                // });
                             });
-                            
-                            // socket.on("reconnect", function() {
-                            //     const connData = {
-                            //         auth: "Bearer " + sessionStorage.getItem("token"),
-                            //         roomId: parseInt(roomId) 
-                            //     };
-                            //     console.log("we are reconnecting")
-                            //     socket.emit("new-user", connData);
-                            // });
 
+                            // oldThis.state.ourRole = data.role;
+                            // oldThis.state.username = sessionStorage.getItem("username");
+                            // oldThis.state.roomId = roomId;
                             oldThis.setState({
                                 ourRole: data.role,
                                 username: sessionStorage.getItem("username"),
@@ -126,14 +137,39 @@ export default class Chatroom extends React.Component {
         window.location.href = "/home";
     };
 
-    sendMessage = () => {
-        window.location.href = "/";
-    };
+    addPeersRef = (peerName, peerId, peer) => {
+        this.peersRef.push({
+            username: peerName,
+            peerId,
+            peer,
+        });
+    }
+
+    removePeersRef = (peerName) => {
+        let index = this.peersRef.findIndex(elem => elem.username === peerName);
+        this.peersRef.splice(index);
+    }
+
+    findPeersRefById = (targetId) => {
+        const item = this.peersRef.find(p => p.peerId === targetId);
+        return item;
+    }
+
+    mutePeerByUsername = (otherName, isMuted) => {
+        this.peersRef.forEach((player) => {
+            if((player.username === otherName) && (player.username !== sessionStorage.getItem("username")) && (player.peer != null)){
+                if(player.peer._remoteStreams != null) {
+                    player.peer._remoteStreams.forEach((stream) => {
+                        stream.getAudioTracks().forEach(track => track.enabled = !isMuted);
+                    });
+                }
+            }
+        });
+    }
 
     render() {
         const isError = this.state.noRoomError || this.state.socketError;
         if (isError) {
-            // to do: plug in socket error to second msg
             const errorMsg = this.state.noRoomError ? 'Error: You have not joined a valid room' : this.state.socketErrorMsg;
             return (
                 <div class="chatroom-container">
@@ -142,13 +178,81 @@ export default class Chatroom extends React.Component {
                 </div>
             );
         }
-                
+
+        // Temp page when socket setup not complete
+        if (!this.state.setupStart){
+            return (
+                <div class="chatroom-container">
+                    <h1 class="title-font">{"Connecting You To Chatroom."}</h1>
+                    <input type="button" value="Return to Home" className="button-primary" onClick={this.toHome}/>
+                </div>
+            );
+        }
+
         return (
             <div class="chatroom-container">
-                <div class="chatroom">
-                    <Gamified/>
-                    <Chat socket={this.state.socket} username={this.username} handleSocketError={this.handleSocketError} />
-                </div>
+                <BrowserView>
+                    <div class="chatroom">
+                        <div id="game-container">
+                            <Gamified
+                                socket={this.state.socket}
+                                username={this.state.username}
+                                setupStatus={this.state.setupComplete}
+                                mutePeerByUsername={this.mutePeerByUsername}
+                                mobile={false}
+                            />
+                        </div>
+                        <div id="chat">
+                            <Chat
+                                socket={this.state.socket}
+                                username={this.state.username}
+                                handleSocketError={this.handleSocketError}
+                                role = {this.state.ourRole}
+                                roomId={this.state.roomId}
+                            />
+                        </div>
+                        <VoiceSession
+                            videoEnabled={false}
+                            socket={this.state.socket}
+                            peersRef={this.peersRef}
+                            addPeersRef={this.addPeersRef}
+                            removePeersRef={this.removePeersRef}
+                            findPeersRefById={this.findPeersRefById}
+                        />
+                    </div>
+                </BrowserView>
+                <MobileView>
+                    <div class="chatroom-mobile">
+                        <div id="game-container">
+                            <Gamified
+                                socket={this.state.socket}
+                                username={this.state.username}
+                                setupStatus={this.state.setupComplete}
+                                mutePeerByUsername={this.mutePeerByUsername}
+                                mobile={true}
+                            />
+                        </div>
+                        <div id="chat">
+                            <Chat
+                                socket={this.state.socket}
+                                username={this.state.username}
+                                handleSocketError={this.handleSocketError}
+                                role = {this.state.ourRole}
+                                roomId={this.state.roomId}
+                            />
+                        </div>
+                        <br/>
+                        <input type="button" value="Toggle Chat" className="toggle-button" onClick={this.toggleChat}/>
+                        <VoiceSession
+                            videoEnabled={false}
+                            socket={this.state.socket}
+                            peersRef={this.peersRef}
+                            addPeersRef={this.addPeersRef}
+                            removePeersRef={this.removePeersRef}
+                            findPeersRefById={this.findPeersRefById}
+                        />
+                    </div>
+                </MobileView>
             </div>
         );
     }

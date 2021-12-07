@@ -3,14 +3,45 @@ import './styles/NavigationBar.css'
 import logo from "../assets/logo.png";
 import {Link} from 'react-router-dom';
 import {BrowserView, MobileView} from 'react-device-detect';
+import ModalMenu from './ModalMenu.jsx';
+
+import MicOnButton from "./elements/MicOn";
+import MicOffButton from "./elements/MicOff";
 
 class NavigationBar extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            menuToggled: false
+            menuToggled: false,
+            muted: false
         };
     };
+
+    state = {
+        show: false,
+        menu: false
+      };
+      showModal = e => {
+        this.setState({
+          show: !this.state.show
+        });
+        this.setState({
+            menu: true
+          });
+      };
+      showHelpModal = e => {
+        this.setState({
+          show: !this.state.show
+        });
+        this.setState({
+            menu: false
+          });
+      };
+      onClose = e => {
+        this.props.onClose && this.props.onClose(e);
+      };
+
+
 
     toLogin = () => {
         window.location.href = "login";
@@ -22,6 +53,7 @@ class NavigationBar extends React.Component {
 
     toHome = () => {
         window.location.href = "/";
+        sessionStorage.removeItem("roomId");
     };
 
     toChatroom = () => {
@@ -36,8 +68,13 @@ class NavigationBar extends React.Component {
     }
 
     toggleMute = () => {
-        //TODO: placeholder
-        window.alert("Not currently supported.");
+        // toggle
+        document.getElementById("our-media-device").srcObject.getAudioTracks()[0].enabled = !document.getElementById("our-media-device").srcObject.getAudioTracks()[0].enabled;
+        // change text of mute button
+        //const buttonText = this.state.muteText == "Mute" ? "Unmute" : "Mute";
+        this.setState({
+            muted: !this.state.muted
+        });
     };
 
     userSettings = () => {
@@ -51,11 +88,6 @@ class NavigationBar extends React.Component {
 
     chatroomUsers = () => {
         window.location.href = "/chatroom-users";
-    };
-
-    toggleAudio = () => {
-        //TODO: placeholder
-        window.alert("Not currently supported.");
     };
 
     openRoomMenu = () => {
@@ -115,6 +147,14 @@ class NavigationBar extends React.Component {
                     </li>
                 </div>
             );
+        }else if(window.location.pathname === "/user-agreement"){
+            return(
+                <div className="login-bar">
+                    <li>
+                        <input type="button" value="Home" className="button-primary" onClick={this.toHome}/>
+                    </li>
+                </div>
+            );
         }else if(window.location.pathname === "/chatroom"){
             return(
                 <div className="chatroom-bar">
@@ -122,7 +162,7 @@ class NavigationBar extends React.Component {
                         <input type="button" value={"Room Code: " + sessionStorage.getItem("roomId")} className="button-primary"/>
                     </li>
                     <li>
-                        <input type="button" value="Toggle Mute" className="button-chatroom" onClick={this.toggleMute}/>
+                        {this.state.muted ? <MicOffButton onClick={this.toggleMute} /> : <MicOnButton onClick={this.toggleMute} />}
                     </li>
                     <li>
                         <input type="button" value="Menu" class="button-chatroom-dropdown"/>
@@ -131,7 +171,8 @@ class NavigationBar extends React.Component {
                             <div class="dropdown-option" onClick={this.callMeeting}>Call a Meeting</div>
                             <div class="dropdown-option" onClick={this.toggleMute}>Toggle Audio</div>
                             <div class="dropdown-option" onClick={this.listUsersInRoom}>Users in Room</div>
-                            <div class="dropdown-option" onClick={this.chatroomUsers}>Admin Options</div>
+                            <div class="dropdown-option" onClick={e => {this.showModal();}}>Admin Options</div>
+                            <div class="dropdown-option" onClick={e => {this.showHelpModal();}}>Help</div>
                         </div>
                     </li>
                     <li>
@@ -214,6 +255,18 @@ class NavigationBar extends React.Component {
                         <input type="button" value="Log In" className="hamburger-item" onClick={this.toLogin}/>
                     </div>
                 );
+            } else if(window.location.pathname === "/user-agreement"){
+                return(
+                    <div className="mobile-menu">
+                        <input type="button" value="=" className="button-hamburger" onClick={this.toggleMenu}/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <br/>
+                        <input type="button" value="Home" className="hamburger-item" onClick={this.toHome}/>
+                    </div>
+                );
             } else if(window.location.pathname === "/user-account"){
                 return(
                     <div className="mobile-menu">
@@ -238,16 +291,22 @@ class NavigationBar extends React.Component {
                         <br/>
                         <br/>
                         <br/>
+                        <input type="button" value={"Room Code: " + sessionStorage.getItem("roomId")} className="hamburger-item"/>
+                        <br/>
+                        <br/>
+                        <input type="button" value="User Settings" className="hamburger-item" onClick={this.userSettings}/>
+                        <br/>
+                        <br/>
+                        <input type="button" value="Call a Meeting" className="hamburger-item" onClick={this.callMeeting}/>
+                        <br/>
+                        <br/>
                         <input type="button" value="Toggle Mute" className="hamburger-item" onClick={this.toggleMute}/>
                         <br/>
                         <br/>
-                        <input type="button" value="Toggle Audio" className="hamburger-item" onClick={this.toggleAudio}/>
+                        <input type="button" value="Users in Room" className="hamburger-item" onClick={this.listUsersInRoom}/>
                         <br/>
                         <br/>
                         <input type="button" value="Leave Room" className="hamburger-item" onClick={this.toHome}/>
-                        <br/>
-                        <br/>
-                        <input type="button" value="Log Out" className="hamburger-item" onClick={this.logout}/>
                     </div>
                 );
             } else if(window.location.pathname === "/"){
@@ -271,9 +330,16 @@ class NavigationBar extends React.Component {
     }
 
     render() {
+        if (window.self !== window.top) {
+            return null;
+        }
+        if (window.location.pathname === "/chatroom") {
         return (
             <>
                 <BrowserView>
+                    <div className="modal-wrapper">
+                        <ModalMenu onClose={this.showModal} show={this.state.show} menu={this.state.menu}/>
+                    </div>
                     <div className="navigation-bar">
                         <div className="logo-bar">
                             <li>
@@ -293,6 +359,31 @@ class NavigationBar extends React.Component {
                 </MobileView>
             </>
         );
+        }
+        else {
+            return (
+                <>
+                    <BrowserView>
+                        <div className="navigation-bar">
+                            <div className="logo-bar">
+                                <li>
+                                    <Link to="/" >
+                                        <img src={logo} title="Home" className="logo"/>
+                                    </Link>
+                                </li>
+                            </div>
+                            {this.showLogin()}
+                        </div>
+                    </BrowserView>
+                    <MobileView>
+                        <div className="navigation-bar">
+                            <img src={logo} title="Home" className="logo-mobile"/>
+                        </div>
+                        {this.hamburgerMenu()}
+                    </MobileView>
+                </>
+            );
+        }
     }
 }
 export default NavigationBar;

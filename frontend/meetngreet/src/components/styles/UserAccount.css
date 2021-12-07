@@ -16,6 +16,52 @@
     border-radius: 1000px;
 }
 
+.current-sprite{
+    cursor: pointer;
+    border-radius: 500px;
+}
+
+.images{
+    cursor: pointer;
+    display: block;
+    float: left;
+    border-radius: 1000px;
+    height: 100px;
+    width: 200px;
+
+}
+.image {
+    position:relative;
+    top:-25px;
+    left:-35px;
+    width:504px;
+    height:auto;
+    display:block;
+    z-index:900;
+}
+.profile-picture-selection{
+    display: block;
+    float: left;
+    margin-top: 5vh;
+    margin-left: 50px;
+    margin-right: auto;
+    max-width: 20%;
+    border-radius: 1000px;
+    transition-duration: 0.4s;
+}
+.profile-picture-selection:hover{
+    /*border: 3px solid black;*/
+    transform: scale(1.3);
+}
+
+.images::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+
+
 /* Small devices (landscape phones, 576px and up) */
 @media only screen and (max-width: 768px) {
     .account-credentials {

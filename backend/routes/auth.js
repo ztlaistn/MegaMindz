@@ -53,7 +53,7 @@ export default (app) => {
     } catch (err) {
         let errString;
       if(err === "Account info already exists"){
-        errString = "Email already in use for other account";
+        errString = "Email or Username already in use for other account";
         client.end();
         console.log(errString);
         return res.status(400).json({message: errString});
@@ -179,6 +179,7 @@ export default (app) => {
       dob:row.dob,
       skills:row.skills,
       status:row.status,
+      sprite:row.sprite,
       message:"Returned Fields"
     });
 
@@ -211,6 +212,7 @@ export default (app) => {
       row = await DbUtil.set_field_for_user_id(client, userId,"skills",new_values["skills"])
       row = await DbUtil.set_field_for_user_id(client, userId,"status",new_values["status"])
       row = await DbUtil.set_field_for_user_id(client, userId,"full_name",new_values["full_name"])
+      row = await DbUtil.set_field_for_user_id(client, userId,"sprite",new_values["sprite"])
 
       // DOB Set intentionally last.  It is the most likely to fail, due to date restrictions (preventing invalid dates).
       // Therefore, if it fails, we still want to set the other fields.

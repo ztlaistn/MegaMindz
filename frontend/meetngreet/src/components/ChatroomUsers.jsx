@@ -2,6 +2,7 @@ import React from "react";
 import "./styles/Text.css";
 import "./styles/Input.css";
 import "./styles/ChatroomUsers.css";
+import "./styles/AdminSettings.css";
 
 
 export default class ChatroomUsers extends React.Component {
@@ -49,7 +50,7 @@ export default class ChatroomUsers extends React.Component {
                     response.json().then(function(data) {
                         console.log(data);
                         window.alert("Error: Failed to Enter Admin Options Page : " + data.message);
-                        window.location.href = "/chatroom";
+                        //window.location.href = "/chatroom";
                     });
                 }else{
                     response.json().then(function(data){
@@ -74,6 +75,164 @@ export default class ChatroomUsers extends React.Component {
     testAlert(username, userId ,roleNumber) {
         window.alert("Hi "+username+" your role number is "+roleNumber+ " and ur user id is "+userId)
     }
+
+    demoteUser(user_Id) {
+        fetch('/users/demoteUser', {
+            method: 'POST', // or 'PUT'
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+            },
+            body: JSON.stringify({ roomId: sessionStorage.getItem("roomId"), user_Id: user_Id, auth: sessionStorage.getItem("token")}),
+        }).then(function(response){
+            if(response.status !== 200){
+                response.json().then(function(data) {
+                    console.log(data);
+                    window.alert("Error: Failed to Demote User : " + data.message);
+                    //window.location.href = "/chatroom";
+                });
+            }else{
+                response.json().then(function(data){
+                    console.log(data);
+                    window.alert("" + data.message);
+                });
+            }
+        }).catch(function(err) {
+            console.log('Fetch Error :-S', err);
+        });
+    }
+
+    makeUserVIP(user_Id) {
+        fetch('/users/makeUserVIP', {
+            method: 'POST', // or 'PUT'
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+            },
+            body: JSON.stringify({ roomId: sessionStorage.getItem("roomId"), user_Id: user_Id, auth: sessionStorage.getItem("token")}),
+        }).then(function(response){
+            if(response.status !== 200){
+                response.json().then(function(data) {
+                    console.log(data);
+                    window.alert("Error: Failed to Make User VIP : " + data.message);
+                    //window.location.href = "/chatroom";
+                });
+            }else{
+                response.json().then(function(data){
+                    console.log(data);
+                    window.alert("" + data.message);
+                });
+            }
+        }).catch(function(err) {
+            console.log('Fetch Error :-S', err);
+        });
+    }
+
+    makeUserModerator(user_Id) {
+        fetch('/users/makeUserModerator', {
+            method: 'POST', // or 'PUT'
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+            },
+            body: JSON.stringify({ roomId: sessionStorage.getItem("roomId"), user_Id: user_Id, auth: sessionStorage.getItem("token")}),
+        }).then(function(response){
+            if(response.status !== 200){
+                response.json().then(function(data) {
+                    console.log(data);
+                    window.alert("Error: Failed to Make User Moderator : " + data.message);
+                    //window.location.href = "/chatroom";
+                });
+            }else{
+                response.json().then(function(data){
+                    console.log(data);
+                    window.alert("" + data.message);
+                });
+            }
+        }).catch(function(err) {
+            console.log('Fetch Error :-S', err);
+        });
+    }
+
+    banUser(user_Id) {
+        fetch('/users/banUser', {
+            method: 'POST', // or 'PUT'
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+            },
+            body: JSON.stringify({ roomId: sessionStorage.getItem("roomId"), user_Id: user_Id, auth: sessionStorage.getItem("token")}),
+        }).then(function(response){
+            if(response.status !== 200){
+                response.json().then(function(data) {
+                    console.log(data);
+                    window.alert("Error: Failed to Ban User : " + data.message);
+                    //window.location.href = "/chatroom";
+                });
+            }else{
+                response.json().then(function(data){
+                    console.log(data);
+                    window.alert("" + data.message);
+                    //window.location.href = "/chatroom-users"; //refresh page since the dude got banned
+                });
+            }
+        }).catch(function(err) {
+            console.log('Fetch Error :-S', err);
+        });
+    }
+
+    kickUser(user_Id) {
+        fetch('/users/kickUser', {
+            method: 'POST', // or 'PUT'
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+            },
+            body: JSON.stringify({ roomId: sessionStorage.getItem("roomId"), user_Id: user_Id, auth: sessionStorage.getItem("token")}),
+        }).then(function(response){
+            if(response.status !== 200){
+                response.json().then(function(data) {
+                    console.log(data);
+                    window.alert("Error: Failed to Kick User : " + data.message);
+                    //window.location.href = "/chatroom";
+                });
+            }else{
+                response.json().then(function(data){
+                    console.log(data);
+                    window.alert("" + data.message);
+                    //window.location.href = "/chatroom-users"; //refresh page since the dude got kicked
+                });
+            }
+        }).catch(function(err) {
+            console.log('Fetch Error :-S', err);
+        });
+    }
+
+    unbanUser(user_Id) {
+        fetch('/users/unbanUser', {
+            method: 'POST', // or 'PUT'
+            headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + sessionStorage.getItem("token")
+            },
+            body: JSON.stringify({ roomId: sessionStorage.getItem("roomId"), user_Id: user_Id, auth: sessionStorage.getItem("token")}),
+        }).then(function(response){
+            if(response.status !== 200){
+                response.json().then(function(data) {
+                    console.log(data);
+                    window.alert("Error: Failed to Ban User : " + data.message);
+                    //window.location.href = "/chatroom";
+                });
+            }else{
+                response.json().then(function(data){
+                    console.log(data);
+                    window.alert("" + data.message);
+                });
+            }
+        }).catch(function(err) {
+            console.log('Fetch Error :-S', err);
+        });
+    }
     
     render() {
         const {usersLoaded, users} = this.state;
@@ -88,34 +247,49 @@ export default class ChatroomUsers extends React.Component {
         }
         if (!usersLoaded) {
             return (
-                
-                <div class="chatroom-container">
-                    <div class="chatroom">
-                        Please wait...
+                <div class="admin-option-list">
+                    <div class="admin-option">
+                        No available options.
                     </div>
                 </div>
             );
         }
         else {
             return (
-                <div class="chatroom-container">
-                    <div class="chatroom">
-                    Make User VIP
-                    {users.user_list.map((user) => ( 
-                    <input type="button" value={user[1]} className="button-primary" onClick={() => this.testAlert(user[1],user[0],user[2])}/>
-                    ))}
+                <div class="admin-option-list">
+                    <div class="admin-option">
+                        Make User VIP
+                        {users.user_list.map((user) => (
+                            <input type="button" value={user[1]} className="button-user" onClick={() => this.makeUserVIP(user[0])}/>
+                        ))}
                     </div>
-                    <div class="chatroom">
-                    Make User Moderator
-                    {users.user_list.map((user) => ( 
-                    <input type="button" value={user[1]} className="button-primary" onClick={() => this.testAlert(user[1],user[0],user[2])}/>
-                    ))}
+                    <br/>
+                    <div class="admin-option">
+                        Make User Moderator
+                        {users.user_list.map((user) => (
+                            <input type="button" value={user[1]} className="button-user" onClick={() => this.makeUserModerator(user[0])}/>
+                        ))}
                     </div>
-                    <div class="chatroom">
-                    Remove User From Room
-                    {users.user_list.map((user) => ( 
-                    <input type="button" value={user[1]} className="button-primary" onClick={() => this.testAlert(user[1],user[0],user[2])}/>
-                    ))}
+                    <br/>
+                    <div class="admin-option">
+                        Demote User
+                        {users.user_list.map((user) => (
+                            <input type="button" value={user[1]} className="button-user" onClick={() => this.demoteUser(user[0])}/>
+                        ))}
+                    </div>
+                    <br/>
+                    <div class="admin-option">
+                        Kick User From Room
+                        {users.user_list.map((user) => (
+                            <input type="button" value={user[1]} className="button-user" onClick={() => this.kickUser(user[0])}/>
+                        ))}
+                    </div>
+                    <br/>
+                    <div class="admin-option">
+                        Ban User From Room
+                        {users.user_list.map((user) => (
+                            <input type="button" value={user[1]} className="button-user" onClick={() => this.banUser(user[0])}/>
+                        ))}
                     </div>
                 </div>
             );

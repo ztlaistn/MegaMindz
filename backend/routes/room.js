@@ -75,7 +75,9 @@ export default (app) => {
       for (var user of user_list) {
         const username = await DbUtil.select_user_with_id(client, user);
         const role = await DbRoll.find_user_in_room_roll(client,user,roomId);
-        listOfUsers.push([user, username.username, role.role]);
+        if (user != userId) {
+          listOfUsers.push([user, username.username, role.role]);
+        }
       }
 	    client.end();
 	    return res.status(200).json({user_list: listOfUsers});
@@ -201,6 +203,12 @@ export default (app) => {
       if (row !== null){
         our_role = row.role;
         set_role_flag = true;
+      }
+      if (row.role === DbRoll.ROLE_BANNED) {
+        const errString = "ENTER ROOM CLIENT ERROR #7: You have been banned from this room"
+        client.end()
+        console.log(errString);
+        return res.status(400).json({message: "You have been banned from this room."});
       }
     } catch (err){
       const errString = "ENTER ROOM CLIENT ERROR #4:" + err;

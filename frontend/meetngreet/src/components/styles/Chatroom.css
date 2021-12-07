@@ -1,5 +1,7 @@
 .chatroom-container {
     padding-top: 50px;
+    z-index: 1;
+    position: relative;
 }
 
 .chatroom-container > * {
@@ -7,9 +9,12 @@
 }
 
 .chatroom {
-    display: flex;
+    display: table;
     flex-direction: row;
     align-items: center;
+    z-index: 1;
+    position: absolute;
+    height: 80vh;
 }
 
 .chatroom-background {
@@ -32,7 +37,7 @@
     /* Card Shadow */
     box-shadow: 0px 4px 8px 2px rgba(57, 53, 52, 0.2);
     border-radius: 12px;
-
+    display: table-cell;
 }
 
 .chat-messages {
@@ -46,4 +51,59 @@
     position: absolute;
     top: 200px;
     left: 100px;
+}
+
+div#game-container {
+    height: 80vh;
+    width: 70vw;
+    margin-left: auto;
+    margin-right: 0;
+}
+
+.toggle-button {
+  width: 100vw;
+  background-color: #1D4FB4;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: Work Sans;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 21px;
+  position: absolute;
+  bottom: 10px;
+  left: 0px;
+  line-height: 25px;
+  transition-duration: 0.4s;
+  z-index: 1;
+}
+
+@media only screen and (max-width: 768px) {
+    .chatroom-card-frame {
+        position: fixed;
+        top: 60px;
+        left: 0px;
+        width: 22vw;
+        background: #4f8fea;
+        display: block;
+        overflow: auto;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 2%;
+        flex-direction: column;
+        text-align: center;
+        height: 80vh;
+        /* Card Shadow */
+        box-shadow: 0px 4px 8px 2px rgba(57, 53, 52, 0.2);
+        border-radius: 12px;
+        z-index: 50;
+
+    }
+    div#game-container {
+        height: 80vh;
+        width: 100vw;
+    }
 }

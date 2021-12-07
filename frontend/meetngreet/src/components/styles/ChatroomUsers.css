@@ -47,3 +47,51 @@
     top: 200px;
     left: 100px;
 }
+
+.button-chat {
+  width: fit-content;
+  background-color: #1D4FB4;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: Work Sans;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 21px;
+  line-height: 25px;
+  transition-duration: 0.4s;
+}
+
+@media only screen and (max-width: 768px) {
+    .chatroom-card-frame {
+        width: 100vw;
+    }
+    .chatroom-container > * {
+        margin-left: 0%;
+    }
+    .chat-messages {
+        height: 40vh;
+        width: 100%;
+        background-color: #F3F7F9;
+        overflow-y: scroll;
+    }
+    .button-chat {
+      width: 100%;
+      background-color: #1D4FB4;
+      color: white;
+      padding: 14px 20px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: Work Sans;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 21px;
+      line-height: 25px;
+      transition-duration: 0.4s;
+    }
+}
