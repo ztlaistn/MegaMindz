@@ -21,7 +21,8 @@ export default class Chatroom extends React.Component {
             socketErrorMsg: "",
             ourRole: 0,
             setupStart: false,
-            setupComplete: false
+            setupComplete: false,
+            chatToggled: true
         };
         // Holds actual peer streams - when changed, there is no re-render
         this.peersRef = [];
@@ -32,6 +33,20 @@ export default class Chatroom extends React.Component {
         this.removePeersRef = this.removePeersRef.bind(this);
         this.findPeersRefById = this.findPeersRefById.bind(this);
         this.mutePeerByUsername = this.mutePeerByUsername.bind(this);
+    }
+
+    toggleChat = () => {
+        if(this.state.chatToggled === false){
+            this.setState({
+                  chatToggled: true
+            });
+            document.getElementById("chat").style.display = "block";
+        } else {
+            this.setState({
+                  chatToggled: false
+            });
+            document.getElementById("chat").style.display = "none";
+        }
     }
 
     componentDidMount() {
@@ -178,20 +193,24 @@ export default class Chatroom extends React.Component {
             <div class="chatroom-container">
                 <BrowserView>
                     <div class="chatroom">
-                        <Gamified
-                            socket={this.state.socket}
-                            username={this.state.username}
-							setupStatus={this.state.setupComplete}
-                            mutePeerByUsername={this.mutePeerByUsername}
-                            mobile={false}
-                        />
-                        <Chat
-                            socket={this.state.socket}
-                            username={this.state.username}
-                            handleSocketError={this.handleSocketError}
-                            role = {this.state.ourRole}
-                            roomId={this.state.roomId}
-                        />
+                        <div id="game-container">
+                            <Gamified
+                                socket={this.state.socket}
+                                username={this.state.username}
+                                setupStatus={this.state.setupComplete}
+                                mutePeerByUsername={this.mutePeerByUsername}
+                                mobile={false}
+                            />
+                        </div>
+                        <div id="chat">
+                            <Chat
+                                socket={this.state.socket}
+                                username={this.state.username}
+                                handleSocketError={this.handleSocketError}
+                                role = {this.state.ourRole}
+                                roomId={this.state.roomId}
+                            />
+                        </div>
                         <VoiceSession
                             videoEnabled={false}
                             socket={this.state.socket}
@@ -204,21 +223,26 @@ export default class Chatroom extends React.Component {
                 </BrowserView>
                 <MobileView>
                     <div class="chatroom-mobile">
-                        <Gamified
-                            socket={this.state.socket}
-                            username={this.state.username}
-							setupStatus={this.state.setupComplete}
-                            mutePeerByUsername={this.mutePeerByUsername}
-                            mobile={true}
-                        />
+                        <div id="game-container">
+                            <Gamified
+                                socket={this.state.socket}
+                                username={this.state.username}
+                                setupStatus={this.state.setupComplete}
+                                mutePeerByUsername={this.mutePeerByUsername}
+                                mobile={true}
+                            />
+                        </div>
+                        <div id="chat">
+                            <Chat
+                                socket={this.state.socket}
+                                username={this.state.username}
+                                handleSocketError={this.handleSocketError}
+                                role = {this.state.ourRole}
+                                roomId={this.state.roomId}
+                            />
+                        </div>
                         <br/>
-                        <Chat
-                            socket={this.state.socket}
-                            username={this.state.username}
-                            handleSocketError={this.handleSocketError}
-                            role = {this.state.ourRole}
-                            roomId={this.state.roomId}
-                        />
+                        <input type="button" value="Toggle Chat" className="toggle-button" onClick={this.toggleChat}/>
                         <VoiceSession
                             videoEnabled={false}
                             socket={this.state.socket}
