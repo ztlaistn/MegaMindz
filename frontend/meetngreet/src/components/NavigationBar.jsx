@@ -5,12 +5,15 @@ import {Link} from 'react-router-dom';
 import {BrowserView, MobileView} from 'react-device-detect';
 import ModalMenu from './ModalMenu.jsx';
 
+import MicOnButton from "./elements/MicOn";
+import MicOffButton from "./elements/MicOff";
+
 class NavigationBar extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             menuToggled: false,
-            muteText: "Mute"
+            muted: false
         };
     };
 
@@ -68,10 +71,10 @@ class NavigationBar extends React.Component {
         // toggle
         document.getElementById("our-media-device").srcObject.getAudioTracks()[0].enabled = !document.getElementById("our-media-device").srcObject.getAudioTracks()[0].enabled;
         // change text of mute button
-        const buttonText = this.state.muteText == "Mute" ? "Unmute" : "Mute";
+        //const buttonText = this.state.muteText == "Mute" ? "Unmute" : "Mute";
         this.setState({
-            muteText: buttonText
-        })
+            muted: !this.state.muted
+        });
     };
 
     userSettings = () => {
@@ -159,7 +162,7 @@ class NavigationBar extends React.Component {
                         <input type="button" value={"Room Code: " + sessionStorage.getItem("roomId")} className="button-primary"/>
                     </li>
                     <li>
-                        <input type="button" value={this.state.muteText} className="button-chatroom" onClick={this.toggleMute}/>
+                        {this.state.muted ? <MicOffButton onClick={this.toggleMute} /> : <MicOnButton onClick={this.toggleMute} />}
                     </li>
                     <li>
                         <input type="button" value="Menu" class="button-chatroom-dropdown"/>
