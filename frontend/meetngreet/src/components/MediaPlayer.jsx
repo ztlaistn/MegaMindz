@@ -18,9 +18,9 @@ const MediaPlayer = (props) => {
  if (props.videoEnabled){
         return(
             <div class="video-container">
-                <video playsInline autoPlay ref={ref} id={props.id}/>
-                {/* Render username under video */}
+                {/* Render username above video */}
                 <p class="video-name-label title-font">{props.id}</p>
+                <video playsInline autoPlay ref={ref} id={props.id}/>
             </div>
         );
     } else{
