@@ -206,7 +206,7 @@ export default class Home extends React.Component {
                 <br/>
                     <input type="button" value="User Account" id = "bottom-container" className="button-secondary" onClick={this.toUserAccount} />
                     <br/>
-                    <input type="button" value="Create Room" className="button-primary" onClick={this.create_room}/>
+                    <input type="button" value="Create Chat Room" className="button-primary" onClick={this.create_room}/>
                 <br/>
                     <input type="button" value="Create Video Room" className="button-primary" onClick={this.newVideoRoom}/>
                     <br/>
