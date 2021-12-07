@@ -49,3 +49,16 @@
     font-family: Work Sans;
     line-height: 20px;
 }
+
+@media only screen and (max-width: 768px) {
+    .videoroom {
+        padding: 0px;
+    }
+    .media {
+        display: block;
+    }
+
+    .video-container {
+        width: 100%;
+    }
+}
