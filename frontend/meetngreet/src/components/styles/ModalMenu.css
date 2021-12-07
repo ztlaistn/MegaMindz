@@ -33,5 +33,6 @@
   transform: translate(-50%, -50%);
   width: 800px;
   height: 480px;
-  
+  overflow: hidden;
+  overflow-y: scroll;
 }

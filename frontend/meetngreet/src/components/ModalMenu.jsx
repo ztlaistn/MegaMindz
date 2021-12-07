@@ -26,8 +26,6 @@ export default class ModalMenu extends React.Component {
                 <div id="modalhelp">
                 <h1>Meet N Greet</h1><br/>
                 <h2>Help Menu</h2><br/>
-                <br/>
-                <br/>
                 <h3>General Usage:</h3><br/>
                 Click on an area on a map to move there<br/>
                 As you approach other users, their name will change color as you enter the audible range.<br/>
@@ -36,7 +34,6 @@ export default class ModalMenu extends React.Component {
                 You can talk to everybody in the room using the text chat in the middle right area.<br/>
                 You can share the room code that appears at the top with other people.<br/>
                 You can see all the other users in the room by clicking "Menu", then "Users in Room"<br/>
-                <br/>
                 <br/>
                 <h3>Administration:</h3><br/>
                 If you have elevated permissions in this room you can access "Menu", then "Admin Options".<br/>
