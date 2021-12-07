@@ -18,8 +18,8 @@ import chatroom_sprite_test from "../assets/chatroom-idle-test.png";
 //Initialize game as HTML component
 export default function Gamified({socket, username, setupStatus, mutePeerByUsername, mobile}) {
     var isClicking = false;
-    var scene_width = "70%";
-    var scene_height = "80%";
+    var scene_width = "100%";
+    var scene_height = "100%";
     var character_width = 100;
     var character_height = 128;
     var name_distance_x = 55;
@@ -38,15 +38,20 @@ export default function Gamified({socket, username, setupStatus, mutePeerByUsern
     var user_font_params = { fontFamily: 'Work Sans', color: '#FFFFFF', stroke: '#000000', strokeThickness: 5, fontSize: font_size };
     var active_font_params = { fontFamily: 'Work Sans', color: '#58CFEA', stroke: '#000000', strokeThickness: 5, fontSize: font_size };
     var inactive_font_params = { fontFamily: 'Work Sans', color: '#F5A623', stroke: '#000000', strokeThickness: 5, fontSize: font_size };
-    console.log(socket);
     return(
     <GameComponent
+    className="game"
     config={{
         //Define game element
         width: scene_width,
         height: scene_height,
         physics: {
             default: 'arcade'
+        },
+        scale: {
+            parent: "game-container",
+            autoCenter: Phaser.Scale.NO_CENTER,
+            mode: Phaser.Scale.FIT
         },
         scene: {
             preload: function() {
@@ -112,7 +117,13 @@ export default function Gamified({socket, username, setupStatus, mutePeerByUsern
                 
                 //Populate the room with other characters
                 socket.on('new-character-event', function(player){
-                    if(player.username !== sessionStorage.getItem("username")){
+                    if(!gotUpdate && self.otherPlayers.length === 0){
+                        console.log("Requesting another position update in new character.")
+                        const connData = {
+                            auth: "Bearer " + sessionStorage.getItem("token"),
+                        };
+                        socket.emit('request-update-all', connData);
+                    }else if(player.username !== sessionStorage.getItem("username")){
                         const otherPlayer = self.add.sprite(player.x, player.y, "s" + player.sprite);
                         otherPlayer.playerId = player.username;
                         otherPlayer.displayWidth = character_width;
@@ -145,22 +156,38 @@ export default function Gamified({socket, username, setupStatus, mutePeerByUsern
                 //Updates the movement of characters on the local screen
                 socket.on('new-move', function(player) {
                     // console.log(player);
-                    self.otherPlayers.getChildren().forEach(function(otherPlayer) {
-                        if (player.username === otherPlayer.playerId) {
-                            otherPlayer.setPosition(player.x, player.y);
-                        }
-                    });
-                    self.otherNames.getChildren().forEach(function(otherName) {
-                        if (player.username === otherName.playerId) {
-                            otherName.setPosition((player.x - name_distance_x), (player.y + name_distance_y));
-                        }
-                    })
+                    if(!gotUpdate && self.otherPlayers.length === 0){
+                        console.log("Requesting another position update in new-move.")
+                        const connData = {
+                            auth: "Bearer " + sessionStorage.getItem("token"),
+                        };
+                        socket.emit('request-update-all', connData);
+                    }else{
+                        self.otherPlayers.getChildren().forEach(function(otherPlayer) {
+                            if (player.username === otherPlayer.playerId) {
+                                otherPlayer.setPosition(player.x, player.y);
+                            }
+                        });
+                        self.otherNames.getChildren().forEach(function(otherName) {
+                            if (player.username === otherName.playerId) {
+                                otherName.setPosition((player.x - name_distance_x), (player.y + name_distance_y));
+                            }
+                        })
+                    }
                 });
 
                 //Event listener for clicking on background to move
                 //ensures that clicking outside the game doesn't move the character
                 this.background.on('pointerdown', function () {
-                    isClicking = true;
+                    if(!gotUpdate && mobile && self.otherPlayers.length === 0){
+                        console.log("Requesting another position update in pointer down.")
+                        const connData = {
+                            auth: "Bearer " + sessionStorage.getItem("token"),
+                        };
+                        socket.emit('request-update-all', connData);
+                    }else{
+                        isClicking = true;
+                    }
                 });
 
             },
@@ -181,7 +208,7 @@ export default function Gamified({socket, username, setupStatus, mutePeerByUsern
     
                     //Perform distance calculations
                     this.otherNames.getChildren().forEach((otherName) => {
-                        if(Math.sqrt((Math.pow((otherName.x - this.name.x), 2)) + (Math.pow((otherName.y - this.name.y), 2))) < 250){
+                        if((Math.abs(otherName.x - this.name.x) < 250) && (Math.abs(otherName.y - this.name.y) < 250)){
                             otherName.setStyle(active_font_params);
                             mutePeerByUsername(otherName.playerId, false);
                         } else {

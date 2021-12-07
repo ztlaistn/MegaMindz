@@ -2,6 +2,7 @@ import React from "react";
 import "./styles/Text.css";
 import "./styles/Input.css";
 import "./styles/ChatroomUsers.css";
+import "./styles/AdminSettings.css";
 
 
 export default class ChatroomUsers extends React.Component {
@@ -246,9 +247,8 @@ export default class ChatroomUsers extends React.Component {
         }
         if (!usersLoaded) {
             return (
-                
-                <div class="chatroom-container">
-                    <div class="chatroom">
+                <div class="admin-option-list">
+                    <div class="admin-option">
                         No available options.
                     </div>
                 </div>
@@ -256,49 +256,41 @@ export default class ChatroomUsers extends React.Component {
         }
         else {
             return (
-                <div class="chatroom-container">
-                    <div class="chatroom">
-                    Demote User
-                    {users.user_list.map((user) => ( 
-                    <input type="button" value={user[1]} className="button-primary" onClick={() => this.demoteUser(user[0])}/>
-                    ))}
+                <div class="admin-option-list">
+                    <div class="admin-option">
+                        Make User VIP
+                        {users.user_list.map((user) => (
+                            <input type="button" value={user[1]} className="button-user" onClick={() => this.makeUserVIP(user[0])}/>
+                        ))}
                     </div>
                     <br/>
-                    <br/>
-                    <div class="chatroom">
-                    Make User VIP
-                    {users.user_list.map((user) => ( 
-                    <input type="button" value={user[1]} className="button-primary" onClick={() => this.makeUserVIP(user[0])}/>
-                    ))}
+                    <div class="admin-option">
+                        Make User Moderator
+                        {users.user_list.map((user) => (
+                            <input type="button" value={user[1]} className="button-user" onClick={() => this.makeUserModerator(user[0])}/>
+                        ))}
                     </div>
                     <br/>
-                    <br/>
-                    <div class="chatroom">
-                    Make User Moderator
-                    {users.user_list.map((user) => ( 
-                    <input type="button" value={user[1]} className="button-primary" onClick={() => this.makeUserModerator(user[0])}/>
-                    ))}
+                    <div class="admin-option">
+                        Demote User
+                        {users.user_list.map((user) => (
+                            <input type="button" value={user[1]} className="button-user" onClick={() => this.demoteUser(user[0])}/>
+                        ))}
                     </div>
                     <br/>
-                    <br/>
-                    <div class="chatroom">
-                    Kick User From Room
-                    {users.user_list.map((user) => ( 
-                    <input type="button" value={user[1]} className="button-primary" onClick={() => this.kickUser(user[0])}/>
-                    ))}
+                    <div class="admin-option">
+                        Kick User From Room
+                        {users.user_list.map((user) => (
+                            <input type="button" value={user[1]} className="button-user" onClick={() => this.kickUser(user[0])}/>
+                        ))}
                     </div>
                     <br/>
-                    <br/>
-                    <div class="chatroom">
-                    Ban User From Room
-                    {users.user_list.map((user) => ( 
-                    <input type="button" value={user[1]} className="button-primary" onClick={() => this.banUser(user[0])}/>
-                    ))}
+                    <div class="admin-option">
+                        Ban User From Room
+                        {users.user_list.map((user) => (
+                            <input type="button" value={user[1]} className="button-user" onClick={() => this.banUser(user[0])}/>
+                        ))}
                     </div>
-                    <br/>
-                    <br/>
-                    
-                    
                 </div>
             );
         }
