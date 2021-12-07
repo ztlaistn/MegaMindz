@@ -7,11 +7,13 @@ import "./styles/Gamified.css";
 //Import game images here
 import chatroom_background from "../assets/chatroom-background.jpg";
 import chatroom_character from "../assets/chatroom-character.gif";
-import chatroom_sprite_default from "../assets/sample-profile-cropped.png";
+import chatroom_sprite_default from "../assets/sample-profile.png";
 import chatroom_sprite_1 from "../assets/sprite1.png";
 import chatroom_sprite_2 from "../assets/sprite2.png";
 import chatroom_sprite_3 from "../assets/sprite3.png";
 import chatroom_sprite_4 from "../assets/sprite4.png";
+import chatroom_sprite_5 from "../assets/sprite5.png";
+import chatroom_sprite_6 from "../assets/sprite6.png";
 
 import chatroom_sprite_test from "../assets/chatroom-idle-test.png";
 
@@ -21,9 +23,9 @@ export default function Gamified({socket, username, setupStatus, mutePeerByUsern
     var scene_width = "100%";
     var scene_height = "100%";
     var character_width = 100;
-    var character_height = 128;
-    var name_distance_x = 55;
-    var name_distance_y = 70;
+    var character_height = 100;
+    var name_distance_x = 40;
+    var name_distance_y = 55;
     var font_size = 20;
     var movement_speed = 5;
     if(mobile === true){
@@ -63,6 +65,8 @@ export default function Gamified({socket, username, setupStatus, mutePeerByUsern
                 this.load.image('s2', chatroom_sprite_2);
                 this.load.image('s3', chatroom_sprite_3);
                 this.load.image('s4', chatroom_sprite_4);
+                this.load.image('s5', chatroom_sprite_5);
+                this.load.image('s6', chatroom_sprite_6);
             },
             create: function() {
                 //Add background; define sizes

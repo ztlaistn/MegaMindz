@@ -4,11 +4,13 @@ import "./styles/Home.css";
 
 import login_icon from "../assets/login_icon.png";
 import {Link, Redirect} from "react-router-dom";
-import sample_profile from "../assets/sample-profile-cropped.png";
+import sample_profile from "../assets/sample-profile.png";
 import sprite_one from "../assets/sprite1.png";
 import sprite_two from "../assets/sprite2.png";
 import sprite_three from "../assets/sprite3.png";
 import sprite_four from "../assets/sprite4.png";
+import sprite_five from "../assets/sprite5.png";
+import sprite_six from "../assets/sprite6.png";
 
 
 export default class Home extends React.Component {
@@ -18,14 +20,9 @@ export default class Home extends React.Component {
           username: "",
             roomId: "",
             videoRoomId: "",
-            sprites_map : {0:sample_profile,1:sprite_one,2:sprite_two,3:sprite_three, 4:sprite_four},
+            sprites_map : {0:sample_profile,1:sprite_one,2:sprite_two,3:sprite_three, 4:sprite_four, 5:sprite_five, 6:sprite_six},
             time: new Date().toLocaleString()
-
         };
-
-
-
-
     }
 
     change_Handler(field, e) {
