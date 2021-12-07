@@ -8,26 +8,28 @@ DROP TABLE IF EXISTS user_info;
 CREATE TABLE
 user_info (
 -- It will generate an unique int userID when we add a new row
-	UserID 			SERIAL NOT NULL PRIMARY KEY,
+	user_id 		SERIAL NOT NULL PRIMARY KEY,
 -- Fields required to create account
-	Email 			VARCHAR(100) NOT NULL DEFAULT '',
-	Username 		VARCHAR(50) NOT NULL DEFAULT '',
-	Pass			VARCHAR(50) NOT NULL DEFAULT '',
+	email 			VARCHAR(100) NOT NULL DEFAULT '',
+	username 		VARCHAR(50) NOT NULL DEFAULT '',
+	hash			VARCHAR(100) NOT NULL DEFAULT '',
+--salt				VARCHAR(50) NOT NULL DEFAULT '',
 -- Additional account information (feel free to add more to this, as we add features)
-	FirstName		VARCHAR(30) NOT NULL DEFAULT '',
-	LastName		VARCHAR(30) NOT NULL DEFAULT '',
-	DOB				DATE DEFAULT '1900-01-01',
-	Location		VARCHAR(50) NOT NULL DEFAULT '',
-	Status			VARCHAR(200) NOT NULL DEFAULT '',
-	Skills			VARCHAR(200) NOT NULL DEFAULT '',
-	CurrRoom		INT DEFAULT NULL,
+--first_name		VARCHAR(30) NOT NULL DEFAULT '',
+--last_name			VARCHAR(30) NOT NULL DEFAULT '',
+	full_name		VARCHAR(80) NOT NULL DEFAULT '',
+	dob				DATE DEFAULT '1900-01-01',
+	location		VARCHAR(50) NOT NULL DEFAULT '',
+	status			VARCHAR(200) NOT NULL DEFAULT '',
+	skills			VARCHAR(200) NOT NULL DEFAULT '',
+	curr_room		INT DEFAULT NULL,
 -- Might want to just disable row, rather than delete entry when account is removed
-	Enabled			SMALLINT NOT NULL DEFAULT 0
+	enabled			SMALLINT NOT NULL DEFAULT 1
 );
 
-CREATE INDEX index1 ON user_info(Enabled, Username, Pass);
-CREATE INDEX index2 ON user_info(Enabled, Lastname, Firstname);
-CREATE INDEX index3 ON user_info(Enabled, CurrRoom, UserID);
+CREATE INDEX index1 ON user_info(enabled, user_id, hash);
+CREATE INDEX index2 ON user_info(enabled, curr_room, user_id);
+CREATE INDEX index3 On user_info(enabled, email, user_id)
 	
 -- Will print table structure when created
 -- DESCRIBE user_info;

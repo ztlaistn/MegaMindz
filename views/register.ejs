@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Meet N Greet</title>
+    <link rel="stylesheet" href="styles/index.css" />
+    <link rel="stylesheet" href="styles/login.css" />
+    <link rel="stylesheet" href="styles/cardtemplate.css" />
+    <link rel="stylesheet" href="styles/input.css" />
+  </head>
+  <body>
+      <div class="App">
+        <div class="App-container">
+          <div class="card-template">
+            <div class="card-frame">
+              <img src="imgs/logo_gray.png" class="alt-logo" alt=""/>
+              <br/>
+              <div class="card-title">Register</div>
+              <div id="registration-form">
+                  <div class="registration-credentials">
+                      <form action="/auth/register" method="post">
+                          <label for="email">Email Address</label>
+                          <input type="email" required id="email" name="email" placeholder="Email" onchange=""/>
+                          <label for="username">Username</label>
+                          <input type="text" required id="username" name="username" placeholder="Username" onchange=""/>
+                          <label for="password1">Password (Must be at least 8 characters)</label>
+                          <input type="password" required id="password1" name="password1" placeholder="Password" onchange=""/>
+                          <label for="password2">Confirm Password</label>
+                          <input type="password" required id="password2" name="password2" placeholder="Password" onchange=""/>
+                          <input type="submit" value="Register" class="button-secondary"/>
+                      </form>
+                      <br/>
+                  </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  </body>
+</html>

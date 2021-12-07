@@ -1,0 +1,6 @@
+.chat-messages {
+    height: 50vh;
+    width: 100%;
+    background-color: #F3F7F9;
+    overflow-y: scroll;
+}
