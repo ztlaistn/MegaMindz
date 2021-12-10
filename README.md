@@ -1,9 +1,10 @@
 # Team MegaMindz
 # Meet N Greet
-Meet N Greet will be a gamified conferencing app. This will be web based since the primary focus is for users to join on their computers. 
+The pandemic has changed how people meet and talk to each other. Schools, jobs, and organizations had moved online and group calls became the new norm. Now, many people are seeing the benefits of virtual meetings- it can be more accessible, productive, and allows flexible work environments! However, other apps only allow only one user to talk at a time. 
 
-We will fill in the niche that zoom lacks- allow users to meet others organically, and allow multiple conversations to occur. Zoom is the primary video conferencing app, but a main drawback is that only one user can talk at a time. Our app will allow users to navigate to other users in the room and have group or one on one conversations at the same time.
-We will likely cater this to a conference or education based setting.
+Meet N Greet is a conferencing app that allows people to meet others and network online in a unique way. Attendees can explore the room and have group or one-on-one conversations at the same time. It aims to be useful for a conference, networking event, or education based setting.
+
+It is a unique way for people to network online and aims to help facilitate meeting and connection!
 
 ## Getting Started
 - Download the app
